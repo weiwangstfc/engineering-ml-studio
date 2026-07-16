@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+
+<html lang="" xml:lang="" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<title>Approval and Operation Guide</title>
+<style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  
+
+    /* Local Regression Studio v1.0.11 standalone documentation layout fix.
+       Pandoc's default max-width was too narrow when guides opened from the sidebar. */
+    body {
+      max-width: none !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: var(--bg, #f6f8fa) !important;
+      color: var(--text, #172026) !important;
+      font-size: 16px;
+    }
+    .page {
+      max-width: min(1180px, calc(100vw - 48px)) !important;
+      margin: 0 auto !important;
+      padding: clamp(1rem, 2.5vw, 2.5rem) !important;
+    }
+    .card {
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 auto !important;
+    }
+    nav#TOC, #TOC {
+      background: var(--accent, #eaf6f8);
+      border: 1px solid var(--line, #d7e0e5);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0 1.5rem;
+      max-height: none;
+      overflow: visible;
+    }
+    img, svg, canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    table {
+      width: 100%;
+      max-width: 100%;
+    }
+    @media (max-width: 700px) {
+      .page {
+        max-width: calc(100vw - 16px) !important;
+        padding: 0.75rem !important;
+      }
+      .doc-nav {
+        gap: 0.4rem;
+      }
+      .doc-nav a {
+        font-size: 0.92rem;
+        padding: 0.35rem 0.5rem;
+      }
+    }
+
+  </style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="./help.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page docs-shell"><nav class="doc-nav"><a href="./user-guide.html">User guide</a><a href="./step-4-model-options.html">Step 4 model options</a><a href="./validation-and-applicability.html">Validation and applicability</a><a href="./approval-and-operation.html">Approval and operation</a><a href="./security-and-privacy.html">Security and privacy</a></nav><p class="fine">Bundled with Local Regression Studio v1.0.11. These files work offline and on static hosting such as GitHub Pages.</p><div class="card doc-card">
+<header id="title-block-header">
+<h1 class="title">Approval and Operation Guide</h1>
+</header>
+<div class="doc-layout"><aside aria-label="Document contents" class="doc-sidebar"><nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#approval-and-operation-guide" id="toc-approval-and-operation-guide">Approval and Operation Guide</a>
+<ul>
+<li><a href="#purpose" id="toc-purpose">Purpose</a></li>
+<li><a href="#prepare-the-model-for-review" id="toc-prepare-the-model-for-review">1. Prepare the model for
+review</a></li>
+<li><a href="#record-operational-documentation" id="toc-record-operational-documentation">2. Record operational
+documentation</a></li>
+<li><a href="#approval-statuses" id="toc-approval-statuses">3. Approval
+statuses</a>
+<ul>
+<li><a href="#draft" id="toc-draft">Draft</a></li>
+<li><a href="#approved" id="toc-approved">Approved</a></li>
+<li><a href="#approved-with-conditions" id="toc-approved-with-conditions">Approved with conditions</a></li>
+<li><a href="#rejected" id="toc-rejected">Rejected</a></li>
+<li><a href="#retired" id="toc-retired">Retired</a></li>
+</ul></li>
+<li><a href="#operational-input-schema" id="toc-operational-input-schema">4. Operational input schema</a></li>
+<li><a href="#validation-report" id="toc-validation-report">5.
+Validation report</a></li>
+<li><a href="#approved-prediction-package" id="toc-approved-prediction-package">6. Approved prediction
+package</a></li>
+<li><a href="#prediction-only-mode" id="toc-prediction-only-mode">7.
+Prediction-only mode</a></li>
+<li><a href="#prediction-output-provenance" id="toc-prediction-output-provenance">8. Prediction output
+provenance</a></li>
+<li><a href="#package-review-and-retirement" id="toc-package-review-and-retirement">9. Package review and
+retirement</a></li>
+<li><a href="#security-limitations" id="toc-security-limitations">10.
+Security limitations</a></li>
+<li><a href="#v1.0-deployment-and-governance" id="toc-v1.0-deployment-and-governance">v1.0 deployment and
+governance</a></li>
+</ul></li>
+</ul>
+</nav></aside><main class="doc-main" id="main-content"><h1 id="approval-and-operation-guide">Approval and Operation Guide</h1><p><strong>Application:</strong> Local Regression Studio v1.0.11</p><h2 id="purpose">Purpose</h2><p>v1.0.11 separates model development from routine prediction. A
+technical user trains and validates a model, a responsible reviewer
+records an approval decision, and an operator loads an approved package
+in prediction-only mode.</p><p>This is a governance aid. It does not replace an organization’s
+authorization, quality, security or regulatory processes.</p><h2 id="prepare-the-model-for-review">1. Prepare the model for
+review</h2><p>Before approval:</p><ol type="1">
+<li>Use a defensible training/validation/test split.</li>
+<li>Review data-quality findings.</li>
+<li>Compare suitable candidate models.</li>
+<li>Inspect residual, uncertainty and group diagnostics.</li>
+<li>Configure measurable acceptance criteria.</li>
+<li>Confirm that the active model’s acceptance result is
+appropriate.</li>
+</ol><p>Full <code>Approved</code> status requires the configured acceptance
+criteria to pass. <code>Approved with conditions</code> requires written
+conditions.</p><h2 id="record-operational-documentation">2. Record operational
+documentation</h2><p>The approval workspace records:</p><ul>
+<li>Model name</li>
+<li>Model owner</li>
+<li>Reviewer or approver</li>
+<li>Decision date</li>
+<li>Next review date</li>
+<li>Intended use</li>
+<li>Prohibited or unsupported uses</li>
+<li>Known limitations</li>
+<li>Approval conditions</li>
+<li>Decision notes</li>
+</ul><p>Be specific. For example, name the supported process, sites,
+populations, materials, instruments, input range and decision type.</p><h2 id="approval-statuses">3. Approval statuses</h2><h3 id="draft">Draft</h3><p>The model is still being developed or reviewed. It cannot be exported
+as an approved package.</p><h3 id="approved">Approved</h3><p>The configured acceptance criteria passed, required documentation is
+complete, and the review date is current.</p><h3 id="approved-with-conditions">Approved with conditions</h3><p>The model may be used only under the documented conditions. This
+status requires a non-empty conditions field.</p><h3 id="rejected">Rejected</h3><p>The model is not authorized for operation. Record the reason and
+required corrective action.</p><h3 id="retired">Retired</h3><p>The model was previously used but is no longer authorized. Retain the
+record for traceability.</p><h2 id="operational-input-schema">4. Operational input schema</h2><p>The app derives ranges and categories from the fitted training
+preprocessor. These values are read-only. Add optional units and
+descriptions for operators.</p><p>Examples:</p><table>
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th>Unit</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>temperature</code></td>
+<td>°C</td>
+<td>Reactor inlet temperature</td>
+</tr>
+<tr class="even">
+<td><code>pressure</code></td>
+<td>bar</td>
+<td>Absolute operating pressure</td>
+</tr>
+<tr class="odd">
+<td><code>material</code></td>
+<td>—</td>
+<td>Approved material grade</td>
+</tr>
+</tbody>
+</table><p>A unit recorded in the package is documentation; the CSV format
+itself cannot prove that a numeric value was measured in that unit.
+Operators must follow the documented data procedure.</p><h2 id="validation-report">5. Validation report</h2><p>Choose <strong>Download validation report (HTML)</strong>. The report
+includes:</p><ul>
+<li>Model and dataset identity</li>
+<li>Dataset fingerprint</li>
+<li>Intended and prohibited uses</li>
+<li>Approval state and history</li>
+<li>Independent test metrics</li>
+<li>Acceptance outcomes</li>
+<li>Operational input schema</li>
+<li>Limitations and conditions</li>
+</ul><p>Open the HTML file in a browser and use <strong>Print or save as
+PDF</strong> when a PDF record is required.</p><h2 id="approved-prediction-package">6. Approved prediction package</h2><p>Choose <strong>Download approved prediction package</strong> only
+after the model is operationally eligible.</p><p>The package contains:</p><ul>
+<li>Fitted preprocessing and model</li>
+<li>Target transformation</li>
+<li>Approval record</li>
+<li>Validation/evaluation summaries</li>
+<li>Operational input schema</li>
+<li>Up to three embedded self-test input/output vectors</li>
+<li>SHA-256 integrity metadata</li>
+</ul><p>The original training CSV is not included.</p><h2 id="prediction-only-mode">7. Prediction-only mode</h2><p>On an operator computer:</p><ol type="1">
+<li>Start the application.</li>
+<li>Choose <strong>Prediction-only mode</strong>.</li>
+<li>Load the <code>.mlpredict.json</code> package.</li>
+<li>Confirm the green package summary.</li>
+<li>Upload a compatible prediction CSV.</li>
+<li>Review applicability warnings.</li>
+<li>Download predicted values.</li>
+</ol><p>The app verifies integrity, approval status, review date and
+self-tests before enabling operational use.</p><h2 id="prediction-output-provenance">8. Prediction output
+provenance</h2><p>Downloaded prediction CSV files include:</p><ul>
+<li><code>package_id</code></li>
+<li><code>approval_status</code></li>
+<li><code>review_date</code></li>
+<li><code>integrity_verified</code></li>
+<li>Applicability status and reasons</li>
+<li>Prediction and interval fields</li>
+</ul><p>Keep these columns with operational records.</p><h2 id="package-review-and-retirement">9. Package review and
+retirement</h2><p>Before the review date:</p><ul>
+<li>Compare recent measured outcomes with predictions.</li>
+<li>Investigate distribution shift and new categories.</li>
+<li>Reassess group performance and interval coverage.</li>
+<li>Retrain or revalidate when the data-generating process changes.</li>
+<li>Issue a new package after approval.</li>
+</ul><p>Do not edit an approved JSON package manually. Any edit causes
+integrity verification to fail.</p><h2 id="security-limitations">10. Security limitations</h2><p>SHA-256 confirms that the package has not changed since export. It is
+not a digital signature and does not prove the identity of the approver.
+Store packages in an access-controlled location and use organizational
+signing or document-management controls when required.</p><hr/><h2 id="v1.0-deployment-and-governance">v1.0 deployment and
+governance</h2><p>v1.0 preserves the documented modelling behaviour and adds separate
+deployment editions, versioned governance lifecycle records, monitoring
+and revalidation, model-change assessments, local recovery, stricter
+import/export validation, and optional verification of organizational
+signatures against deployment-pinned public keys. See the package-root
+<code>DEPLOYMENT_GUIDE.md</code>, <code>GOVERNANCE_GUIDE.md</code>,
+<code>MONITORING_GUIDE.md</code>, <code>SECURITY.md</code>, and
+<code>MIGRATION_GUIDE.md</code>.</p></main></div></div></div>
+</body>
+</html>

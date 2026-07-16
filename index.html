@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Governed, private browser-only regression modelling, approval, prediction and monitoring.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
+  <title>Local Regression Studio v1.0.11</title>
+  <link rel="stylesheet" href="./css/app.css">
+</head>
+<body>
+  <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">Governed browser-only machine learning · v1.0.11</p>
+      <h1>Local Regression Studio</h1>
+      <p class="subtitle">Prepare, compare, validate, approve, operate and monitor regression models locally with versioned governance records.</p>
+    </div>
+    <div class="header-actions">
+      <label class="language-control">
+        <span>Language</span>
+        <select id="languageSelector" aria-label="Interface language">
+          <option value="auto">Automatic (browser)</option>
+          <option value="en">English</option>
+          <option value="zh-CN">简体中文</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+        </select>
+      </label>
+      <span id="runtimeMode" class="status-pill status-loading">Loading libraries…</span>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <aside class="sidebar" aria-label="Workflow steps">
+      <ol class="step-list">
+        <li><a href="#step-upload"><span>1</span>Load data</a></li>
+        <li class="training-only"><a href="#step-features"><span>2</span>Features</a></li>
+        <li class="training-only"><a href="#step-preprocess"><span>3</span>Preprocess</a></li>
+        <li class="training-only"><a href="#step-model"><span>4</span>Model</a></li>
+        <li class="training-only"><a href="#step-split"><span>5</span>Split & train</a></li>
+        <li class="training-only"><a href="#step-diagnostics"><span>6</span>Diagnostics</a></li>
+        <li><a href="#step-predict"><span>7</span>Predict</a></li>
+        <li class="governance-only"><a href="#step-monitor"><span>8</span>Monitor</a></li>
+      </ol>
+      <div class="privacy-card">
+        <strong>Local by design</strong>
+        <p>CSV contents, models and results stay on this device unless you explicitly save or download a file.</p>
+      </div>
+      <button id="privacyInfoBtn" class="button secondary sidebar-privacy-button" type="button">Privacy</button>
+      <div class="sidebar-system-card" aria-label="System utilities">
+        <strong>System</strong>
+        <button id="systemIntegrityBtn" class="text-button system-link" type="button">Runtime and integrity</button>
+        <button id="systemRecoveryBtn" class="text-button system-link" type="button">Recovery</button>
+      </div>
+      <div class="sidebar-help-card" aria-label="Help documentation">
+        <strong>Help</strong>
+        <a class="text-button system-link" href="./docs/html/user-guide.html" target="_blank" rel="noopener">User guide</a>
+        <a class="text-button system-link" href="./docs/html/step-4-model-options.html" target="_blank" rel="noopener">Step 4 model options</a>
+        <a class="text-button system-link" href="./docs/html/validation-and-applicability.html" target="_blank" rel="noopener">Validation and applicability</a>
+        <a class="text-button system-link" href="./docs/html/approval-and-operation.html" target="_blank" rel="noopener">Approval and operation</a>
+        <a class="text-button system-link" href="./docs/html/security-and-privacy.html" target="_blank" rel="noopener">Security and privacy</a>
+      </div>
+    </aside>
+
+    <section class="workspace">
+      <div id="alertRegion" class="alert-region" aria-live="polite"></div>
+
+      <section id="step-upload" class="panel">
+        <div class="panel-heading"><div><span class="step-kicker">Step 1</span><h2>Start and load data</h2></div></div>
+        <div id="dropZone" class="drop-zone training-only" tabindex="0" role="button" aria-label="Upload CSV file">
+          <input id="csvFile" type="file" accept=".csv,text/csv" hidden>
+          <div class="drop-icon">CSV</div>
+          <strong>Drop a CSV here or choose a file</strong>
+          <span>Recommended: up to 50,000 rows and 50 original columns</span>
+          <button id="chooseCsvBtn" class="button primary" type="button">Choose CSV</button>
+        </div>
+        <div class="action-row compact wrap">
+          <label class="file-button button secondary training-only">Open project<input id="projectFile" type="file" accept=".mlproject,.json,application/json" hidden></label>
+          <label class="file-button button secondary training-only">Load fitted model<input id="modelFile" type="file" accept=".mlmodel,.json,application/json" hidden></label>
+          <label class="file-button button primary">Load approved prediction package<input id="approvedPackageFile" type="file" accept=".mlpredict,.json,application/json" hidden></label>
+          <button id="predictionOnlyModeBtn" class="button secondary" type="button">Prediction-only mode</button>
+          <label class="toggle-inline training-only"><input id="forceOfflineMode" type="checkbox"> Use offline mode — local libraries only</label>
+        </div>
+        <p class="fine-print training-only">Offline mode reloads the app without attempting any CDN request. In either mode, CSV data is never sent to a CDN.</p>
+        <div id="datasetSummary" class="summary-grid hidden"></div>
+        <div id="previewWrap" class="table-wrap hidden"><table id="previewTable"></table></div>
+      </section>
+
+      <section id="step-features" class="panel training-only locked" aria-disabled="true">
+        <div class="panel-heading">
+          <div><span class="step-kicker">Step 2</span><h2>Select features and transform the target</h2></div>
+          <button id="autoFeaturesBtn" class="button secondary" type="button">Detect features automatically</button>
+        </div>
+        <div class="form-grid three">
+          <label>Target column<select id="targetColumn"><option value="">Choose target…</option></select></label>
+          <label>Target transformation
+            <select id="targetTransform">
+              <option value="none">None</option>
+              <option value="log">Natural logarithm</option>
+              <option value="log10">Log base 10</option>
+              <option value="sqrt">Square root</option>
+              <option value="boxcox">Box–Cox</option>
+              <option value="yeojohnson">Yeo–Johnson</option>
+            </select>
+          </label>
+          <label>Feature search<input id="featureSearch" type="search" placeholder="Filter columns"></label>
+        </div>
+        <div id="targetTransformHelp" class="info-box compact-box">Predictions and uncertainty bounds are converted back to the original target scale.</div>
+        <div class="feature-toolbar">
+          <button id="selectAllFeatures" class="text-button" type="button">Select all eligible</button>
+          <button id="clearFeatures" class="text-button" type="button">Clear selection</button>
+          <span id="featureCount">0 selected</span>
+        </div>
+        <div id="featureList" class="feature-list"></div>
+        <section class="subpanel data-quality-workspace" aria-live="polite">
+          <div class="panel-heading compact-heading">
+            <div><h3>Data-quality assistant <button id="dataQualityHelpBtn" class="help-button" type="button" aria-label="What does the data-quality assistant check?">?</button></h3><p class="fine-print">Automated checks update with the selected target and features. They identify common risks but do not replace scientific or domain review.</p></div>
+          </div>
+          <div id="dataQualitySummary" class="quality-summary">Load a CSV to run data-quality checks.</div>
+          <div class="table-wrap quality-table-wrap"><table id="dataQualityTable"></table></div>
+        </section>
+      </section>
+
+      <section id="step-preprocess" class="panel training-only locked" aria-disabled="true">
+        <div class="panel-heading"><div><span class="step-kicker">Step 3</span><h2>Configure preprocessing</h2></div></div>
+        <div class="form-grid three">
+          <label>Numeric missing values
+            <select id="numericMissing"><option value="mean">Replace with mean</option><option value="median">Replace with median</option><option value="zero">Replace with zero</option><option value="drop">Drop affected rows</option></select>
+          </label>
+          <label>Numeric scaling fitted on training data
+            <select id="numericScaling"><option value="standard">Standardise</option><option value="minmax">Min–max scale</option><option value="none">No scaling</option></select>
+          </label>
+          <label>Categorical missing values
+            <select id="categoricalMissing"><option value="missing">Use “Missing” category</option><option value="mode">Replace with most frequent</option><option value="drop">Drop affected rows</option></select>
+          </label>
+          <label>Categorical encoding
+            <select id="categoricalEncoding"><option value="onehot">One-hot encoding</option><option value="ordinal">Ordinal integer encoding</option><option value="exclude">Exclude categorical columns</option></select>
+          </label>
+          <label>Maximum categories per column<input id="maxCategories" type="number" min="2" max="200" value="50"></label>
+          <label class="toggle-card"><input id="dropFirstCategory" type="checkbox" checked><span><strong>Remove one reference category from each categorical feature</strong><small>Recommended for linear and ridge regression to avoid redundant one-hot columns. Usually unnecessary for tree models.</small></span></label>
+        </div>
+        <div id="preprocessEstimate" class="info-box">Select a target and at least one feature to estimate the processed feature count.</div>
+      </section>
+
+      <section id="step-model" class="panel training-only locked" aria-disabled="true">
+        <div class="panel-heading"><div><span class="step-kicker">Step 4</span><h2>Select a model and tune hyperparameters</h2><p class="fine-print"><strong>Regression only:</strong> these models predict a continuous numeric target. Classification targets are not supported in this release.</p></div></div>
+        <div class="model-grid">
+          <label class="model-card"><input type="radio" name="modelType" value="linear" checked><span><strong>Linear regression</strong><small>Fast, interpretable baseline with analytical prediction intervals.</small></span></label>
+          <label class="model-card"><input type="radio" name="modelType" value="ridge"><span><strong>Ridge regression</strong><small>L2 coefficient shrinkage with bootstrap uncertainty.</small></span></label>
+          <label class="model-card"><input type="radio" name="modelType" value="elasticnet"><span><strong>Elastic net</strong><small>Combined L1 and L2 shrinkage for sparse, correlated linear models.</small></span></label>
+          <label class="model-card"><input type="radio" name="modelType" value="robust"><span><strong>Huber robust regression</strong><small>Downweights large residuals to reduce outlier influence.</small></span></label>
+          <label class="model-card"><input type="radio" name="modelType" value="tree"><span><strong>Decision tree</strong><small>Nonlinear model with approximate leaf-based intervals.</small></span></label>
+          <label class="model-card"><input type="radio" name="modelType" value="forest"><span><strong>Random forest</strong><small>Tree ensemble with approximate between-tree intervals.</small></span></label>
+          <label class="model-card"><input type="radio" name="modelType" value="gboost"><span><strong>Gradient-boosted trees</strong><small>Sequential shallow trees for strong nonlinear tabular prediction.</small></span></label>
+          <label class="model-card"><input type="radio" name="modelType" value="knn"><span><strong>k-nearest neighbours</strong><small>Local prediction from similar processed training rows.</small></span></label>
+          <label class="model-card"><input type="radio" name="modelType" value="quantile"><span><strong>Linear quantile regression</strong><small>Predicts a conditional quantile and fitted lower/upper quantile bounds.</small></span></label>
+          <label class="model-card"><input type="radio" name="modelType" value="gp"><span><strong>Gaussian process</strong><small>Exact or representative-subset GP with native predictive uncertainty.</small></span></label>
+          <label class="model-card"><input type="radio" name="modelType" value="ann"><span><strong>Artificial neural network</strong><small>Feed-forward dense network with early stopping and approximate uncertainty.</small></span></label>
+        </div>
+        <div class="subpanel">
+          <div class="form-grid three">
+            <label>Tuning method
+              <select id="tuningMode"><option value="manual">Manual configuration</option><option value="grid">Grid search</option><option value="random">Ordinary random search</option><option value="lhs">Latin hypercube sampling</option></select>
+            </label>
+            <label id="searchTrialsLabel" class="hidden">Number of search samples<input id="searchTrials" type="number" min="2" max="64" value="12"></label>
+          </div>
+          <div id="modelParams"></div>
+          <div id="searchSummary" class="info-box compact-box">Manual configuration selected.</div>
+          <p class="fine-print">Grid values are generated from minimum, maximum and number of points. Tuning compares candidates on the validation set only; the test set remains isolated.</p>
+        </div>
+      </section>
+
+      <section id="step-split" class="panel training-only locked" aria-disabled="true">
+        <div class="panel-heading"><div><span class="step-kicker">Step 5</span><h2>Split data and train the model</h2></div></div>
+        <div class="form-grid three">
+          <label>Split strategy
+            <select id="splitStrategy"><option value="random">Naive random split</option><option value="source">Metadata/source-grouped split</option><option value="regime">Regime-aware split</option><option value="time">Time-based split for transient data</option></select>
+          </label>
+          <label>Random seed<input id="randomSeed" type="number" value="42"></label>
+          <label class="toggle-card"><input id="enableCV" type="checkbox"><span><strong>Run k-fold cross-validation on training data</strong><small>Fits preprocessing and the model separately in each fold.</small></span></label>
+          <label id="foldsLabel" class="hidden">Number of folds<input id="cvFolds" type="number" min="3" max="10" value="5"></label>
+        </div>
+        <div id="splitControls" class="subpanel"></div>
+        <div class="subpanel">
+          <h3>Prediction uncertainty</h3>
+          <div class="form-grid three">
+            <label class="toggle-card"><input id="enableUncertainty" type="checkbox" checked><span><strong>Estimate prediction intervals</strong><small>The method depends on the selected model and is labelled in results.</small></span></label>
+            <label>Requested interval coverage
+              <select id="intervalLevel"><option value="0.8">80%</option><option value="0.9">90%</option><option value="0.95" selected>95%</option><option value="0.99">99%</option></select>
+            </label>
+            <label id="bootstrapSamplesLabel">Bootstrap models for ridge<input id="bootstrapSamples" type="number" min="10" max="100" value="30"></label>
+          </div>
+        </div>
+        <div id="splitPreview" class="info-box">Choose a split strategy. A split summary will be shown before training.</div>
+        <div class="subpanel comparison-builder">
+          <div class="panel-heading compact-heading">
+            <div><h3>Compare several baseline models</h3><p class="fine-print">Single-model training is the default. Open the comparison tools only when you want a quick baseline comparison across multiple model families.</p></div>
+            <button id="toggleComparisonToolsBtn" class="button secondary" type="button" aria-expanded="false" aria-controls="comparisonToolPanel">Show comparison tools</button>
+          </div>
+          <div id="comparisonToolPanel" class="comparison-tool-panel hidden">
+            <p class="fine-print"><strong>Shared-split rule:</strong> quick baseline comparison freezes the current target, selected features, preprocessing, target transformation, uncertainty level, random seed, and exact train/validation/test rows, then trains each selected model once using documented baseline settings.</p>
+            <details class="comparison-preset-details">
+              <summary>Show baseline comparison settings</summary>
+              <p class="fine-print">These presets are not the same as full Step 4 tuning. They are quick, documented starting configurations used to compare model families on one frozen split. To tune a model, use Step 4 and train it separately; tuned comparison remains a later workflow.</p>
+              <div class="table-wrap comparison-preset-wrap">
+                <table id="comparisonPresetTable" class="comparison-preset-table">
+                  <thead><tr><th>Model</th><th>Baseline settings used in comparison</th><th>Speed note</th></tr></thead>
+                  <tbody>
+                    <tr><td>Linear</td><td>Ordinary linear regression, no model-specific hyperparameters.</td><td>Fast baseline.</td></tr>
+                    <tr><td>Ridge</td><td>λ = 1.</td><td>Fast; useful with correlated features.</td></tr>
+                    <tr><td>Elastic net</td><td>λ = 0.1, L1 ratio = 0.5, coordinate-descent limit = 500.</td><td>Moderate; can shrink unhelpful features.</td></tr>
+                    <tr><td>Robust regression</td><td>Huber threshold = 1.345, IRLS limit = 80.</td><td>Moderate; downweights large residuals.</td></tr>
+                    <tr><td>Decision tree</td><td>Depth = 8, minimum leaf = 5, 24 candidate thresholds.</td><td>Fast nonlinear baseline.</td></tr>
+                    <tr><td>Random forest</td><td>40 trees, depth = 8, minimum leaf = 5, row sample = 0.8, sqrt features.</td><td>Moderate; strong general tabular baseline.</td></tr>
+                    <tr><td>Gradient boosting</td><td>80 stages, learning rate = 0.05, depth = 3, row sample = 0.8.</td><td>Moderate to slow; sequential tree ensemble.</td></tr>
+                    <tr><td>k-nearest neighbours</td><td>k = 7, inverse-distance weighting, Euclidean distance.</td><td>Fast fit; prediction can be heavier on large data.</td></tr>
+                    <tr><td>Quantile regression</td><td>Median with lower/upper quantiles from the requested interval, 1500 iterations.</td><td>Moderate; interval behaviour differs from residual intervals.</td></tr>
+                    <tr><td>Gaussian process</td><td>RBF kernel, length scale = 1, signal variance = 1, noise = 0.1, stochastic kernel-search iterations = 8; representative subset if needed.</td><td>Can be slow; native uncertainty.</td></tr>
+                    <tr><td>Neural network</td><td>64 → 32 hidden layers, ReLU, Adam, learning rate = 0.001, dropout = 0.1, early stopping.</td><td>Can be slow and iterative.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </details>
+            <div id="comparisonModelChoices" class="comparison-model-grid">
+              <label><input type="checkbox" name="comparisonModel" value="linear" checked><span><strong>Linear</strong><small>Fast baseline</small></span></label>
+              <label><input type="checkbox" name="comparisonModel" value="ridge" checked><span><strong>Ridge</strong><small>L2 regularised linear</small></span></label>
+              <label><input type="checkbox" name="comparisonModel" value="elasticnet"><span><strong>Elastic net</strong><small>L1 + L2 regularisation</small></span></label>
+              <label><input type="checkbox" name="comparisonModel" value="robust"><span><strong>Robust regression</strong><small>Outlier-resistant linear</small></span></label>
+              <label><input type="checkbox" name="comparisonModel" value="tree" checked><span><strong>Decision tree</strong><small>Nonlinear rules</small></span></label>
+              <label><input type="checkbox" name="comparisonModel" value="forest" checked><span><strong>Random forest</strong><small>Nonlinear ensemble</small></span></label>
+              <label><input type="checkbox" name="comparisonModel" value="gboost" checked><span><strong>Gradient boosting</strong><small>Sequential tree ensemble</small></span></label>
+              <label><input type="checkbox" name="comparisonModel" value="knn"><span><strong>k-nearest neighbours</strong><small>Local similarity model</small></span></label>
+              <label><input type="checkbox" name="comparisonModel" value="quantile"><span><strong>Quantile regression</strong><small>Conditional median and bounds</small></span></label>
+              <label><input type="checkbox" name="comparisonModel" value="gp"><span><strong>Gaussian process</strong><small>Slower; native uncertainty</small></span></label>
+              <label><input type="checkbox" name="comparisonModel" value="ann"><span><strong>Neural network</strong><small>Slower; iterative training</small></span></label>
+            </div>
+            <div class="action-row wrap">
+              <button id="trainComparisonBtn" class="button secondary" type="button">Train selected baseline models</button>
+              <span id="comparisonBatchStatus" class="fine-print">No comparison batch is running.</span>
+            </div>
+            <div id="comparisonQueue" class="comparison-queue hidden" aria-live="polite"></div>
+          </div>
+        </div>
+                <div class="warning-box">Training data fits preprocessing and the model. Validation data selects hyperparameters. Test data is used only for the final independent evaluation.</div>
+        <div class="action-row">
+          <button id="previewSplitBtn" class="button secondary" type="button">Preview split</button>
+          <button id="trainBtn" class="button primary large" type="button">Train and evaluate</button>
+          <button id="cancelBtn" class="button danger hidden" type="button">Cancel</button>
+          <span id="trainingStatus"></span>
+        </div>
+        <div id="progressWrap" class="progress-wrap hidden"><div id="progressBar" class="progress-bar"></div></div>
+      </section>
+
+      <section id="step-diagnostics" class="panel training-only locked" aria-disabled="true">
+        <div class="panel-heading"><div><span class="step-kicker">Step 6</span><h2>Review, validate, approve, and export</h2></div></div>
+        <div id="experimentSummary" class="experiment-summary hidden" aria-live="polite"></div>
+        <section id="comparisonWorkspace" class="subpanel comparison-workspace hidden" aria-live="polite">
+          <div class="panel-heading compact-heading">
+            <div><h3>Model comparison workspace</h3><p class="fine-print">Experiments marked comparable use the same dataset fingerprint, target, features, preprocessing, split membership, target transformation and interval level.</p></div>
+            <div class="comparison-toolbar">
+              <label>Sort by<select id="comparisonSort"><option value="validationRmse">Validation RMSE</option><option value="testRmse">Test RMSE</option><option value="testMae">Test MAE</option><option value="testR2">Test R²</option><option value="intervalScore">Interval score</option><option value="elapsedMs">Training time</option></select></label>
+              <label>Chart metric<select id="comparisonMetric"><option value="validationRmse">Validation RMSE</option><option value="testRmse">Test RMSE</option><option value="testMae">Test MAE</option><option value="testR2">Test R²</option><option value="testCoverage">Interval coverage</option><option value="meanIntervalWidth">Mean interval width</option><option value="intervalScore">Interval score</option><option value="elapsedMs">Training time</option></select></label>
+              <label>Chart scope<select id="comparisonChartScope"><option value="comparable">Comparable experiments only</option><option value="all">All experiments, labelled</option></select></label>
+              <label class="toggle-inline"><input id="comparisonComparableOnly" type="checkbox" checked> Table comparable only</label>
+            </div>
+          </div>
+          <div id="comparisonNotice" class="info-box compact-box"></div>
+          <div id="comparisonDifferencePanel" class="info-box compact-box comparison-difference-panel hidden" aria-live="polite"></div>
+          <div class="table-wrap comparison-table-wrap"><table id="comparisonTable"></table></div>
+          <div class="action-row wrap">
+            <button id="downloadComparisonBtn" class="button secondary" type="button">Download comparison CSV</button>
+            <button id="clearComparisonBtn" class="button secondary" type="button">Remove non-active experiments</button>
+          </div>
+          <article class="chart-card comparison-chart-card"><div class="chart-title"><h3 id="comparisonChartTitle">Selected comparison metric by model</h3><button data-plot="comparisonRmse" class="text-button export-plot" type="button">PNG</button></div><div id="plotComparisonRmse" class="plot comparison-plot"></div></article>
+        </section>
+        <div id="metricsTableWrap" class="table-wrap metrics-table-wrap"><table id="metricsTable"></table></div>
+        <div id="cvSummary" class="info-box hidden"></div>
+        <div class="diagnostic-controls">
+          <h3>Diagnostic plot settings</h3>
+          <div class="form-grid three">
+            <label>Dataset shown in plots<select id="diagnosticDataset"><option value="test">Test</option><option value="validation">Validation</option><option value="training">Training</option></select></label>
+            <label>Input feature for residual plot<select id="diagnosticFeature"></select></label>
+            <label>Source column for grouped diagnostics<select id="diagnosticSource"><option value="">No source grouping</option></select></label>
+          </div>
+          <label class="toggle-card">
+            <input id="showDiagnosticUncertainty" type="checkbox" checked>
+            <span><strong>Show uncertainty intervals in plots</strong><small>This controls only the displayed uncertainty bands and error bars. It does not change the fitted model or uncertainty metrics.</small></span>
+          </label>
+        </div>
+        <div class="charts-grid">
+          <article class="chart-card"><div class="chart-title"><h3>Actual vs predicted</h3><button data-plot="actualPredicted" class="text-button export-plot" type="button">PNG</button></div><div id="plotActualPredicted" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Actual and predicted vs input feature</h3><button data-plot="actualPredictedFeature" class="text-button export-plot" type="button">PNG</button></div><div id="plotActualPredictedFeature" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Residuals vs predicted</h3><button data-plot="residualPredicted" class="text-button export-plot" type="button">PNG</button></div><div id="plotResidualPredicted" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Residual distribution</h3><button data-plot="residualHistogram" class="text-button export-plot" type="button">PNG</button></div><div id="plotResidualHistogram" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Residual Q–Q plot</h3><button data-plot="qq" class="text-button export-plot" type="button">PNG</button></div><div id="plotQQ" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Residuals vs input feature</h3><button data-plot="residualFeature" class="text-button export-plot" type="button">PNG</button></div><div id="plotResidualFeature" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Residuals by source</h3><button data-plot="residualSource" class="text-button export-plot" type="button">PNG</button></div><div id="plotResidualSource" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Interval width vs prediction</h3><button data-plot="intervalWidth" class="text-button export-plot" type="button">PNG</button></div><div id="plotIntervalWidth" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Training and optimisation history</h3><button data-plot="trainingHistory" class="text-button export-plot" type="button">PNG</button></div><div id="plotTrainingHistory" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Feature importance</h3><button data-plot="importance" class="text-button export-plot" type="button">PNG</button></div><div id="plotImportance" class="plot"></div></article>
+        </div>
+        <section id="validationWorkspace" class="subpanel validation-workspace" aria-live="polite">
+          <div class="panel-heading compact-heading">
+            <div><h3>Validation and acceptance</h3><p class="fine-print">Acceptance criteria apply to the currently active experiment unless you explicitly apply them to all comparable experiments. Blank numeric fields are not evaluated. Acceptance is a user decision, not an automatic certification.</p></div>
+          </div>
+          <div class="form-grid three validation-criteria-grid">
+            <label>Maximum test RMSE<input id="criterionMaxRmse" type="number" step="any" placeholder="Not configured"></label>
+            <label>Minimum test R²<input id="criterionMinR2" type="number" step="any" placeholder="Not configured"></label>
+            <label>Minimum interval coverage<input id="criterionMinCoverage" type="number" min="0" max="1" step="0.01" placeholder="For example 0.90"></label>
+            <label>Maximum interval coverage<input id="criterionMaxCoverage" type="number" min="0" max="1" step="0.01" placeholder="For example 0.99"></label>
+            <label>Maximum group test RMSE<input id="criterionMaxGroupRmse" type="number" step="any" placeholder="Not configured"></label>
+            <label>Group column<select id="validationGroup"><option value="">No group requirement</option></select></label>
+          </div>
+          <label class="toggle-card validation-toggle"><input id="criterionNoCritical" type="checkbox" checked><span><strong>Require no critical data-quality findings</strong><small>Critical findings are based on the currently selected target and features.</small></span></label>
+          <div class="action-row wrap">
+            <button id="evaluateValidationBtn" class="button primary" type="button">Evaluate active model</button>
+            <button id="evaluateAllValidationBtn" class="button secondary" type="button">Apply criteria to all comparable models</button>
+            <button id="downloadValidationBtn" class="button secondary" type="button">Download validation summary</button>
+          </div>
+          <div id="acceptanceSummary" class="acceptance-summary">Train or load a model to evaluate acceptance criteria.</div>
+          <div class="table-wrap acceptance-table-wrap"><table id="acceptanceTable"></table></div>
+          <h4 class="group-performance-title">Test performance by selected group</h4>
+          <div class="table-wrap group-performance-wrap"><table id="groupPerformanceTable"></table></div>
+        </section>
+
+
+        <section id="approvalWorkspace" class="subpanel approval-workspace" aria-live="polite">
+          <div class="panel-heading compact-heading">
+            <div><h3>Approval and operational release</h3><p class="fine-print">Record a human decision, document intended and prohibited uses, define the operational input schema, and export an integrity-checked prediction package.</p></div>
+          </div>
+          <div id="approvalCandidatePanel" class="approval-candidate-panel">
+            <h4>Model selected for approval</h4>
+            <p class="fine-print">Approval decisions apply to this explicit release candidate. Final approval records, history, and approved-package exports are available in Final reports and exports below. The selector defaults to the preferred experiment when one is marked; otherwise it uses the active experiment.</p>
+            <div class="form-grid two">
+              <label>Approval candidate<select id="approvalCandidateExperiment"><option value="">No fitted experiment available</option></select></label>
+              <div class="form-action-cell"><button id="openApprovalCandidateBtn" class="button secondary" type="button">Open selected model for review</button></div>
+            </div>
+            <div id="approvalCandidateSummary" class="approval-candidate-summary">Train or open a model to choose an approval candidate.</div>
+          </div>
+          <div class="form-grid three approval-identity-grid">
+            <label>Model name<input id="approvalModelName" type="text" placeholder="For example Yield model A"></label>
+            <label>Model developer<input id="approvalDeveloper" type="text" placeholder="Person or team that developed the model"></label>
+            <label>Model owner<input id="approvalOwner" type="text" placeholder="Responsible person or team"></label>
+            <label>Independent reviewer<input id="approvalReviewer" type="text" placeholder="Person conducting the review"></label>
+            <label>Approver<input id="approvalApprover" type="text" placeholder="Person authorising operational use"></label>
+            <label>Recorded role<select id="approvalReviewerRole"><option value="developer">Developer</option><option value="owner">Owner</option><option value="reviewer" selected>Reviewer</option><option value="approver">Approver</option><option value="administrator">Administrator</option></select></label>
+            <label>Approval status<select id="approvalStatus"><option value="draft">Draft</option><option value="under-review">Under review</option><option value="validation-failed">Validation failed</option><option value="approved">Approved</option><option value="approved-with-conditions">Approved with conditions</option><option value="suspended">Suspended</option><option value="expired">Expired</option><option value="rejected">Rejected</option><option value="retired">Retired</option></select></label>
+            <label>Decision date<input id="approvalDecisionDate" type="date"></label>
+            <label>Next review date<input id="approvalReviewDate" type="date"></label>
+          </div>
+          <div class="form-grid two approval-text-grid">
+            <label>Intended use<textarea id="approvalIntendedUse" rows="4" placeholder="Describe who may use the model, for which process, population, material, site or decision."></textarea></label>
+            <label>Prohibited or unsupported uses<textarea id="approvalProhibitedUses" rows="4" placeholder="Describe extrapolation, sites, groups or decisions that are not supported."></textarea></label>
+            <label>Known limitations<textarea id="approvalLimitations" rows="4" placeholder="Document data, uncertainty, model and applicability limitations."></textarea></label>
+            <label>Approval conditions<textarea id="approvalConditions" rows="4" placeholder="Required for approval with conditions."></textarea></label>
+          </div>
+          <label>Decision notes<textarea id="approvalNotes" rows="3" placeholder="Record the rationale, required follow-up, or rejection/retirement reason."></textarea></label>
+          <h4>Operational input schema</h4>
+          <p class="fine-print">Training-derived ranges and category levels are locked. Optional units and descriptions are saved with approved prediction packages.</p>
+          <div class="table-wrap approval-schema-wrap"><table id="approvalSchemaTable"></table></div>
+          <div class="action-row wrap">
+            <button id="recordApprovalBtn" class="button primary" type="button">Record approval decision</button>
+          </div>
+          <div id="approvalOperationalSummary" class="approval-operational-summary">Train or load a model to record an approval decision.</div>
+          <h4>Approval history</h4>
+          <div class="table-wrap approval-history-wrap"><table id="approvalHistoryTable"></table></div>
+        </section>
+        <section id="validationReportWorkspace" class="subpanel validation-report-workspace final-reports-exports-workspace" aria-live="polite">
+          <div class="panel-heading compact-heading">
+            <div><h3>Final reports and exports</h3><p class="fine-print">Download validation evidence, approval records, operational packages, model artifacts, metrics and plots after completing diagnostics, acceptance review and approval decisions.</p></div>
+          </div>
+          <div class="report-options">
+            <strong>Figures to embed in the validation report</strong>
+            <label class="toggle-inline"><input id="reportIncludeActualPredicted" type="checkbox" checked> Actual vs predicted</label>
+            <label class="toggle-inline"><input id="reportIncludeActualFeature" type="checkbox" checked> Actual and predicted vs selected feature</label>
+            <label class="toggle-inline"><input id="reportIncludeResidualPredicted" type="checkbox" checked> Residuals vs predicted</label>
+            <label class="toggle-inline"><input id="reportIncludeResidualHistogram" type="checkbox" checked> Residual distribution</label>
+            <label class="toggle-inline"><input id="reportIncludeQQ" type="checkbox"> Q–Q plot</label>
+            <label class="toggle-inline"><input id="reportIncludeComparison" type="checkbox"> Model-comparison chart</label>
+          </div>
+          <div class="export-group">
+            <h4>Validation and governance reports</h4>
+            <div class="action-row wrap">
+              <button id="downloadValidationReportBtn" class="button secondary" type="button">Download validation report (HTML)</button>
+              <button id="downloadGovernanceJsonBtn" class="button secondary" type="button">Download governance report (JSON)</button>
+              <button id="downloadApprovalRecordBtn" class="button secondary" type="button">Download approval record</button>
+              <button id="downloadApprovalHistoryBtn" class="button secondary" type="button">Download approval history CSV</button>
+            </div>
+          </div>
+          <div class="export-group">
+            <h4>Model, project and result exports</h4>
+            <div class="action-row wrap">
+              <button id="downloadModelBtn" class="button secondary" type="button">Download model</button>
+              <button id="downloadPredictionsBtn" class="button secondary" type="button">Download split predictions</button>
+              <button id="downloadMetricsBtn" class="button secondary" type="button">Download metrics</button>
+              <button id="downloadExperimentBtn" class="button secondary" type="button">Download experiment record</button>
+              <button id="downloadProjectBtn" class="button secondary" type="button">Save project</button>
+              <button id="downloadAllPlotsBtn" class="button secondary" type="button">Download all plots</button>
+            </div>
+            <p class="fine-print"><strong>The project file does not contain the original CSV.</strong> It contains configuration, fitted model, predictions and diagnostic results.</p>
+          </div>
+          <div class="export-group">
+            <h4>Operational release</h4>
+            <div class="action-row wrap">
+              <button id="downloadApprovedPackageBtn" class="button secondary" type="button" disabled>Download approved prediction package</button>
+            </div>
+            <p class="fine-print">The approved prediction package is enabled only when the selected approval candidate has an approved or conditionally approved status.</p>
+          </div>
+        </section>
+      </section>
+      <section id="step-predict" class="panel locked" aria-disabled="true">
+        <div class="panel-heading"><div><span class="step-kicker">Step 7</span><h2>Predict unknown data</h2></div><span id="operationModeBadge" class="status-pill">Full workspace</span></div>
+        <div id="approvedPackageSummary" class="approved-package-summary">No approved prediction package is loaded. Full-workspace users may still predict with the active fitted model.</div>
+        <div class="action-row wrap">
+          <label class="file-button button primary">Upload prediction CSV<input id="predictionFile" type="file" accept=".csv,text/csv" hidden></label>
+          <label>Plot predictions against input feature<select id="predictionFeature"></select></label>
+          <label>Optional source/group column<select id="predictionSource"><option value="">No grouping</option></select></label>
+          <button id="downloadUnknownPredictionsBtn" class="button secondary" type="button" disabled>Download predicted values</button>
+          <label class="toggle-inline"><input id="includeFeaturesInPredictionExport" type="checkbox" checked> Include original input features in export</label>
+        </div>
+        <div class="subpanel">
+          <h3>Optional measured-target comparison</h3>
+          <div class="form-grid two">
+            <label class="toggle-card"><input id="showMeasuredTarget" type="checkbox" disabled><span><strong>Show measured target values in the plot</strong><small>Measured values are displayed only for comparison. They are not used to fit, update or tune the model.</small></span></label>
+            <label>Measured target column<select id="predictionMeasuredTarget" disabled><option value="">Choose measured target…</option></select></label>
+          </div>
+        </div>
+        <div id="predictionSummary" class="info-box">Train or load a fitted model, then upload a compatible CSV. A measured target column is optional.</div>
+        <div id="predictionApplicabilitySummary" class="applicability-summary hidden" aria-live="polite"></div>
+        <article class="chart-card prediction-chart-card"><div class="chart-title"><h3>Predictions against selected input feature</h3><button data-plot="unknownPrediction" class="text-button export-plot" type="button">PNG</button></div><div id="plotUnknownPrediction" class="plot"></div></article>
+      </section>
+
+      <section id="step-monitor" class="panel governance-only">
+        <div class="panel-heading"><div><span class="step-kicker">Step 8</span><h2>Monitor operational performance and revalidation</h2><p class="fine-print">Import a CSV containing previous predictions and later measured outcomes. Monitoring does not retrain or alter the model.</p></div></div>
+        <div class="action-row wrap">
+          <label class="file-button button primary">Upload monitoring CSV<input id="monitoringFile" type="file" accept=".csv,text/csv" hidden></label>
+          <button id="downloadMonitoringBtn" class="button secondary" type="button" disabled>Download monitoring record</button>
+        </div>
+        <div id="monitoringMapping" class="form-grid three hidden">
+          <label>Measured target column<select id="monitorMeasuredColumn"></select></label>
+          <label>Predicted target column<select id="monitorPredictedColumn"></select></label>
+          <label>Lower interval column<select id="monitorLowerColumn"><option value="">Not available</option></select></label>
+          <label>Upper interval column<select id="monitorUpperColumn"><option value="">Not available</option></select></label>
+          <label>Optional group column<select id="monitorGroupColumn"><option value="">No grouping</option></select></label>
+          <label>Optional date column<select id="monitorDateColumn"><option value="">No dates</option></select></label>
+          <label>Applicability-status column<select id="monitorApplicabilityColumn"><option value="">Not available</option></select></label>
+          <div class="form-action-cell"><button id="analyseMonitoringBtn" class="button primary" type="button">Analyse monitoring data</button></div>
+        </div>
+        <div class="info-box compact-box"><strong>Monitoring CSV formats:</strong> a minimal file needs measured and predicted target columns. Extended monitoring should also include original input features, package ID, row/sample ID, prediction date, applicability status, and source/regime columns so you can investigate drift and failures.</div>
+        <div id="monitoringSummary" class="monitoring-summary">Upload an operational-results CSV to calculate performance after deployment.</div>
+        <div class="table-wrap"><table id="monitoringGroupTable"></table></div>
+        <section class="subpanel">
+          <h3>Revalidation triggers</h3>
+          <div class="form-grid three">
+            <label>Maximum monitoring RMSE<input id="monitorMaxRmse" type="number" step="any" placeholder="Not configured"></label>
+            <label>Maximum absolute bias<input id="monitorMaxBias" type="number" step="any" placeholder="Not configured"></label>
+            <label>Minimum interval coverage<input id="monitorMinCoverage" type="number" min="0" max="1" step="0.01" placeholder="Not configured"></label>
+            <label>Maximum warning/outside rate<input id="monitorMaxOutsideRate" type="number" min="0" max="1" step="0.01" placeholder="Not configured"></label>
+            <label>Required review date<input id="monitorReviewDate" type="date"></label>
+          </div>
+          <div class="action-row wrap"><button id="evaluateRevalidationBtn" class="button secondary" type="button" disabled>Evaluate revalidation triggers</button></div>
+          <div id="revalidationSummary" class="acceptance-summary">No monitoring record has been analysed.</div>
+          <div class="table-wrap"><table id="revalidationTable"></table></div>
+        </section>
+        <section class="subpanel">
+          <h3>Model-change assessment</h3>
+          <p class="fine-print">Compare the active experiment with another saved experiment before replacement or reapproval.</p>
+          <div class="action-row wrap"><label>Reference experiment<select id="changeReferenceExperiment"><option value="">Choose saved experiment…</option></select></label><button id="compareModelChangeBtn" class="button secondary" type="button" disabled>Compare models</button><button id="downloadModelChangeBtn" class="button secondary" type="button" disabled>Download assessment</button></div>
+          <div id="modelChangeSummary" class="info-box">Save at least two experiments in the project to compare a proposed replacement.</div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="privacyDialog">
+    <h2>Privacy and network behaviour</h2>
+    <p>CSV data, preprocessing, training, diagnostics and predictions run in this browser. The app has no analytics, cloud-storage or data-upload endpoint.</p>
+    <p>The Full Studio hybrid edition may request pinned public JavaScript libraries at startup. Strict-offline and prediction-only editions use bundled local libraries only. CSV data are never sent to a CDN.</p>
+    <p>Downloaded projects, models and prediction files may contain sensitive derived information. Store and share them appropriately.</p>
+    <form method="dialog"><button class="button primary">Close</button></form>
+  </dialog>
+
+  <dialog id="integrityDialog" class="system-dialog">
+    <h2>Runtime and integrity</h2>
+    <div id="integrityDialogContent" class="system-dialog-content">
+      <section class="subpanel compact-governance-panel">
+        <h3>Build and runtime integrity</h3>
+        <div id="integritySummary" class="integrity-summary">Checking the application edition and dependency sources…</div>
+        <div class="action-row wrap"><button id="downloadRuntimeManifestBtn" class="button secondary" type="button">Download runtime manifest</button></div>
+      </section>
+    </div>
+    <form method="dialog"><button class="button primary">Close</button></form>
+  </dialog>
+  <dialog id="recoveryDialog" class="system-dialog">
+    <h2>Local recovery</h2>
+    <div id="recoveryDialogContent" class="system-dialog-content">
+      <section id="recoveryPanel" class="subpanel compact-governance-panel">
+        <h3>Local recovery</h3>
+        <div id="recoverySummary" class="recovery-summary">No recovery snapshot was found.</div>
+        <div class="action-row wrap"><button id="restoreRecoveryBtn" class="button secondary" type="button" disabled>Restore snapshot</button><button id="discardRecoveryBtn" class="button secondary" type="button" disabled>Discard snapshot</button></div>
+        <p class="fine-print">Recovery snapshots exclude the original training CSV. They may contain fitted models and derived results.</p>
+      </section>
+    </div>
+    <form method="dialog"><button class="button primary">Close</button></form>
+  </dialog>
+  <dialog id="dataQualityHelpDialog" class="system-dialog">
+    <h2>What the data-quality assistant checks</h2>
+    <p>The assistant runs local checks when the target or selected features change. It flags duplicate rows, missing values, constant or near-constant columns, ID-like features, high-cardinality categories, missing target values, features equal to the target, and extremely high numeric correlation with the target.</p>
+    <p><strong>Severity:</strong> critical findings can invalidate fitting or interpretation; warnings need review; information items explain workflow state. These checks do not verify units, scientific plausibility, sampling representativeness, causal validity, or every form of target leakage.</p>
+    <form method="dialog"><button class="button primary">Close</button></form>
+  </dialog>
+  <script src="./js/build-config.js"></script>
+  <script src="./js/i18n.js"></script>
+  <script src="./js/bootstrap.js"></script>
+</body>
+</html>

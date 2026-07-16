@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+
+<html lang="" xml:lang="" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<title>Local Regression Studio User Guide</title>
+<style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  
+
+    /* Local Regression Studio v1.0.11 standalone documentation layout fix.
+       Pandoc's default max-width was too narrow when guides opened from the sidebar. */
+    body {
+      max-width: none !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: var(--bg, #f6f8fa) !important;
+      color: var(--text, #172026) !important;
+      font-size: 16px;
+    }
+    .page {
+      max-width: min(1180px, calc(100vw - 48px)) !important;
+      margin: 0 auto !important;
+      padding: clamp(1rem, 2.5vw, 2.5rem) !important;
+    }
+    .card {
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 auto !important;
+    }
+    nav#TOC, #TOC {
+      background: var(--accent, #eaf6f8);
+      border: 1px solid var(--line, #d7e0e5);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0 1.5rem;
+      max-height: none;
+      overflow: visible;
+    }
+    img, svg, canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    table {
+      width: 100%;
+      max-width: 100%;
+    }
+    @media (max-width: 700px) {
+      .page {
+        max-width: calc(100vw - 16px) !important;
+        padding: 0.75rem !important;
+      }
+      .doc-nav {
+        gap: 0.4rem;
+      }
+      .doc-nav a {
+        font-size: 0.92rem;
+        padding: 0.35rem 0.5rem;
+      }
+    }
+
+  </style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="./help.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page docs-shell"><nav class="doc-nav"><a href="./user-guide.html">User guide</a><a href="./step-4-model-options.html">Step 4 model options</a><a href="./validation-and-applicability.html">Validation and applicability</a><a href="./approval-and-operation.html">Approval and operation</a><a href="./security-and-privacy.html">Security and privacy</a></nav><p class="fine">Bundled with Local Regression Studio v1.0.11. These files work offline and on static hosting such as GitHub Pages.</p><div class="card doc-card">
+<header id="title-block-header">
+<h1 class="title">Local Regression Studio User Guide</h1>
+</header>
+<div class="doc-layout"><aside aria-label="Document contents" class="doc-sidebar"><nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#local-regression-studio-v1.0.11" id="toc-local-regression-studio-v1.0.11">Local Regression Studio
+v1.0.11</a>
+<ul>
+<li><a href="#user-guide-and-privacy-policy" id="toc-user-guide-and-privacy-policy">User guide and privacy
+policy</a></li>
+</ul></li>
+<li><a href="#what-the-application-does" id="toc-what-the-application-does">1. What the application does</a></li>
+<li><a href="#starting-the-application" id="toc-starting-the-application">2. Starting the application</a>
+<ul>
+<li><a href="#offline-mode" id="toc-offline-mode">Offline mode</a></li>
+<li><a href="#hybrid-mode" id="toc-hybrid-mode">Hybrid mode</a></li>
+</ul></li>
+<li><a href="#language-selection" id="toc-language-selection">3.
+Language selection</a></li>
+<li><a href="#step-1-start-and-load-data" id="toc-step-1-start-and-load-data">4. Step 1 — Start and load
+data</a></li>
+<li><a href="#step-2-select-features-and-transform-the-target" id="toc-step-2-select-features-and-transform-the-target">5. Step 2 —
+Select features and transform the target</a></li>
+<li><a href="#step-3-configure-preprocessing" id="toc-step-3-configure-preprocessing">6. Step 3 — Configure
+preprocessing</a>
+<ul>
+<li><a href="#numeric-missing-values" id="toc-numeric-missing-values">Numeric missing values</a></li>
+<li><a href="#numeric-scaling-fitted-on-training-data" id="toc-numeric-scaling-fitted-on-training-data">Numeric scaling fitted
+on training data</a></li>
+<li><a href="#categorical-missing-values" id="toc-categorical-missing-values">Categorical missing values</a></li>
+<li><a href="#categorical-encoding" id="toc-categorical-encoding">Categorical encoding</a></li>
+</ul></li>
+<li><a href="#step-4-select-a-model-and-tune-hyperparameters" id="toc-step-4-select-a-model-and-tune-hyperparameters">7. Step 4 —
+Select a model and tune hyperparameters</a>
+<ul>
+<li><a href="#manual-configuration" id="toc-manual-configuration">Manual
+configuration</a></li>
+<li><a href="#grid-search" id="toc-grid-search">Grid search</a></li>
+<li><a href="#ordinary-random-search" id="toc-ordinary-random-search">Ordinary random search</a></li>
+<li><a href="#latin-hypercube-sampling" id="toc-latin-hypercube-sampling">Latin hypercube sampling</a></li>
+</ul></li>
+<li><a href="#a.-models-added-in-v1.0.11" id="toc-a.-models-added-in-v1.0.11">7A. Models added in v1.0.11</a></li>
+<li><a href="#core-model-settings" id="toc-core-model-settings">8. Core
+model settings</a>
+<ul>
+<li><a href="#linear-regression" id="toc-linear-regression">Linear
+regression</a></li>
+<li><a href="#ridge-regression" id="toc-ridge-regression">Ridge
+regression</a></li>
+<li><a href="#elastic-net" id="toc-elastic-net">Elastic net</a></li>
+<li><a href="#huber-robust-regression" id="toc-huber-robust-regression">Huber robust regression</a></li>
+<li><a href="#gradient-boosted-trees" id="toc-gradient-boosted-trees">Gradient-boosted trees</a></li>
+<li><a href="#k-nearest-neighbours" id="toc-k-nearest-neighbours">k-nearest neighbours</a></li>
+<li><a href="#linear-quantile-regression" id="toc-linear-quantile-regression">Linear quantile regression</a></li>
+<li><a href="#decision-tree" id="toc-decision-tree">Decision
+tree</a></li>
+<li><a href="#random-forest" id="toc-random-forest">Random
+forest</a></li>
+</ul></li>
+<li><a href="#gaussian-process-regression" id="toc-gaussian-process-regression">9. Gaussian-process regression</a>
+<ul>
+<li><a href="#exact-gp" id="toc-exact-gp">Exact GP</a></li>
+<li><a href="#representative-subset-gp" id="toc-representative-subset-gp">Representative-subset GP</a></li>
+<li><a href="#automatic-subset-size-optimisation" id="toc-automatic-subset-size-optimisation">Automatic subset-size
+optimisation</a></li>
+<li><a href="#kernels" id="toc-kernels">Kernels</a></li>
+<li><a href="#gp-uncertainty" id="toc-gp-uncertainty">GP
+uncertainty</a></li>
+</ul></li>
+<li><a href="#artificial-neural-network-regression" id="toc-artificial-neural-network-regression">10. Artificial
+neural-network regression</a>
+<ul>
+<li><a href="#architecture" id="toc-architecture">Architecture</a></li>
+<li><a href="#training-settings" id="toc-training-settings">Training
+settings</a></li>
+<li><a href="#model-size-recommendations" id="toc-model-size-recommendations">Model-size recommendations</a></li>
+<li><a href="#ann-hyperparameter-tuning" id="toc-ann-hyperparameter-tuning">ANN hyperparameter tuning</a></li>
+<li><a href="#monte-carlo-dropout-uncertainty" id="toc-monte-carlo-dropout-uncertainty">Monte Carlo dropout
+uncertainty</a></li>
+<li><a href="#small-deep-ensemble-uncertainty" id="toc-small-deep-ensemble-uncertainty">Small deep ensemble
+uncertainty</a></li>
+</ul></li>
+<li><a href="#step-5-split-and-train" id="toc-step-5-split-and-train">11. Step 5 — Split and train</a>
+<ul>
+<li><a href="#naive-random-split" id="toc-naive-random-split">Naive
+random split</a></li>
+<li><a href="#metadatasource-grouped-split" id="toc-metadatasource-grouped-split">Metadata/source-grouped
+split</a></li>
+<li><a href="#regime-aware-split" id="toc-regime-aware-split">Regime-aware split</a></li>
+<li><a href="#time-based-split" id="toc-time-based-split">Time-based
+split</a></li>
+<li><a href="#cross-validation" id="toc-cross-validation">Cross-validation</a></li>
+</ul></li>
+<li><a href="#step-6-review-validate-and-approve" id="toc-step-6-review-validate-and-approve">12. Step 6 — Review,
+validate and approve</a></li>
+<li><a href="#step-7-predict-unknown-data" id="toc-step-7-predict-unknown-data">13. Step 7 — Predict unknown
+data</a></li>
+<li><a href="#saving-and-reopening-work" id="toc-saving-and-reopening-work">14. Saving and reopening work</a>
+<ul>
+<li><a href="#model-file" id="toc-model-file">Model file</a></li>
+<li><a href="#project-file" id="toc-project-file">Project file</a></li>
+<li><a href="#sensitive-derived-information" id="toc-sensitive-derived-information">Sensitive derived
+information</a></li>
+</ul></li>
+<li><a href="#privacy-policy" id="toc-privacy-policy">15. Privacy
+policy</a>
+<ul>
+<li><a href="#data-processed-locally" id="toc-data-processed-locally">Data processed locally</a></li>
+<li><a href="#data-not-automatically-stored" id="toc-data-not-automatically-stored">Data not automatically
+stored</a></li>
+<li><a href="#network-requests" id="toc-network-requests">Network
+requests</a></li>
+<li><a href="#no-analytics-or-remote-logging" id="toc-no-analytics-or-remote-logging">No analytics or remote
+logging</a></li>
+<li><a href="#hosting-logs" id="toc-hosting-logs">Hosting logs</a></li>
+<li><a href="#user-controlled-downloads" id="toc-user-controlled-downloads">User-controlled downloads</a></li>
+</ul></li>
+<li><a href="#current-limitations" id="toc-current-limitations">16.
+Current limitations</a></li>
+<li><a href="#troubleshooting" id="toc-troubleshooting">17.
+Troubleshooting</a>
+<ul>
+<li><a href="#the-app-does-not-start" id="toc-the-app-does-not-start">The app does not start</a></li>
+<li><a href="#gp-covariance-factorisation-fails" id="toc-gp-covariance-factorisation-fails">GP covariance factorisation
+fails</a></li>
+<li><a href="#gp-training-is-too-slow" id="toc-gp-training-is-too-slow">GP training is too slow</a></li>
+<li><a href="#ann-loss-does-not-improve" id="toc-ann-loss-does-not-improve">ANN loss does not improve</a></li>
+<li><a href="#ann-loss-becomes-non-finite" id="toc-ann-loss-becomes-non-finite">ANN loss becomes
+non-finite</a></li>
+<li><a href="#ann-overfits" id="toc-ann-overfits">ANN overfits</a></li>
+<li><a href="#prediction-csv-is-rejected" id="toc-prediction-csv-is-rejected">Prediction CSV is rejected</a></li>
+<li><a href="#save-as-is-unavailable" id="toc-save-as-is-unavailable">Save As is unavailable</a></li>
+</ul></li>
+<li><a href="#step-4-interface-behaviour" id="toc-step-4-interface-behaviour">Step 4 interface behaviour</a></li>
+<li><a href="#experiment-provenance-and-schema-migration-in-v1.0.11" id="toc-experiment-provenance-and-schema-migration-in-v1.0.11">Experiment
+provenance and schema migration in v1.0.11</a>
+<ul>
+<li><a href="#dataset-fingerprint" id="toc-dataset-fingerprint">Dataset
+fingerprint</a></li>
+<li><a href="#experiment-record" id="toc-experiment-record">Experiment
+record</a></li>
+<li><a href="#project-and-model-schema-version-10" id="toc-project-and-model-schema-version-10">Project and model schema
+version 10</a></li>
+<li><a href="#experiment-collections" id="toc-experiment-collections">Experiment collections</a></li>
+<li><a href="#managed-jobs-and-cancellation" id="toc-managed-jobs-and-cancellation">Managed jobs and
+cancellation</a></li>
+<li><a href="#web-worker-foundation" id="toc-web-worker-foundation">Web
+Worker foundation</a></li>
+</ul></li>
+<li><a href="#model-comparison-workspace" id="toc-model-comparison-workspace">Model comparison workspace</a>
+<ul>
+<li><a href="#training-a-comparison-set" id="toc-training-a-comparison-set">Training a comparison set</a></li>
+<li><a href="#reading-the-leaderboard" id="toc-reading-the-leaderboard">Reading the leaderboard</a></li>
+<li><a href="#active-and-preferred-models" id="toc-active-and-preferred-models">Active and preferred
+models</a></li>
+<li><a href="#saving-comparison-projects" id="toc-saving-comparison-projects">Saving comparison projects</a></li>
+</ul></li>
+<li><a href="#validation-workflow" id="toc-validation-workflow">Validation workflow</a>
+<ul>
+<li><a href="#data-quality-assistant" id="toc-data-quality-assistant">Data-quality assistant</a></li>
+<li><a href="#acceptance-criteria" id="toc-acceptance-criteria">Acceptance criteria</a></li>
+<li><a href="#group-validation" id="toc-group-validation">Group
+validation</a></li>
+<li><a href="#prediction-applicability" id="toc-prediction-applicability">Prediction applicability</a></li>
+</ul></li>
+<li><a href="#v0.4.0-approval-and-operational-workflow" id="toc-v0.4.0-approval-and-operational-workflow">v0.4.0 approval and
+operational workflow</a>
+<ul>
+<li><a href="#approval-workspace" id="toc-approval-workspace">Approval
+workspace</a></li>
+<li><a href="#operational-input-schema" id="toc-operational-input-schema">Operational input schema</a></li>
+<li><a href="#validation-and-approval-report" id="toc-validation-and-approval-report">Validation and approval
+report</a></li>
+<li><a href="#approved-prediction-package" id="toc-approved-prediction-package">Approved prediction
+package</a></li>
+<li><a href="#prediction-only-mode" id="toc-prediction-only-mode">Prediction-only mode</a></li>
+<li><a href="#security-and-governance-limitations" id="toc-security-and-governance-limitations">Security and governance
+limitations</a></li>
+<li><a href="#v1.0-deployment-and-governance" id="toc-v1.0-deployment-and-governance">v1.0 deployment and
+governance</a></li>
+</ul></li>
+<li><a href="#v1.0.11-comparison-and-approval-usability-notes" id="toc-v1.0.11-comparison-and-approval-usability-notes">v1.0.11
+comparison and approval usability notes</a></li>
+</ul>
+</nav></aside><main class="doc-main" id="main-content"><h1 id="local-regression-studio-v1.0.11">Local Regression Studio
+v1.0.11</h1><h2 id="user-guide-and-privacy-policy">User guide and privacy
+policy</h2><p><strong>Release:</strong> 1.0.11<br/>
+<strong>Operation:</strong> Browser-only regression modelling<br/>
+<strong>Original CSV storage:</strong> Not included in exported projects
+or models</p><hr/><h1 id="what-the-application-does">1. What the application does</h1><p>Local Regression Studio loads tabular CSV data, prepares input
+features, fits regression models, evaluates independent training,
+validation and test datasets, displays diagnostic plots and applies
+fitted models to compatible prediction CSV files.</p><p>Supported models:</p><ul>
+<li>Linear regression</li>
+<li>Ridge regression</li>
+<li>Elastic-net regression</li>
+<li>Huber robust regression</li>
+<li>Decision-tree regression</li>
+<li>Random-forest regression</li>
+<li>Gradient-boosted regression trees</li>
+<li>k-nearest-neighbour regression</li>
+<li>Linear quantile regression</li>
+<li>Gaussian-process regression</li>
+<li>Artificial neural-network regression</li>
+</ul><p>All calculations run inside the browser. The application does not
+contain an account system, analytics service, cloud-training endpoint,
+database or CSV-upload endpoint.</p><hr/><h1 id="starting-the-application">2. Starting the application</h1><h2 id="offline-mode">Offline mode</h2><p>Extract the package and run the launcher for your operating
+system:</p><ul>
+<li>Windows: <code>start-windows.bat</code></li>
+<li>macOS: <code>start-macos.command</code></li>
+<li>Linux: <code>start-linux.sh</code></li>
+</ul><p>The launcher opens a loopback address, normally similar to:</p><pre class="text"><code>http://127.0.0.1:8080/?localOnly=1</code></pre><p><code>127.0.0.1</code> is the user’s own computer. The launcher does
+not expose the application to other devices on the network.</p><p>Offline mode loads all required program files from the extracted
+package and does not attempt to contact a CDN.</p><h2 id="hybrid-mode">Hybrid mode</h2><p>Opening <code>index.html</code>, publishing the package on a static
+host, or running:</p><div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1" tabindex="-1"></a><span class="ex">python3</span> start.py <span class="at">--hybrid</span></span></code></pre></div><p>allows the application to try pinned CDN copies of Papa Parse and
+Plotly. If either request fails or times out, the bundled local
+replacement is used automatically.</p><p>Hybrid mode does not send CSV data to the CDN. It does send an
+ordinary request for the JavaScript library, which may expose normal
+network metadata such as IP address and browser headers to the CDN
+provider.</p><hr/><h1 id="language-selection">3. Language selection</h1><p>Use the language selector in the page header.</p><p>Options:</p><ul>
+<li>Automatic browser detection</li>
+<li>English</li>
+<li>Simplified Chinese</li>
+<li>Spanish</li>
+<li>French</li>
+<li>German</li>
+</ul><p>Language switching changes interface text and number formatting. It
+does not translate CSV column names, category values, filenames or user
+data.</p><p>Language files are bundled with the package and work in offline
+mode.</p><hr/><h1 id="step-1-start-and-load-data">4. Step 1 — Start and load data</h1><p>Choose a training CSV. The application displays:</p><ul>
+<li>Row and column counts</li>
+<li>Numeric and categorical column counts</li>
+<li>A local preview of the first rows</li>
+<li>Recommended workload warnings</li>
+</ul><p>Recommended ordinary workload:</p><ul>
+<li>Up to about 50,000 rows and 50 original columns for the core
+models</li>
+<li>Smaller datasets for Gaussian processes</li>
+<li>ANN workload determined by both row count and trainable-parameter
+count</li>
+</ul><p>The preview and profiling remain in browser memory.</p><p>You may also open:</p><ul>
+<li>A <code>.mlproject</code> project file</li>
+<li>A fitted <code>.mlmodel.json</code> or compatible JSON model
+file</li>
+</ul><p>Project and model files do not contain the original CSV.</p><hr/><h1 id="step-2-select-features-and-transform-the-target">5. Step 2 —
+Select features and transform the target</h1><p>Select one numeric target column and one or more input features.</p><p>The automatic feature detector excludes the target and likely
+identifier columns. Review its choices before training.</p><p>Target transformations:</p><ul>
+<li>None</li>
+<li>Natural logarithm</li>
+<li>Log base 10</li>
+<li>Square root</li>
+<li>Box–Cox</li>
+<li>Yeo–Johnson</li>
+</ul><p>Transformation parameters are fitted from training targets only.
+Predictions and uncertainty bounds are converted back to the original
+target scale.</p><p>Requirements:</p><ul>
+<li>Log and log10 require positive targets.</li>
+<li>Square root requires non-negative targets.</li>
+<li>Box–Cox requires positive targets.</li>
+<li>Yeo–Johnson supports negative, zero and positive targets.</li>
+</ul><p>For ANN and linear quantile regression, target values are
+additionally centred and scaled internally during network optimisation.
+This internal scaling is reversed before the selected target inverse
+transformation is applied.</p><hr/><h1 id="step-3-configure-preprocessing">6. Step 3 — Configure
+preprocessing</h1><h2 id="numeric-missing-values">Numeric missing values</h2><p>Choose one of:</p><ul>
+<li>Training mean</li>
+<li>Training median</li>
+<li>Zero</li>
+<li>Drop affected rows</li>
+</ul><h2 id="numeric-scaling-fitted-on-training-data">Numeric scaling fitted
+on training data</h2><p>Choose:</p><ul>
+<li>Standardisation</li>
+<li>Min–max scaling</li>
+<li>No scaling</li>
+</ul><p>Scaling statistics are calculated from the training data only. The
+fitted values are applied unchanged to validation, test and prediction
+CSV data.</p><p>Scaling is strongly recommended for Gaussian processes and artificial
+neural networks.</p><h2 id="categorical-missing-values">Categorical missing values</h2><p>Choose:</p><ul>
+<li>A dedicated Missing category</li>
+<li>The most frequent training category</li>
+<li>Drop affected rows</li>
+</ul><h2 id="categorical-encoding">Categorical encoding</h2><p>Choose:</p><ul>
+<li>One-hot encoding</li>
+<li>Ordinal integer encoding</li>
+<li>Exclude categorical columns</li>
+</ul><p>For linear, ridge, elastic-net, Huber robust, and linear quantile
+regression, removing one reference category from each one-hot feature
+avoids a redundant indicator column. Tree, GP and ANN models can use
+either setting, although one-hot encoding may create many processed
+features.</p><p>Unseen categories in validation, test or prediction CSV data follow
+the fitted training-category policy and produce a warning.</p><hr/><h1 id="step-4-select-a-model-and-tune-hyperparameters">7. Step 4 —
+Select a model and tune hyperparameters</h1><h2 id="manual-configuration">Manual configuration</h2><p>The selected settings are fitted directly. Validation data is still
+used for ANN early stopping and for diagnostic evaluation, but not to
+choose model hyperparameters.</p><h2 id="grid-search">Grid search</h2><p>Specify minimum, maximum, number of grid points and linear or
+logarithmic spacing for each tunable numeric parameter. The app previews
+the candidate count and caps excessively large grids.</p><h2 id="ordinary-random-search">Ordinary random search</h2><p>Each parameter is sampled independently from its configured
+range.</p><h2 id="latin-hypercube-sampling">Latin hypercube sampling</h2><p>Each continuous parameter range is divided into intervals and sampled
+once per interval. LHS generally covers multi-dimensional ranges more
+evenly than ordinary random search with the same number of trials.</p><p>All automatic tuning compares candidates using validation RMSE. Test
+data remains isolated.</p><hr/><h1 id="a.-models-added-in-v1.0.11">7A. Models added in v1.0.11</h1><p>The expanded modelling release adds elastic net, Huber robust
+regression, gradient-boosted trees, k-nearest neighbours, and linear
+quantile regression. All participate in tuning, cross-validation,
+comparison, validation, approval, and prediction-only workflows.</p><p>Key cautions:</p><ul>
+<li>Standardise inputs for elastic net, robust regression, kNN, and
+quantile regression.</li>
+<li>kNN does not extrapolate and may create large model packages because
+it stores processed training rows.</li>
+<li>Gradient boosting can overfit as stages/depth increase; inspect
+validation history.</li>
+<li>Quantile bounds are fitted conditional quantiles, not guaranteed
+calibrated coverage.</li>
+<li>New-model uncertainty methods must be checked on the independent
+test set.</li>
+</ul><p>See <code>docs/EXPANDED_MODELLING_GUIDE.md</code> for parameter-level
+guidance.</p><h1 id="core-model-settings">8. Core model settings</h1><h2 id="linear-regression">Linear regression</h2><p>No model hyperparameters. Provides analytical confidence and
+prediction calculations under ordinary linear-model assumptions.</p><h2 id="ridge-regression">Ridge regression</h2><p>Main setting:</p><ul>
+<li>Ridge strength, lambda</li>
+</ul><p>Uncertainty uses residual bootstrap models and is labelled
+approximate.</p><h2 id="elastic-net">Elastic net</h2><p>Settings include total penalty, L1 mixing ratio, coordinate-descent
+iterations and convergence tolerance.</p><h2 id="huber-robust-regression">Huber robust regression</h2><p>Settings include Huber threshold, IRLS iterations, convergence
+tolerance and a numerical ridge stabiliser.</p><h2 id="gradient-boosted-trees">Gradient-boosted trees</h2><p>Settings include stages, learning rate, tree depth, minimum leaf
+size, row subsampling and threshold-search detail.</p><h2 id="k-nearest-neighbours">k-nearest neighbours</h2><p>Settings include neighbour count, weighting, distance metric and
+maximum stored rows.</p><h2 id="linear-quantile-regression">Linear quantile regression</h2><p>Settings include central quantile, iterations, learning rate and L2
+regularisation. Lower/upper quantiles are derived from requested
+interval coverage during final fitting.</p><h2 id="decision-tree">Decision tree</h2><p>Settings include:</p><ul>
+<li>Maximum depth</li>
+<li>Minimum rows per leaf</li>
+<li>Candidate thresholds per feature</li>
+<li>Number of features considered per split</li>
+</ul><p>The training-history panel shows training and validation mean-squared
+loss across candidate maximum depths.</p><h2 id="random-forest">Random forest</h2><p>Settings include:</p><ul>
+<li>Number of trees</li>
+<li>Maximum depth</li>
+<li>Minimum rows per leaf</li>
+<li>Row sampling fraction</li>
+<li>Candidate thresholds</li>
+<li>Features considered per split</li>
+</ul><p>The history panel shows cumulative training and validation loss as
+trees are added.</p><hr/><h1 id="gaussian-process-regression">9. Gaussian-process regression</h1><h2 id="exact-gp">Exact GP</h2><p>Exact GP uses every processed training row. Training creates and
+factorises a dense covariance matrix.</p><p>The app uses a default hard limit of 2,000 representative rows. Exact
+GP may become slow well before that limit on a phone, tablet or
+lower-powered laptop.</p><h2 id="representative-subset-gp">Representative-subset GP</h2><p>A smaller representative subset is used to construct the GP
+state.</p><p>Selection methods:</p><ul>
+<li>Farthest-point sampling</li>
+<li>K-means++-style representative sampling</li>
+<li>Random sampling</li>
+</ul><p>This is a subset-of-data approximation. It is not a sparse
+variational GP and does not optimise free inducing-point locations.</p><h2 id="automatic-subset-size-optimisation">Automatic subset-size
+optimisation</h2><p>Select <strong>Automatically optimise subset size</strong> and
+configure:</p><ul>
+<li>Minimum subset size</li>
+<li>Maximum subset size</li>
+<li>Number of sizes to evaluate</li>
+<li>Validation tolerance</li>
+</ul><p>The app evaluates candidate sizes using validation RMSE and selects
+the smallest subset within the requested tolerance of the best
+validation result.</p><p>Example: with a 1% tolerance, a 250-row subset may be selected over a
+1,000-row subset when its validation RMSE is no more than 1% worse.</p><h2 id="kernels">Kernels</h2><p>Available kernels:</p><ul>
+<li>RBF or squared exponential</li>
+<li>Matérn 3/2</li>
+<li>Matérn 5/2</li>
+<li>Rational quadratic</li>
+<li>Linear</li>
+</ul><p>Settings include:</p><ul>
+<li>Length scale</li>
+<li>Signal variance</li>
+<li>Observation-noise standard deviation</li>
+<li>Numerical jitter</li>
+<li>Rational-quadratic alpha</li>
+<li>Kernel optimisation iterations</li>
+</ul><p>The implementation uses a shared length scale across processed
+features in v1.0.11. Therefore, the GP feature-relevance chart is only a
+shared-scale proxy rather than an ARD ranking.</p><h2 id="gp-uncertainty">GP uncertainty</h2><p>The GP produces a predictive mean and variance. Prediction intervals
+include the configured observation-noise term. Step 6 reports empirical
+interval coverage, width, coverage error and interval score on each
+split.</p><p>The optimisation-history plot displays negative log marginal
+likelihood by iteration.</p><hr/><h1 id="artificial-neural-network-regression">10. Artificial
+neural-network regression</h1><p>The ANN is a local CPU-based dense feed-forward network implemented
+in JavaScript. It does not use cloud training.</p><h2 id="architecture">Architecture</h2><p>Configure one to three hidden layers with up to 512 neurons per
+layer.</p><p>Activations:</p><ul>
+<li>ReLU</li>
+<li>Leaky ReLU</li>
+<li>Tanh</li>
+<li>Sigmoid</li>
+</ul><p>The output layer is linear for regression.</p><h2 id="training-settings">Training settings</h2><ul>
+<li>Adam or stochastic gradient descent</li>
+<li>Learning rate</li>
+<li>Batch size</li>
+<li>Maximum epochs</li>
+<li>Dropout rate</li>
+<li>L2 regularisation</li>
+<li>Early-stopping patience</li>
+<li>Minimum validation improvement</li>
+</ul><p>Training data updates the network weights. Validation data determines
+early stopping. The best validation epoch is restored.</p><p>The learning-curve plot shows training and validation mean-squared
+loss on the internally standardised transformed-target scale.</p><h2 id="model-size-recommendations">Model-size recommendations</h2><p>The app calculates trainable parameters before fitting.</p><ul>
+<li>Below 50,000: small browser model</li>
+<li>50,000–250,000: ordinary desktop range</li>
+<li>250,000–500,000: large model</li>
+<li>500,000–1,000,000: very large browser workload</li>
+<li>Above 1,000,000: blocked by default</li>
+</ul><p>On mobile or memory-constrained devices, remain below approximately
+100,000 parameters.</p><p>A small dataset combined with a very large network can overfit even
+when the browser has enough memory. Prefer smaller networks, dropout, L2
+regularisation and early stopping.</p><h2 id="ann-hyperparameter-tuning">ANN hyperparameter tuning</h2><p>Grid, random and LHS searches can vary:</p><ul>
+<li>First hidden-layer size</li>
+<li>Second hidden-layer size</li>
+<li>Learning rate</li>
+<li>Dropout</li>
+<li>L2 regularisation</li>
+</ul><p>Other settings remain manually configurable. Search candidates use a
+single network; an optional ensemble is trained only after the final
+hyperparameters are selected.</p><h2 id="monte-carlo-dropout-uncertainty">Monte Carlo dropout
+uncertainty</h2><p>Repeated stochastic forward passes keep dropout active during
+prediction. The distribution is combined with training residual
+variation.</p><p>This interval is approximate and does not guarantee nominal
+coverage.</p><h2 id="small-deep-ensemble-uncertainty">Small deep ensemble
+uncertainty</h2><p>Two to seven independently initialised networks are trained. Their
+prediction distribution is combined with residual variation.</p><p>Ensembles multiply training time, memory use and exported model
+size.</p><hr/><h1 id="step-5-split-and-train">11. Step 5 — Split and train</h1><p>The application maintains three independent datasets:</p><ul>
+<li>Training: fits preprocessing and model parameters</li>
+<li>Validation: selects hyperparameters, GP subset size and ANN stopping
+epoch</li>
+<li>Test: final independent evaluation only</li>
+</ul><p>Split strategies:</p><h2 id="naive-random-split">Naive random split</h2><p>Seeded row-level random allocation.</p><h2 id="metadatasource-grouped-split">Metadata/source-grouped split</h2><p>Choose a source column and assign validation and test source values.
+Every remaining source goes to training. A source cannot appear in
+multiple splits.</p><h2 id="regime-aware-split">Regime-aware split</h2><p>Choose either:</p><ul>
+<li>Proportional splitting inside each regime</li>
+<li>Complete held-out regimes for validation or test</li>
+</ul><p>Held-out regimes measure extrapolation to unseen conditions.</p><h2 id="time-based-split">Time-based split</h2><p>Choose a time or sequence column. The app sorts rows and allocates
+contiguous training, validation and test periods without shuffling.</p><h2 id="cross-validation">Cross-validation</h2><p>Optional k-fold cross-validation is performed on training data only.
+Every fold independently refits preprocessing, target transformation and
+model.</p><p>For GP and ANN, cross-validation can be computationally expensive.
+Use smaller subsets, fewer folds or reduced ANN epochs.</p><hr/><h1 id="step-6-review-validate-and-approve">12. Step 6 — Review,
+validate and approve</h1><p>Step 6 is ordered to match the review workflow:</p><ol type="1">
+<li>Confirm the active experiment and compare saved experiments.</li>
+<li>Review performance metrics.</li>
+<li>Choose diagnostic plot settings.</li>
+<li>Inspect diagnostic plots.</li>
+<li>Evaluate validation and acceptance criteria.</li>
+<li>Generate validation and governance reports.</li>
+<li>Download general model, metrics, experiment and project
+exports.</li>
+<li>Record the approval decision and, when appropriate, export an
+approved prediction package.</li>
+</ol><p>Point metrics:</p><ul>
+<li>R²</li>
+<li>RMSE</li>
+<li>MAE</li>
+</ul><p>Uncertainty metrics when intervals are available:</p><ul>
+<li>Prediction Interval Coverage Probability</li>
+<li>Mean Prediction Interval Width</li>
+<li>Normalised interval width</li>
+<li>Coverage error</li>
+<li>Interval or Winkler-style score</li>
+</ul><p>Plots include:</p><ul>
+<li>Actual versus predicted</li>
+<li>Residual versus predicted</li>
+<li>Residual distribution</li>
+<li>Residual Q–Q plot</li>
+<li>Residual versus selected input feature</li>
+<li>Residual by source</li>
+<li>Interval width versus prediction</li>
+<li>Training, growth or optimisation history</li>
+<li>Feature importance or relevance proxy</li>
+</ul><p>The <strong>Show uncertainty intervals in plots</strong> checkbox
+affects only visual display. It does not retrain the model or remove
+uncertainty metrics.</p><p>Test metrics should be treated as the final independent assessment.
+Do not repeatedly adjust model choices after inspecting the test set
+without creating a new untouched test dataset.</p><hr/><h1 id="step-7-predict-unknown-data">13. Step 7 — Predict unknown
+data</h1><p>Upload a compatible CSV containing all required input columns.</p><p>The target column is not required. When a measured target is present,
+select it under <strong>Optional measured-target comparison</strong> and
+enable the checkbox to display measured and predicted values
+together.</p><p>Measured values are used only for plotting. They do not update, fit
+or tune the model.</p><p>The prediction download contains:</p><ul>
+<li>Source row number</li>
+<li>Prediction</li>
+<li>Lower and upper interval bounds when available</li>
+<li>Interval level</li>
+<li>Uncertainty method</li>
+</ul><p>GP predictions use the saved representative processed training state.
+ANN predictions use saved network weights. The same fitted preprocessing
+and target transformation are applied.</p><hr/><h1 id="saving-and-reopening-work">14. Saving and reopening work</h1><h2 id="model-file">Model file</h2><p>Contains the fitted model and preprocessing required for prediction.
+It omits diagnostic data and the original CSV.</p><h2 id="project-file">Project file</h2><p>Contains configuration, model, metrics, split predictions and
+diagnostic data. It omits the original CSV.</p><p>When reopening a project, upload the original or a compatible CSV to
+retrain or restore raw-data-dependent controls.</p><h2 id="sensitive-derived-information">Sensitive derived
+information</h2><p>Model files can still be sensitive:</p><ul>
+<li>GP files include representative processed training inputs,
+covariance factors and coefficients.</li>
+<li>ANN files include learned weights that may encode patterns from the
+training data.</li>
+<li>Predictions and metrics may reveal sensitive outcomes.</li>
+</ul><p>Secure exported files appropriately.</p><hr/><h1 id="privacy-policy">15. Privacy policy</h1><h2 id="data-processed-locally">Data processed locally</h2><p>The following operations occur inside the user’s browser:</p><ul>
+<li>CSV parsing</li>
+<li>Column profiling</li>
+<li>Missing-value handling</li>
+<li>Scaling and categorical encoding</li>
+<li>Data splitting</li>
+<li>Hyperparameter search</li>
+<li>Model training</li>
+<li>Cross-validation</li>
+<li>Uncertainty estimation</li>
+<li>Diagnostics and plotting</li>
+<li>Unknown-data prediction</li>
+<li>Export generation</li>
+</ul><h2 id="data-not-automatically-stored">Data not automatically
+stored</h2><p>The application does not automatically store CSV data in browser
+local storage, IndexedDB, cookies or a remote service.</p><p>The application retains data in memory while the page remains open.
+Closing or reloading the page clears that in-memory state unless the
+user first downloads a project or model.</p><h2 id="network-requests">Network requests</h2><p>Offline mode makes no CDN attempt. A hosted page or local loopback
+server still serves application files to the browser.</p><p>Hybrid mode may request JavaScript libraries from configured CDNs.
+Requests do not contain CSV rows, model inputs, predictions or
+metrics.</p><h2 id="no-analytics-or-remote-logging">No analytics or remote
+logging</h2><p>The packaged application contains no:</p><ul>
+<li>Analytics SDK</li>
+<li>Advertising SDK</li>
+<li>Remote error-reporting service</li>
+<li><code>fetch</code>-based data upload</li>
+<li><code>XMLHttpRequest</code> data upload</li>
+<li>WebSocket data channel</li>
+<li>Cloud model API</li>
+</ul><h2 id="hosting-logs">Hosting logs</h2><p>When the package is hosted on GitHub Pages, GoDaddy or another web
+server, the hosting provider may log ordinary request metadata such as
+IP address, browser type, time and requested file path. This is separate
+from application-level CSV processing.</p><h2 id="user-controlled-downloads">User-controlled downloads</h2><p>Files leave browser memory only when the user explicitly downloads or
+saves them. The user is responsible for selecting a safe directory and
+controlling access to exported models, projects, predictions, plots and
+metrics.</p><hr/><h1 id="current-limitations">16. Current limitations</h1><ul>
+<li>GP uses a shared length scale rather than per-feature ARD.</li>
+<li>Representative-subset GP is not a variational sparse GP.</li>
+<li>GP matrix calculations are CPU-based JavaScript and may be slow near
+the hard limit.</li>
+<li>ANN training is CPU-based and may be slower than native or GPU
+frameworks.</li>
+<li>ANN uncertainty is approximate.</li>
+<li>A single decision-tree interval is leaf-based and approximate.</li>
+<li>Random-forest intervals use variation between trees and are
+approximate.</li>
+<li>Browser memory reporting is optional and may be unavailable or
+imprecise.</li>
+<li>Some specialised plot hover text may remain in English after
+switching languages.</li>
+</ul><hr/><h1 id="troubleshooting">17. Troubleshooting</h1><h2 id="the-app-does-not-start">The app does not start</h2><p>Use a launcher rather than opening <code>index.html</code> directly.
+Confirm the folder structure still contains <code>js</code>,
+<code>css</code> and <code>vendor</code> directories.</p><h2 id="gp-covariance-factorisation-fails">GP covariance factorisation
+fails</h2><p>Increase observation noise or numerical jitter, standardise features,
+remove duplicate rows, or use a smaller representative subset.</p><h2 id="gp-training-is-too-slow">GP training is too slow</h2><p>Reduce subset size, kernel optimisation iterations, tuning trials or
+cross-validation folds.</p><h2 id="ann-loss-does-not-improve">ANN loss does not improve</h2><p>Standardise numeric inputs, use Adam, reduce the learning rate, use
+ReLU or tanh, reduce network size or increase maximum epochs.</p><h2 id="ann-loss-becomes-non-finite">ANN loss becomes non-finite</h2><p>Reduce the learning rate, standardise inputs, reduce layer sizes and
+inspect the target for invalid or extreme values.</p><h2 id="ann-overfits">ANN overfits</h2><p>Reduce layer sizes, increase dropout or L2, use early stopping,
+obtain more training data, or simplify the feature set.</p><h2 id="prediction-csv-is-rejected">Prediction CSV is rejected</h2><p>Ensure every required feature column is present with the exact
+original spelling. The target column is optional.</p><h2 id="save-as-is-unavailable">Save As is unavailable</h2><p>The browser will use its configured download directory. Direct
+file-system access is not supported consistently across every
+browser.</p><hr/><h1 id="step-4-interface-behaviour">Step 4 interface behaviour</h1><p>The package includes a detailed model-options reference at:</p><pre class="text"><code>docs/STEP_4_MODEL_OPTIONS_GUIDE.md</code></pre><p>Step 4 now hides settings that do not affect the selected
+Gaussian-process configuration:</p><ul>
+<li>Rational-quadratic alpha appears only for the rational-quadratic
+kernel.</li>
+<li>Length scale is hidden for the linear kernel.</li>
+<li>Exact GP hides every subset control.</li>
+<li>Representative-subset GP shows fixed subset size and subset
+selection.</li>
+<li>Automatic subset optimisation shows the automatic size-range
+controls and subset selection.</li>
+</ul><p>ANN grid, ordinary-random and Latin-hypercube tuning include all
+three hidden-layer sizes. A third hidden layer is allowed only when the
+second hidden layer is present. Search summaries distinguish requested
+samples from unique valid configurations and show when a grid is
+capped.</p><hr/><h1 id="experiment-provenance-and-schema-migration-in-v1.0.11">Experiment
+provenance and schema migration in v1.0.11</h1><h2 id="dataset-fingerprint">Dataset fingerprint</h2><p>After a training CSV is loaded, the app calculates a SHA-256
+fingerprint locally. Before hashing, a UTF-8 byte-order mark is removed
+and Windows or classic-Mac line endings are normalised to line-feed
+characters. This makes fingerprints stable when the CSV content is the
+same but line-ending conventions differ.</p><p>The fingerprint is an identifier, not encryption and not a
+replacement for keeping the original data. The original CSV is not
+placed in model, project or experiment files.</p><h2 id="experiment-record">Experiment record</h2><p>Every successful training run creates an experiment record
+containing:</p><ul>
+<li>Experiment ID and application version</li>
+<li>Dataset filename metadata, row and column counts, and
+fingerprint</li>
+<li>Target, features, preprocessing and target transformation</li>
+<li>Split method, random seed, split sizes and CSV row membership</li>
+<li>Model type, capabilities and hyperparameters</li>
+<li>Tuning settings and candidate history</li>
+<li>Uncertainty settings</li>
+<li>Training, validation and test metrics</li>
+<li>Training-job start, finish, progress status and result summary</li>
+<li>Warnings and migration notes</li>
+</ul><p>Use <strong>Download experiment record</strong> in Step 6 to save
+this information as a <code>.mlexperiment.json</code> file.</p><h2 id="project-and-model-schema-version-10">Project and model schema
+version 10</h2><p>v1.0.11 writes model and project schema version 10, experiment schema
+version 6, and approved prediction-package schema version 2. Files from
+earlier releases are migrated in memory when loaded. The migration does
+not modify the original file on disk. Saving the migrated artifact
+creates a new v1.0.11 file.</p><p>A migrated artifact from an earlier release may not contain a dataset
+fingerprint or exact split membership because those values were not
+recorded by the earlier release. The app marks the generated experiment
+record as migrated and includes a warning.</p><h2 id="experiment-collections">Experiment collections</h2><p>A v1.0.11 project contains multiple fitted experiments, an active
+experiment ID, an optional preferred experiment ID, validation records
+and approval records. Step 6 provides the multi-model comparison
+workspace while diagnostics operate on the active experiment.</p><h2 id="managed-jobs-and-cancellation">Managed jobs and
+cancellation</h2><p>Training now has an internal job record. The record tracks progress,
+status, start and finish times, cancellation requests and errors. The
+existing Cancel button requests cancellation through this job system
+while retaining the existing model-level cancellation checks.</p><h2 id="web-worker-foundation">Web Worker foundation</h2><p>The package includes a local Web Worker protocol. v1.0.11 uses it for
+dataset fingerprinting when the browser permits workers. If the
+application is opened in a browser context that blocks workers,
+fingerprinting safely falls back to the main browser thread.</p><p>Model training remains on the main application thread in v1.0.11.
+Moving complete training and tuning workflows into workers is planned
+for a later release and requires careful transfer, progress and
+cancellation handling.</p><h1 id="model-comparison-workspace">Model comparison workspace</h1><h2 id="training-a-comparison-set">Training a comparison set</h2><p>In Step 5, select the model families to include and choose
+<strong>Train selected baseline models</strong>. The app fits them
+sequentially using the same split, preprocessing, target transformation
+and uncertainty level. Linear, ridge, tree and forest are selected
+initially. GP and ANN are optional because they can be slower.</p><p>The comparison batch uses documented baseline hyperparameters. For a
+tuned candidate, configure the model in Step 4 and use <strong>Train and
+evaluate</strong>; the resulting experiment is added to the same
+workspace.</p><h2 id="reading-the-leaderboard">Reading the leaderboard</h2><p>The Step 6 comparison workspace shows validation RMSE, independent
+test metrics, uncertainty metrics and training time. Use validation
+performance to compare or select candidates. Use test metrics for the
+final independent assessment rather than repeatedly tuning against the
+test set.</p><p>A <strong>Different setup</strong> badge means that the experiment
+differs from the active model in one or more of: dataset fingerprint,
+target, features, preprocessing, target transformation, exact split
+membership or requested interval level. Such experiments remain
+available but are hidden when <strong>Comparable only</strong> is
+selected.</p><h2 id="active-and-preferred-models">Active and preferred models</h2><ul>
+<li><strong>Open</strong> makes an experiment active and refreshes
+diagnostics and Step 7 prediction.</li>
+<li><strong>Prefer</strong> records the user’s preferred candidate and
+moves it to the top of the leaderboard. It is not a formal approval
+mechanism.</li>
+<li><strong>Remove</strong> deletes an experiment from the current
+in-memory project.</li>
+</ul><h2 id="saving-comparison-projects">Saving comparison projects</h2><p>A v1.0.11 project stores every fitted artifact, the active experiment,
+the preferred experiment, experiment records and diagnostic outputs. The
+original CSV remains excluded. Multi-model projects can be larger than
+earlier project files.</p><h1 id="validation-workflow">Validation workflow</h1><h2 id="data-quality-assistant">Data-quality assistant</h2><p>The assistant updates when the target or feature selection changes.
+It checks common risks including exact duplicate rows, missing target or
+feature values, constant and near-constant columns, selected
+identifier-like columns, high-cardinality categories and very strong
+numeric relationships that may indicate target leakage.</p><p>Findings are classified as critical, warning or information. These
+automated checks do not determine whether data are scientifically
+representative or whether a relationship is causal.</p><h2 id="acceptance-criteria">Acceptance criteria</h2><p>Step 6 allows optional limits for test RMSE, test R², interval
+coverage and worst-group test RMSE. It can also require no critical
+data-quality finding. Blank numeric limits are not evaluated.</p><p>The result is Passed, Failed or Not evaluated. A passed result means
+only that the configured measurable criteria passed. It is not
+regulatory approval or certification.</p><h2 id="group-validation">Group validation</h2><p>Choose a source, regime or other available column to calculate count,
+RMSE, MAE, R², bias and interval coverage for each test-set group. Very
+small groups can produce unstable metrics.</p><h2 id="prediction-applicability">Prediction applicability</h2><p>For uploaded prediction data, the app checks numeric values against
+fitted training ranges, identifies values near range boundaries, reports
+missing values handled by preprocessing and detects categorical levels
+not present during training. Row-level status and explanations are
+included in the prediction CSV.</p><p>These checks do not detect every type of distribution shift and do
+not guarantee that a prediction is reliable.</p><h1 id="v0.4.0-approval-and-operational-workflow">v0.4.0 approval and
+operational workflow</h1><h2 id="approval-workspace">Approval workspace</h2><p>After validation, Step 6 provides an approval workspace for the
+active experiment. Record the model name, owner, reviewer, intended use,
+prohibited uses, known limitations, conditions, decision date and next
+review date. Approval history is stored with the fitted artifact,
+experiment record and project.</p><p>Statuses are Draft, Approved, Approved with conditions, Rejected and
+Retired. Full approval requires the configured acceptance criteria to
+pass. Conditional approval requires written conditions. Approval is a
+human decision recorded by the app; it is not automatic
+certification.</p><h2 id="operational-input-schema">Operational input schema</h2><p>The app builds an input schema from the fitted training preprocessor.
+Numeric training ranges and categorical levels are retained. Optional
+units and descriptions can be added for operators. These values are
+documentation and applicability evidence; they do not prove that
+uploaded values use the stated unit or are fully in-distribution.</p><h2 id="validation-and-approval-report">Validation and approval
+report</h2><p>Choose <strong>Download validation report (HTML)</strong> to create a
+local report containing model identity, dataset fingerprint,
+intended/prohibited uses, test metrics, acceptance outcomes, input
+schema, limitations and decision history. Open the report in a browser
+and print or save it as PDF when required.</p><h2 id="approved-prediction-package">Approved prediction package</h2><p>An approved <code>.mlpredict.json</code> package contains the fitted
+model and preprocessing, approval record, evaluation summary, input
+schema, embedded test vectors and SHA-256 integrity metadata. The
+original CSV is excluded. The package is available only when the
+approval record is operational and the review date has not passed.</p><h2 id="prediction-only-mode">Prediction-only mode</h2><p>Prediction-only mode hides model-development controls. It requires an
+approved package and verifies:</p><ul>
+<li>Package type and schema</li>
+<li>SHA-256 integrity</li>
+<li>Approval status</li>
+<li>Review-date validity</li>
+<li>Embedded self-test predictions</li>
+<li>Required input columns and numeric types</li>
+</ul><p>After verification, upload a compatible CSV in Step 7. Prediction
+downloads include package ID, approval status, review date, integrity
+status and applicability findings.</p><h2 id="security-and-governance-limitations">Security and governance
+limitations</h2><p>SHA-256 detects changes but is not a digital signature. It does not
+authenticate the reviewer or enforce organizational access control.
+Store approved packages and reports in controlled systems when
+auditability or regulated authorization is required.</p><hr/><h2 id="v1.0-deployment-and-governance">v1.0 deployment and
+governance</h2><p>v1.0 preserves the documented modelling behaviour and adds separate
+deployment editions, versioned governance lifecycle records, monitoring
+and revalidation, model-change assessments, local recovery, stricter
+import/export validation, and optional verification of organizational
+signatures against deployment-pinned public keys. See the package-root
+<code>DEPLOYMENT_GUIDE.md</code>, <code>GOVERNANCE_GUIDE.md</code>,
+<code>MONITORING_GUIDE.md</code>, <code>SECURITY.md</code>, and
+<code>MIGRATION_GUIDE.md</code>.</p><h1 id="v1.0.11-comparison-and-approval-usability-notes">v1.0.11
+comparison and approval usability notes</h1><p>The Train a comparison set panel now states explicitly that a quick
+baseline comparison uses one frozen target, feature selection,
+preprocessing setup, target transformation, exact train/validation/test
+membership, random seed and interval level. A preset table and
+<code>?</code> help buttons explain the baseline settings used for each
+model.</p><p>The Model comparison workspace now includes a chart-scope selector.
+Comparable-only charts remain the recommended final-selection view.
+All-experiment charts are available for overview and mark
+different-setup models with a warning symbol. Use the Why different?
+button to display the descriptor fields that differ from the active
+experiment.</p><p>The Approval and operational release section now provides separate
+approval record JSON and approval history CSV downloads. The full
+approval bundle remains planned for a later release.</p></main></div></div></div>
+</body>
+</html>

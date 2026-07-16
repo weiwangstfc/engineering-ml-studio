@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+<html lang="" xml:lang="" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<title>Security and Privacy</title>
+<style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  
+
+    /* Local Regression Studio v1.0.11 standalone documentation layout fix.
+       Pandoc's default max-width was too narrow when guides opened from the sidebar. */
+    body {
+      max-width: none !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: var(--bg, #f6f8fa) !important;
+      color: var(--text, #172026) !important;
+      font-size: 16px;
+    }
+    .page {
+      max-width: min(1180px, calc(100vw - 48px)) !important;
+      margin: 0 auto !important;
+      padding: clamp(1rem, 2.5vw, 2.5rem) !important;
+    }
+    .card {
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 auto !important;
+    }
+    nav#TOC, #TOC {
+      background: var(--accent, #eaf6f8);
+      border: 1px solid var(--line, #d7e0e5);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0 1.5rem;
+      max-height: none;
+      overflow: visible;
+    }
+    img, svg, canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    table {
+      width: 100%;
+      max-width: 100%;
+    }
+    @media (max-width: 700px) {
+      .page {
+        max-width: calc(100vw - 16px) !important;
+        padding: 0.75rem !important;
+      }
+      .doc-nav {
+        gap: 0.4rem;
+      }
+      .doc-nav a {
+        font-size: 0.92rem;
+        padding: 0.35rem 0.5rem;
+      }
+    }
+
+  </style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="./help.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page docs-shell"><nav class="doc-nav"><a href="./user-guide.html">User guide</a><a href="./step-4-model-options.html">Step 4 model options</a><a href="./validation-and-applicability.html">Validation and applicability</a><a href="./approval-and-operation.html">Approval and operation</a><a href="./security-and-privacy.html">Security and privacy</a></nav><p class="fine">Bundled with Local Regression Studio v1.0.11. These files work offline and on static hosting such as GitHub Pages.</p><div class="card doc-card">
+<header id="title-block-header">
+<h1 class="title">Security and Privacy</h1>
+</header>
+<div class="doc-layout"><aside aria-label="Document contents" class="doc-sidebar"><nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#security-and-privacy" id="toc-security-and-privacy">Security and privacy</a></li>
+<li><a href="#privacy" id="toc-privacy">Privacy</a></li>
+<li><a href="#security-policy" id="toc-security-policy">Security
+Policy</a>
+<ul>
+<li><a href="#supported-release" id="toc-supported-release">Supported
+release</a></li>
+<li><a href="#reporting-a-vulnerability" id="toc-reporting-a-vulnerability">Reporting a vulnerability</a></li>
+<li><a href="#security-properties" id="toc-security-properties">Security
+properties</a></li>
+<li><a href="#organizational-signatures" id="toc-organizational-signatures">Organizational signatures</a></li>
+<li><a href="#known-security-boundaries" id="toc-known-security-boundaries">Known security boundaries</a></li>
+<li><a href="#security-update-process" id="toc-security-update-process">Security update process</a></li>
+</ul></li>
+<li><a href="#threat-model" id="toc-threat-model">Threat Model</a>
+<ul>
+<li><a href="#protected-assets" id="toc-protected-assets">Protected
+assets</a></li>
+<li><a href="#primary-threats-and-controls" id="toc-primary-threats-and-controls">Primary threats and
+controls</a></li>
+<li><a href="#trust-boundaries" id="toc-trust-boundaries">Trust
+boundaries</a></li>
+</ul></li>
+</ul>
+</nav></aside><main class="doc-main" id="main-content"><h1 id="security-and-privacy">Security and privacy</h1><h1 id="privacy">Privacy</h1><p>Local Regression Studio processes CSV data, preprocessing, training,
+diagnostics, monitoring, and predictions in the user’s browser. It has
+no analytics, account service, cloud storage, remote model execution, or
+data-upload endpoint.</p><p>The Full Studio may load pinned Plotly and CSV parser assets from
+jsDelivr when deliberately started in hybrid mode. Those requests are
+for application libraries, not user CSV data. The local launchers
+default to bundled libraries. Strict-offline and Prediction-only
+editions force bundled assets and use a CSP that disallows remote script
+and connection sources.</p><p>The original CSV is not embedded in saved projects, models,
+experiment records, approved prediction packages, governance reports, or
+recovery snapshots. Derived artifacts can nevertheless reveal sensitive
+information through feature names, ranges, categories, coefficients,
+stored rows, predictions, residuals, approval notes, and monitoring
+outcomes. Treat downloads as potentially sensitive.</p><p>Local browser storage is used only for an optional recovery snapshot
+and user interface state. The recovery snapshot excludes the original
+CSV. Users can discard it from the recovery panel or clear site storage
+through the browser.</p><hr/><h1 id="security-policy">Security Policy</h1><h2 id="supported-release">Supported release</h2><p>The supported reference release is Local Regression Studio v1.0.11.
+Security corrections should be distributed as a new signed or
+checksum-verifiable release rather than by replacing files silently.</p><h2 id="reporting-a-vulnerability">Reporting a vulnerability</h2><p>Report suspected vulnerabilities privately to the application owner
+or deployment administrator. Include the application version, edition,
+browser, steps to reproduce, affected artifact type, and whether raw
+user data are required. Do not attach sensitive datasets unless an
+approved secure channel is available.</p><h2 id="security-properties">Security properties</h2><ul>
+<li>Browser-local model development and prediction</li>
+<li>No analytics, remote training, cloud-storage, or CSV-upload
+endpoint</li>
+<li>Strict-offline editions with no permitted remote script or
+connection sources</li>
+<li>SHA-256 artifact integrity for approved prediction packages</li>
+<li>Optional ECDSA P-256 organizational signature verification against
+administrator-pinned public keys</li>
+<li>Import file-size and structural-complexity limits</li>
+<li>CSV row/column limits and duplicate-header rejection</li>
+<li>Spreadsheet-formula injection protection in generated CSV files</li>
+<li>HTML escaping of user-controlled labels and governance text</li>
+<li>Bounded model and tuning workloads</li>
+</ul><h2 id="organizational-signatures">Organizational signatures</h2><p>The app does not create organizational signatures or store private
+keys. A deployment may configure trusted public JWK values in
+<code>js/build-config.js</code> under <code>trustedSigningKeys</code>.
+Signed packages are accepted only when the declared <code>keyId</code>
+exists in that trusted map and the ECDSA signature verifies over the
+package SHA-256 digest.</p><p>An embedded public key is not treated as organizational trust. Key
+distribution, rotation, revocation, custody, and signer identity are
+deployment responsibilities.</p><h2 id="known-security-boundaries">Known security boundaries</h2><ul>
+<li>Prediction-only mode is a workflow restriction, not authentication
+or authorization.</li>
+<li>Governance names and roles are recorded metadata, not verified
+identities.</li>
+<li>A malicious user with permission to replace application files can
+also replace configuration and trusted keys; protect the deployment
+directory with ordinary hosting and operating-system controls.</li>
+<li>Browser memory exhaustion cannot be eliminated completely. The app
+validates documented limits and refuses oversized structures, but
+administrators should set web-server upload limits as an additional
+control.</li>
+<li>The Full Studio hybrid edition permits pinned jsDelivr sources
+through its CSP when hybrid mode is enabled. Use Strict-offline for
+controlled environments.</li>
+</ul><h2 id="security-update-process">Security update process</h2><ol type="1">
+<li>Reproduce and classify the issue.</li>
+<li>Correct it on a new maintenance branch.</li>
+<li>Add a regression test.</li>
+<li>Run numerical, migration, security, and browser checks.</li>
+<li>Publish a new version, checksum, manifest, SBOM, test report, and
+release notes.</li>
+<li>Inform operators whether approved model packages need reissue or
+revalidation.</li>
+</ol><hr/><h1 id="threat-model">Threat Model</h1><h2 id="protected-assets">Protected assets</h2><ul>
+<li>Training and prediction CSV data</li>
+<li>Fitted model and preprocessing state</li>
+<li>Approved prediction packages</li>
+<li>Governance and monitoring records</li>
+<li>Trusted organizational public keys</li>
+<li>Release files and manifests</li>
+</ul><h2 id="primary-threats-and-controls">Primary threats and controls</h2><table>
+<colgroup>
+<col style="width: 33%"/>
+<col style="width: 33%"/>
+<col style="width: 33%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Threat</th>
+<th>Controls</th>
+<th>Residual risk</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sensitive data sent externally</td>
+<td>Local processing; no upload endpoint; strict-offline CSP</td>
+<td>Browser extensions, compromised host, or custom modifications remain
+outside app control</td>
+</tr>
+<tr class="even">
+<td>Malicious/oversized CSV</td>
+<td>File, row, and column limits; duplicate-header checks; bounded
+workloads</td>
+<td>Complex but within-limit data can still consume substantial
+memory</td>
+</tr>
+<tr class="odd">
+<td>Malformed/oversized JSON</td>
+<td>File, depth, node, array, type, schema, and hash checks</td>
+<td>Novel semantic corruption may require additional model-specific
+checks</td>
+</tr>
+<tr class="even">
+<td>Spreadsheet formula injection</td>
+<td>Prefix dangerous exported cells with an apostrophe</td>
+<td>Users can manually remove protection after download</td>
+</tr>
+<tr class="odd">
+<td>HTML/script injection</td>
+<td>Escaping and CSP</td>
+<td>Deployment modifications can weaken CSP</td>
+</tr>
+<tr class="even">
+<td>Package tampering</td>
+<td>SHA-256 integrity and embedded self-test vectors</td>
+<td>Hash alone does not prove organizational origin</td>
+</tr>
+<tr class="odd">
+<td>False signer identity</td>
+<td>Administrator-pinned trusted keys</td>
+<td>Key custody, rotation, and revocation are organizational
+responsibilities</td>
+</tr>
+<tr class="even">
+<td>Unauthorized Studio access</td>
+<td>Separate prediction edition and deployment guidance</td>
+<td>Static editions do not provide authentication</td>
+</tr>
+<tr class="odd">
+<td>Model misuse outside scope</td>
+<td>Intended/prohibited uses, applicability warnings, approval
+status</td>
+<td>Human process can ignore warnings</td>
+</tr>
+<tr class="even">
+<td>Stale model</td>
+<td>Review dates, monitoring, revalidation triggers,
+suspension/expiry</td>
+<td>Monitoring data can be late or incomplete</td>
+</tr>
+<tr class="odd">
+<td>Supply-chain compromise</td>
+<td>Bundled libraries, version inventory, SBOM, manifest, strict-offline
+edition</td>
+<td>Reference build is checksum-verifiable but not signed by a private
+release key</td>
+</tr>
+</tbody>
+</table><h2 id="trust-boundaries">Trust boundaries</h2><p>The browser, operating system, hosting environment, installed
+extensions, and organizational identity system are outside the
+JavaScript application’s control. The app assumes its own static files
+and configured trusted keys have not been replaced by an attacker with
+deployment access.</p></main></div></div></div>
+</body>
+</html>

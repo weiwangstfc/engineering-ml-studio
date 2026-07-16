@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html lang="" xml:lang="" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<title>Validation and Applicability Guide</title>
+<style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  
+
+    /* Local Regression Studio v1.0.11 standalone documentation layout fix.
+       Pandoc's default max-width was too narrow when guides opened from the sidebar. */
+    body {
+      max-width: none !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: var(--bg, #f6f8fa) !important;
+      color: var(--text, #172026) !important;
+      font-size: 16px;
+    }
+    .page {
+      max-width: min(1180px, calc(100vw - 48px)) !important;
+      margin: 0 auto !important;
+      padding: clamp(1rem, 2.5vw, 2.5rem) !important;
+    }
+    .card {
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 auto !important;
+    }
+    nav#TOC, #TOC {
+      background: var(--accent, #eaf6f8);
+      border: 1px solid var(--line, #d7e0e5);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0 1.5rem;
+      max-height: none;
+      overflow: visible;
+    }
+    img, svg, canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    table {
+      width: 100%;
+      max-width: 100%;
+    }
+    @media (max-width: 700px) {
+      .page {
+        max-width: calc(100vw - 16px) !important;
+        padding: 0.75rem !important;
+      }
+      .doc-nav {
+        gap: 0.4rem;
+      }
+      .doc-nav a {
+        font-size: 0.92rem;
+        padding: 0.35rem 0.5rem;
+      }
+    }
+
+  </style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="./help.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page docs-shell"><nav class="doc-nav"><a href="./user-guide.html">User guide</a><a href="./step-4-model-options.html">Step 4 model options</a><a href="./validation-and-applicability.html">Validation and applicability</a><a href="./approval-and-operation.html">Approval and operation</a><a href="./security-and-privacy.html">Security and privacy</a></nav><p class="fine">Bundled with Local Regression Studio v1.0.11. These files work offline and on static hosting such as GitHub Pages.</p><div class="card doc-card">
+<header id="title-block-header">
+<h1 class="title">Validation and Applicability Guide</h1>
+</header>
+<div class="doc-layout"><aside aria-label="Document contents" class="doc-sidebar"><nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#validation-and-applicability-guide" id="toc-validation-and-applicability-guide">Validation and Applicability
+Guide</a>
+<ul>
+<li><a href="#purpose" id="toc-purpose">Purpose</a></li>
+<li><a href="#data-quality-assistant" id="toc-data-quality-assistant">Data-quality assistant</a>
+<ul>
+<li><a href="#interpretation" id="toc-interpretation">Interpretation</a></li>
+</ul></li>
+<li><a href="#acceptance-criteria" id="toc-acceptance-criteria">Acceptance criteria</a></li>
+<li><a href="#performance-by-group" id="toc-performance-by-group">Performance by group</a></li>
+<li><a href="#prediction-applicability" id="toc-prediction-applicability">Prediction applicability</a>
+<ul>
+<li><a href="#limitations" id="toc-limitations">Limitations</a></li>
+</ul></li>
+<li><a href="#conformal-calibration" id="toc-conformal-calibration">Conformal calibration</a></li>
+<li><a href="#relationship-to-approval" id="toc-relationship-to-approval">Relationship to approval</a></li>
+<li><a href="#v1.0-deployment-and-governance" id="toc-v1.0-deployment-and-governance">v1.0 deployment and
+governance</a></li>
+</ul></li>
+</ul>
+</nav></aside><main class="doc-main" id="main-content"><h1 id="validation-and-applicability-guide">Validation and Applicability
+Guide</h1><p><strong>Application:</strong> Local Regression Studio v1.0.11</p><h2 id="purpose">Purpose</h2><p>The validation layer helps users identify common data risks, define
+measurable acceptance requirements, inspect performance by group and
+recognize prediction inputs that differ from the fitted training
+domain.</p><p>These tools support review. They do not certify a model, establish
+causality or guarantee reliable predictions under distribution
+shift.</p><h2 id="data-quality-assistant">Data-quality assistant</h2><p>The assistant updates when the target or selected features change. It
+currently checks:</p><ul>
+<li>Exact duplicate rows</li>
+<li>Small datasets</li>
+<li>Missing or nonnumeric target values</li>
+<li>Substantial missingness in selected features</li>
+<li>Constant and near-constant selected columns</li>
+<li>Identifier-like selected features</li>
+<li>High-cardinality categorical features</li>
+<li>Features exactly equal to the target</li>
+<li>Extremely high numeric correlation that may indicate target
+leakage</li>
+</ul><p>Each finding is labelled critical, warning or information and
+includes a suggested response.</p><h3 id="interpretation">Interpretation</h3><p>A critical finding should normally be resolved before model approval.
+A warning requires investigation and documentation. Information items
+explain the current state or limitations of the check.</p><p>The absence of findings does not prove that the dataset is
+representative, unbiased or suitable for the intended use.</p><h2 id="acceptance-criteria">Acceptance criteria</h2><p>Step 6 supports these optional requirements:</p><ul>
+<li>Maximum test RMSE</li>
+<li>Minimum test R²</li>
+<li>Minimum test interval coverage</li>
+<li>Maximum test interval coverage</li>
+<li>Maximum RMSE in any selected test group</li>
+<li>No critical data-quality findings</li>
+</ul><p>Blank numeric fields are not evaluated. The result is:</p><ul>
+<li><strong>Passed:</strong> all configured measurable requirements
+passed</li>
+<li><strong>Failed:</strong> at least one configured requirement
+failed</li>
+<li><strong>Not evaluated:</strong> no measurable requirement could be
+evaluated</li>
+</ul><p>Acceptance settings and results are stored in the fitted artifact,
+experiment record and project file.</p><h2 id="performance-by-group">Performance by group</h2><p>Choose a group column such as source, site, instrument, batch, regime
+or a selected feature. The app reports:</p><ul>
+<li>Test rows</li>
+<li>RMSE</li>
+<li>MAE</li>
+<li>R²</li>
+<li>Mean residual bias</li>
+<li>Interval coverage, when intervals are available</li>
+</ul><p>Small groups can produce unstable statistics. Group results should be
+interpreted with sample size and domain knowledge.</p><h2 id="prediction-applicability">Prediction applicability</h2><p>When a prediction CSV is uploaded, each row receives one of these
+statuses:</p><ul>
+<li><code>within-domain</code></li>
+<li><code>near-boundary</code></li>
+<li><code>warning</code></li>
+<li><code>outside-domain</code></li>
+</ul><p>Checks include:</p><ul>
+<li>Numeric values outside fitted training ranges</li>
+<li>Numeric values within 5% of a training-range boundary</li>
+<li>Missing numeric or categorical values</li>
+<li>Categorical values not observed during training</li>
+<li>Rows dropped by fitted preprocessing rules</li>
+</ul><p>The downloaded prediction CSV includes:</p><ul>
+<li><code>applicability_status</code></li>
+<li><code>applicability_issue_count</code></li>
+<li><code>applicability_notes</code></li>
+</ul><h3 id="limitations">Limitations</h3><p>The current applicability checks are transparent marginal checks.
+They do not fully detect multivariate extrapolation, covariate shift,
+concept drift or changes in the relationship between inputs and
+target.</p><h2 id="conformal-calibration">Conformal calibration</h2><p>Conformal interval calibration is not included in v1.0.11. A
+statistically defensible implementation should use a calibration set
+that is separate from both hyperparameter selection and final test
+assessment. Reusing the same validation rows for tuning and calibration
+would weaken the coverage claim. A future release can add an explicit
+calibration split or nested workflow.</p><h2 id="relationship-to-approval">Relationship to approval</h2><p>In v1.0.11 the acceptance result is an input to the human approval
+workflow. A full <code>Approved</code> decision requires the configured
+criteria to pass. <code>Approved with conditions</code> can document
+restricted use and requires written conditions. Rejected, retired and
+draft models cannot be exported as approved prediction packages.</p><p>Acceptance and approval remain different concepts:</p><ul>
+<li><strong>Acceptance</strong> evaluates user-configured measurable
+criteria.</li>
+<li><strong>Approval</strong> records a responsible human decision,
+intended use, limitations and review date.</li>
+</ul><hr/><h2 id="v1.0-deployment-and-governance">v1.0 deployment and
+governance</h2><p>v1.0 preserves the documented modelling behaviour and adds separate
+deployment editions, versioned governance lifecycle records, monitoring
+and revalidation, model-change assessments, local recovery, stricter
+import/export validation, and optional verification of organizational
+signatures against deployment-pinned public keys. See the package-root
+<code>DEPLOYMENT_GUIDE.md</code>, <code>GOVERNANCE_GUIDE.md</code>,
+<code>MONITORING_GUIDE.md</code>, <code>SECURITY.md</code>, and
+<code>MIGRATION_GUIDE.md</code>.</p></main></div></div></div>
+</body>
+</html>

@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+
+<html lang="" xml:lang="" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<title>Step 4 Model Options Guide</title>
+<style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  
+
+    /* Local Regression Studio v1.0.11 standalone documentation layout fix.
+       Pandoc's default max-width was too narrow when guides opened from the sidebar. */
+    body {
+      max-width: none !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: var(--bg, #f6f8fa) !important;
+      color: var(--text, #172026) !important;
+      font-size: 16px;
+    }
+    .page {
+      max-width: min(1180px, calc(100vw - 48px)) !important;
+      margin: 0 auto !important;
+      padding: clamp(1rem, 2.5vw, 2.5rem) !important;
+    }
+    .card {
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 auto !important;
+    }
+    nav#TOC, #TOC {
+      background: var(--accent, #eaf6f8);
+      border: 1px solid var(--line, #d7e0e5);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0 1.5rem;
+      max-height: none;
+      overflow: visible;
+    }
+    img, svg, canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    table {
+      width: 100%;
+      max-width: 100%;
+    }
+    @media (max-width: 700px) {
+      .page {
+        max-width: calc(100vw - 16px) !important;
+        padding: 0.75rem !important;
+      }
+      .doc-nav {
+        gap: 0.4rem;
+      }
+      .doc-nav a {
+        font-size: 0.92rem;
+        padding: 0.35rem 0.5rem;
+      }
+    }
+
+  </style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="./help.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page docs-shell"><nav class="doc-nav"><a href="./user-guide.html">User guide</a><a href="./step-4-model-options.html">Step 4 model options</a><a href="./validation-and-applicability.html">Validation and applicability</a><a href="./approval-and-operation.html">Approval and operation</a><a href="./security-and-privacy.html">Security and privacy</a></nav><p class="fine">Bundled with Local Regression Studio v1.0.11. These files work offline and on static hosting such as GitHub Pages.</p><div class="card doc-card">
+<header id="title-block-header">
+<h1 class="title">Step 4 Model Options Guide</h1>
+</header>
+<div class="doc-layout"><aside aria-label="Document contents" class="doc-sidebar"><nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#step-4-model-options-guide" id="toc-step-4-model-options-guide">Step 4 Model Options Guide</a>
+<ul>
+<li><a href="#contents" id="toc-contents">Contents</a></li>
+</ul></li>
+<li><a href="#how-step-4-fits-into-the-workflow" id="toc-how-step-4-fits-into-the-workflow">1. How Step 4 fits into the
+workflow</a></li>
+<li><a href="#choosing-a-model" id="toc-choosing-a-model">2. Choosing a
+model</a>
+<ul>
+<li><a href="#quick-comparison" id="toc-quick-comparison">Quick
+comparison</a></li>
+<li><a href="#suggested-starting-point" id="toc-suggested-starting-point">Suggested starting point</a></li>
+</ul></li>
+<li><a href="#tuning-methods" id="toc-tuning-methods">3. Tuning
+methods</a>
+<ul>
+<li><a href="#manual-configuration" id="toc-manual-configuration">Manual
+configuration</a></li>
+<li><a href="#grid-search" id="toc-grid-search">Grid search</a></li>
+<li><a href="#ordinary-random-search" id="toc-ordinary-random-search">Ordinary random search</a></li>
+<li><a href="#latin-hypercube-sampling" id="toc-latin-hypercube-sampling">Latin hypercube sampling</a></li>
+<li><a href="#number-of-search-samples" id="toc-number-of-search-samples">Number of search samples</a></li>
+<li><a href="#linear-versus-logarithmic-spacing" id="toc-linear-versus-logarithmic-spacing">Linear versus logarithmic
+spacing</a></li>
+</ul></li>
+<li><a href="#linear-regression" id="toc-linear-regression">4. Linear
+regression</a>
+<ul>
+<li><a href="#what-it-does" id="toc-what-it-does">What it does</a></li>
+<li><a href="#step-4-options" id="toc-step-4-options">Step 4
+options</a></li>
+<li><a href="#when-to-use-it" id="toc-when-to-use-it">When to use
+it</a></li>
+<li><a href="#strengths" id="toc-strengths">Strengths</a></li>
+<li><a href="#limitations" id="toc-limitations">Limitations</a></li>
+<li><a href="#related-preprocessing-advice" id="toc-related-preprocessing-advice">Related preprocessing
+advice</a></li>
+</ul></li>
+<li><a href="#ridge-regression" id="toc-ridge-regression">5. Ridge
+regression</a>
+<ul>
+<li><a href="#what-it-does-1" id="toc-what-it-does-1">What it
+does</a></li>
+<li><a href="#ridge-strength-lambda" id="toc-ridge-strength-lambda">Ridge strength — lambda</a>
+<ul>
+<li><a href="#if-lambda-is-too-small" id="toc-if-lambda-is-too-small">If
+lambda is too small</a></li>
+<li><a href="#if-lambda-is-too-large" id="toc-if-lambda-is-too-large">If
+lambda is too large</a></li>
+<li><a href="#suggested-starting-values" id="toc-suggested-starting-values">Suggested starting values</a></li>
+</ul></li>
+<li><a href="#uncertainty" id="toc-uncertainty">Uncertainty</a></li>
+</ul></li>
+<li><a href="#decision-tree-regression" id="toc-decision-tree-regression">6. Decision-tree regression</a>
+<ul>
+<li><a href="#what-it-does-2" id="toc-what-it-does-2">What it
+does</a></li>
+<li><a href="#maximum-depth" id="toc-maximum-depth">Maximum
+depth</a></li>
+<li><a href="#minimum-rows-per-leaf" id="toc-minimum-rows-per-leaf">Minimum rows per leaf</a></li>
+<li><a href="#candidate-thresholds-per-feature" id="toc-candidate-thresholds-per-feature">Candidate thresholds per
+feature</a></li>
+<li><a href="#features-considered-per-split" id="toc-features-considered-per-split">Features considered per split</a>
+<ul>
+<li><a href="#all" id="toc-all">All</a></li>
+<li><a href="#square-root" id="toc-square-root">Square root</a></li>
+<li><a href="#log2" id="toc-log2">Log2</a></li>
+</ul></li>
+<li><a href="#uncertainty-1" id="toc-uncertainty-1">Uncertainty</a></li>
+</ul></li>
+<li><a href="#random-forest-regression" id="toc-random-forest-regression">7. Random-forest regression</a>
+<ul>
+<li><a href="#what-it-does-3" id="toc-what-it-does-3">What it
+does</a></li>
+<li><a href="#number-of-trees" id="toc-number-of-trees">Number of
+trees</a></li>
+<li><a href="#maximum-depth-1" id="toc-maximum-depth-1">Maximum
+depth</a></li>
+<li><a href="#minimum-rows-per-leaf-1" id="toc-minimum-rows-per-leaf-1">Minimum rows per leaf</a></li>
+<li><a href="#row-sampling-fraction" id="toc-row-sampling-fraction">Row
+sampling fraction</a></li>
+<li><a href="#candidate-thresholds-per-feature-1" id="toc-candidate-thresholds-per-feature-1">Candidate thresholds per
+feature</a></li>
+<li><a href="#features-considered-per-split-1" id="toc-features-considered-per-split-1">Features considered per
+split</a>
+<ul>
+<li><a href="#all-1" id="toc-all-1">All</a></li>
+<li><a href="#square-root-1" id="toc-square-root-1">Square root</a></li>
+<li><a href="#log2-1" id="toc-log2-1">Log2</a></li>
+</ul></li>
+<li><a href="#uncertainty-2" id="toc-uncertainty-2">Uncertainty</a></li>
+</ul></li>
+<li><a href="#gaussian-process-regression" id="toc-gaussian-process-regression">8. Gaussian-process regression</a>
+<ul>
+<li><a href="#what-it-does-4" id="toc-what-it-does-4">What it
+does</a></li>
+<li><a href="#gp-training-mode" id="toc-gp-training-mode">GP training
+mode</a>
+<ul>
+<li><a href="#exact-gp" id="toc-exact-gp">Exact GP</a></li>
+<li><a href="#representative-subset-gp" id="toc-representative-subset-gp">Representative-subset GP</a></li>
+<li><a href="#automatically-optimise-subset-size" id="toc-automatically-optimise-subset-size">Automatically optimise
+subset size</a></li>
+</ul></li>
+<li><a href="#kernel" id="toc-kernel">Kernel</a>
+<ul>
+<li><a href="#rbf-squared-exponential" id="toc-rbf-squared-exponential">RBF / squared exponential</a></li>
+<li><a href="#matérn-32" id="toc-matérn-32">Matérn 3/2</a></li>
+<li><a href="#matérn-52" id="toc-matérn-52">Matérn 5/2</a></li>
+<li><a href="#rational-quadratic" id="toc-rational-quadratic">Rational
+quadratic</a></li>
+<li><a href="#linear-kernel" id="toc-linear-kernel">Linear
+kernel</a></li>
+</ul></li>
+<li><a href="#length-scale" id="toc-length-scale">Length scale</a>
+<ul>
+<li><a href="#if-too-small" id="toc-if-too-small">If too small</a></li>
+<li><a href="#if-too-large" id="toc-if-too-large">If too large</a></li>
+<li><a href="#shared-length-scale" id="toc-shared-length-scale">Shared
+length scale</a></li>
+</ul></li>
+<li><a href="#signal-variance" id="toc-signal-variance">Signal
+variance</a>
+<ul>
+<li><a href="#if-too-small-1" id="toc-if-too-small-1">If too
+small</a></li>
+<li><a href="#if-too-large-1" id="toc-if-too-large-1">If too
+large</a></li>
+</ul></li>
+<li><a href="#observation-noise-standard-deviation" id="toc-observation-noise-standard-deviation">Observation-noise standard
+deviation</a>
+<ul>
+<li><a href="#units" id="toc-units">Units</a></li>
+<li><a href="#effect-of-the-value" id="toc-effect-of-the-value">Effect
+of the value</a></li>
+<li><a href="#if-too-small-2" id="toc-if-too-small-2">If too
+small</a></li>
+<li><a href="#if-too-large-2" id="toc-if-too-large-2">If too
+large</a></li>
+<li><a href="#important-scaling-note" id="toc-important-scaling-note">Important scaling note</a></li>
+</ul></li>
+<li><a href="#observation-noise-versus-numerical-jitter" id="toc-observation-noise-versus-numerical-jitter">Observation noise
+versus numerical jitter</a></li>
+<li><a href="#numerical-jitter" id="toc-numerical-jitter">Numerical
+jitter</a>
+<ul>
+<li><a href="#when-to-increase-it-manually" id="toc-when-to-increase-it-manually">When to increase it
+manually</a></li>
+</ul></li>
+<li><a href="#stochastic-kernel-search-iterations" id="toc-stochastic-kernel-search-iterations">Stochastic kernel-search
+iterations</a>
+<ul>
+<li><a href="#how-the-internal-gp-optimiser-works" id="toc-how-the-internal-gp-optimiser-works">How the internal GP
+optimiser works</a></li>
+</ul></li>
+<li><a href="#rational-quadratic-alpha" id="toc-rational-quadratic-alpha">Rational-quadratic alpha</a></li>
+<li><a href="#representative-subset-size" id="toc-representative-subset-size">Representative subset size</a></li>
+<li><a href="#subset-selection" id="toc-subset-selection">Subset
+selection</a>
+<ul>
+<li><a href="#farthest-point-sampling" id="toc-farthest-point-sampling">Farthest-point sampling</a></li>
+<li><a href="#k-means-representative-sampling" id="toc-k-means-representative-sampling">K-means++ representative
+sampling</a></li>
+<li><a href="#random-sampling" id="toc-random-sampling">Random
+sampling</a></li>
+</ul></li>
+<li><a href="#automatic-subset-minimum" id="toc-automatic-subset-minimum">Automatic subset minimum</a></li>
+<li><a href="#automatic-subset-maximum" id="toc-automatic-subset-maximum">Automatic subset maximum</a></li>
+<li><a href="#subset-sizes-evaluated" id="toc-subset-sizes-evaluated">Subset sizes evaluated</a></li>
+<li><a href="#validation-tolerance-for-smaller-subset" id="toc-validation-tolerance-for-smaller-subset">Validation tolerance
+for smaller subset</a></li>
+<li><a href="#gp-tuning-ranges" id="toc-gp-tuning-ranges">GP tuning
+ranges</a></li>
+</ul></li>
+<li><a href="#artificial-neural-network-regression" id="toc-artificial-neural-network-regression">9. Artificial
+neural-network regression</a>
+<ul>
+<li><a href="#what-it-does-5" id="toc-what-it-does-5">What it
+does</a></li>
+<li><a href="#hidden-layer-1-neurons" id="toc-hidden-layer-1-neurons">Hidden layer 1 neurons</a></li>
+<li><a href="#hidden-layer-2-neurons" id="toc-hidden-layer-2-neurons">Hidden layer 2 neurons</a></li>
+<li><a href="#hidden-layer-3-neurons" id="toc-hidden-layer-3-neurons">Hidden layer 3 neurons</a></li>
+<li><a href="#architecture-guidance" id="toc-architecture-guidance">Architecture guidance</a>
+<ul>
+<li><a href="#small" id="toc-small">Small</a></li>
+<li><a href="#medium" id="toc-medium">Medium</a></li>
+<li><a href="#larger" id="toc-larger">Larger</a></li>
+</ul></li>
+<li><a href="#activation-function" id="toc-activation-function">Activation function</a>
+<ul>
+<li><a href="#relu" id="toc-relu">ReLU</a></li>
+<li><a href="#leaky-relu" id="toc-leaky-relu">Leaky ReLU</a></li>
+<li><a href="#tanh" id="toc-tanh">Tanh</a></li>
+<li><a href="#sigmoid" id="toc-sigmoid">Sigmoid</a></li>
+</ul></li>
+<li><a href="#optimiser" id="toc-optimiser">Optimiser</a>
+<ul>
+<li><a href="#adam" id="toc-adam">Adam</a></li>
+<li><a href="#stochastic-gradient-descent" id="toc-stochastic-gradient-descent">Stochastic gradient
+descent</a></li>
+</ul></li>
+<li><a href="#learning-rate" id="toc-learning-rate">Learning
+rate</a></li>
+<li><a href="#batch-size" id="toc-batch-size">Batch size</a></li>
+<li><a href="#maximum-epochs" id="toc-maximum-epochs">Maximum
+epochs</a></li>
+<li><a href="#dropout-rate" id="toc-dropout-rate">Dropout rate</a></li>
+<li><a href="#l2-regularisation" id="toc-l2-regularisation">L2
+regularisation</a></li>
+<li><a href="#early-stopping-patience" id="toc-early-stopping-patience">Early-stopping patience</a></li>
+<li><a href="#minimum-validation-improvement" id="toc-minimum-validation-improvement">Minimum validation
+improvement</a></li>
+<li><a href="#ann-uncertainty-method" id="toc-ann-uncertainty-method">ANN uncertainty method</a>
+<ul>
+<li><a href="#monte-carlo-dropout" id="toc-monte-carlo-dropout">Monte
+Carlo dropout</a></li>
+<li><a href="#small-deep-ensemble" id="toc-small-deep-ensemble">Small
+deep ensemble</a></li>
+</ul></li>
+<li><a href="#monte-carlo-dropout-passes" id="toc-monte-carlo-dropout-passes">Monte Carlo dropout passes</a></li>
+<li><a href="#ensemble-members" id="toc-ensemble-members">Ensemble
+members</a></li>
+<li><a href="#ann-parameter-count" id="toc-ann-parameter-count">ANN
+parameter count</a></li>
+<li><a href="#ann-tuning-ranges" id="toc-ann-tuning-ranges">ANN tuning
+ranges</a></li>
+</ul></li>
+<li><a href="#models-added-in-v1.0.11" id="toc-models-added-in-v1.0.11">Models added in v1.0.11</a>
+<ul>
+<li><a href="#elastic-net-regression" id="toc-elastic-net-regression">Elastic-net regression</a></li>
+<li><a href="#huber-robust-regression" id="toc-huber-robust-regression">Huber robust regression</a></li>
+<li><a href="#gradient-boosted-trees" id="toc-gradient-boosted-trees">Gradient-boosted trees</a></li>
+<li><a href="#k-nearest-neighbour-regression" id="toc-k-nearest-neighbour-regression">k-nearest-neighbour
+regression</a></li>
+<li><a href="#linear-quantile-regression" id="toc-linear-quantile-regression">Linear quantile regression</a></li>
+</ul></li>
+<li><a href="#common-tuning-advice" id="toc-common-tuning-advice">10.
+Common tuning advice</a>
+<ul>
+<li><a href="#change-one-thing-at-a-time-when-learning" id="toc-change-one-thing-at-a-time-when-learning">Change one thing at a
+time when learning</a></li>
+<li><a href="#signs-of-underfitting" id="toc-signs-of-underfitting">Signs of underfitting</a></li>
+<li><a href="#signs-of-overfitting" id="toc-signs-of-overfitting">Signs
+of overfitting</a></li>
+<li><a href="#use-the-validation-set-not-the-test-set" id="toc-use-the-validation-set-not-the-test-set">Use the validation set,
+not the test set</a></li>
+<li><a href="#compare-uncertainty-quality-as-well-as-point-error" id="toc-compare-uncertainty-quality-as-well-as-point-error">Compare
+uncertainty quality as well as point error</a></li>
+</ul></li>
+<li><a href="#performance-and-safety-limits" id="toc-performance-and-safety-limits">11. Performance and safety
+limits</a>
+<ul>
+<li><a href="#decision-tree" id="toc-decision-tree">Decision
+tree</a></li>
+<li><a href="#random-forest" id="toc-random-forest">Random
+forest</a></li>
+<li><a href="#gaussian-process" id="toc-gaussian-process">Gaussian
+process</a></li>
+<li><a href="#ann" id="toc-ann">ANN</a></li>
+<li><a href="#browser-considerations" id="toc-browser-considerations">Browser considerations</a></li>
+</ul></li>
+<li><a href="#glossary" id="toc-glossary">12. Glossary</a>
+<ul>
+<li><a href="#candidate-configuration" id="toc-candidate-configuration">Candidate configuration</a></li>
+<li><a href="#epoch" id="toc-epoch">Epoch</a></li>
+<li><a href="#hyperparameter" id="toc-hyperparameter">Hyperparameter</a></li>
+<li><a href="#kernel-1" id="toc-kernel-1">Kernel</a></li>
+<li><a href="#latent-function" id="toc-latent-function">Latent
+function</a></li>
+<li><a href="#negative-log-marginal-likelihood" id="toc-negative-log-marginal-likelihood">Negative log marginal
+likelihood</a></li>
+<li><a href="#observation-noise" id="toc-observation-noise">Observation
+noise</a></li>
+<li><a href="#overfitting" id="toc-overfitting">Overfitting</a></li>
+<li><a href="#prediction-interval" id="toc-prediction-interval">Prediction interval</a></li>
+<li><a href="#regularisation" id="toc-regularisation">Regularisation</a></li>
+<li><a href="#representative-subset" id="toc-representative-subset">Representative subset</a></li>
+<li><a href="#trainable-parameter" id="toc-trainable-parameter">Trainable parameter</a></li>
+<li><a href="#validation-rmse" id="toc-validation-rmse">Validation
+RMSE</a></li>
+</ul></li>
+<li><a href="#practical-default-configurations" id="toc-practical-default-configurations">Practical default
+configurations</a>
+<ul>
+<li><a href="#linear-baseline" id="toc-linear-baseline">Linear
+baseline</a></li>
+<li><a href="#ridge-baseline" id="toc-ridge-baseline">Ridge
+baseline</a></li>
+<li><a href="#decision-tree-baseline" id="toc-decision-tree-baseline">Decision-tree baseline</a></li>
+<li><a href="#random-forest-baseline" id="toc-random-forest-baseline">Random-forest baseline</a></li>
+<li><a href="#exact-gp-baseline" id="toc-exact-gp-baseline">Exact GP
+baseline</a></li>
+<li><a href="#representative-gp-baseline" id="toc-representative-gp-baseline">Representative GP baseline</a></li>
+<li><a href="#ann-baseline" id="toc-ann-baseline">ANN baseline</a></li>
+<li><a href="#important-interpretation-warning" id="toc-important-interpretation-warning">Important interpretation
+warning</a></li>
+</ul></li>
+<li><a href="#v0.3.0-comparison-set-note" id="toc-v0.3.0-comparison-set-note">v0.3.0 comparison-set note</a>
+<ul>
+<li><a href="#v1.0-deployment-and-governance" id="toc-v1.0-deployment-and-governance">v1.0 deployment and
+governance</a></li>
+</ul></li>
+</ul>
+</nav></aside><main class="doc-main" id="main-content"><h1 id="step-4-model-options-guide">Step 4 Model Options Guide</h1><p><strong>Application:</strong> Local Regression Studio<br/>
+<strong>Version:</strong> 1.0.11<br/>
+<strong>Purpose:</strong> Explain the model choices and hyperparameters
+shown in <strong>Step 4: Select a model and tune
+hyperparameters</strong>.</p><hr/><h2 id="contents">Contents</h2><ol type="1">
+<li><a href="#1-how-step-4-fits-into-the-workflow">How Step 4 fits into
+the workflow</a></li>
+<li><a href="#2-choosing-a-model">Choosing a model</a></li>
+<li><a href="#3-tuning-methods">Tuning methods</a></li>
+<li><a href="#4-linear-regression">Linear regression</a></li>
+<li><a href="#5-ridge-regression">Ridge regression</a></li>
+<li><a href="#6-decision-tree-regression">Decision-tree
+regression</a></li>
+<li><a href="#7-random-forest-regression">Random-forest
+regression</a></li>
+<li><a href="#8-gaussian-process-regression">Gaussian-process
+regression</a></li>
+<li><a href="#9-artificial-neural-network-regression">Artificial
+neural-network regression</a></li>
+<li><a href="#10-common-tuning-advice">Common tuning advice</a></li>
+<li><a href="#11-performance-and-safety-limits">Performance and safety
+limits</a></li>
+<li><a href="#12-glossary">Glossary</a></li>
+</ol><hr/><h1 id="how-step-4-fits-into-the-workflow">1. How Step 4 fits into the
+workflow</h1><p>Step 4 selects the model and its hyperparameters. The model is
+trained later in Step 5.</p><p>The app uses the three datasets as follows:</p><table>
+<thead>
+<tr class="header">
+<th>Dataset</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Training</td>
+<td>Fits preprocessing and model parameters</td>
+</tr>
+<tr class="even">
+<td>Validation</td>
+<td>Compares candidate hyperparameter settings</td>
+</tr>
+<tr class="odd">
+<td>Test</td>
+<td>Produces the final independent assessment</td>
+</tr>
+</tbody>
+</table><p>The <strong>test dataset is not used to select
+hyperparameters</strong>.</p><p>Preprocessing is fitted using the training data only. The same fitted
+preprocessing is then applied to validation, test, and prediction
+data.</p><p>Target transformation is selected in Step 2. Model settings in Step 4
+operate on the target scale used during model fitting. Results and
+prediction intervals are converted back to the original target scale
+where supported.</p><hr/><h1 id="choosing-a-model">2. Choosing a model</h1><h2 id="quick-comparison">Quick comparison</h2><table>
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Best suited to</th>
+<th>Main advantages</th>
+<th>Main limitations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Linear regression</td>
+<td>Approximately linear relationships</td>
+<td>Fast, interpretable, analytical intervals</td>
+<td>Cannot naturally model complex nonlinear relationships</td>
+</tr>
+<tr class="even">
+<td>Ridge regression</td>
+<td>Linear relationships with correlated or numerous features</td>
+<td>More stable coefficients than ordinary linear regression</td>
+<td>Still fundamentally linear</td>
+</tr>
+<tr class="odd">
+<td>Elastic net</td>
+<td>Sparse or correlated linear features</td>
+<td>Combines L1 selection and L2 stability</td>
+<td>Still linear; coefficient selection can be unstable with correlated
+variables</td>
+</tr>
+<tr class="even">
+<td>Huber robust regression</td>
+<td>Broadly linear data with target outliers</td>
+<td>Reduces influence of large residuals</td>
+<td>Does not fix nonlinear form or high-leverage input outliers</td>
+</tr>
+<tr class="odd">
+<td>Decision tree</td>
+<td>Nonlinear thresholds and interactions</td>
+<td>Easy to understand, no strict linearity assumption</td>
+<td>Can overfit and be unstable</td>
+</tr>
+<tr class="even">
+<td>Random forest</td>
+<td>General nonlinear tabular regression</td>
+<td>Strong general-purpose performance, robust to interactions</td>
+<td>Larger and slower; less interpretable</td>
+</tr>
+<tr class="odd">
+<td>Gradient-boosted trees</td>
+<td>High-performance nonlinear tabular regression</td>
+<td>Sequentially corrects residual structure</td>
+<td>Needs careful stage/depth/learning-rate validation</td>
+</tr>
+<tr class="even">
+<td>k-nearest neighbours</td>
+<td>Local similarity problems</td>
+<td>Simple flexible local predictions</td>
+<td>Scaling-sensitive; slow on large stored datasets; no
+extrapolation</td>
+</tr>
+<tr class="odd">
+<td>Linear quantile regression</td>
+<td>Conditional median or asymmetric conditional bounds</td>
+<td>Directly models selected quantiles</td>
+<td>Linear quantile form; fitted bounds are not guaranteed
+calibrated</td>
+</tr>
+<tr class="even">
+<td>Gaussian process</td>
+<td>Smooth relationships and small-to-medium datasets</td>
+<td>Native predictive uncertainty</td>
+<td>Expensive as the training set grows</td>
+</tr>
+<tr class="odd">
+<td>Artificial neural network</td>
+<td>Complex nonlinear relationships with adequate data</td>
+<td>Flexible function approximation</td>
+<td>More tuning, slower training, approximate uncertainty</td>
+</tr>
+</tbody>
+</table><h2 id="suggested-starting-point">Suggested starting point</h2><p>For a first analysis:</p><ol type="1">
+<li>Train <strong>linear regression</strong> as a baseline.</li>
+<li>Try <strong>ridge regression</strong> if features are correlated or
+numerous.</li>
+<li>Try <strong>random forest</strong> for nonlinear behaviour.</li>
+<li>Use <strong>decision trees</strong> when interpretability of rules
+is important.</li>
+<li>Use <strong>Gaussian processes</strong> when uncertainty is
+important and the dataset is small enough.</li>
+<li>Use an <strong>ANN</strong> when the relationship is complex and
+there is enough training data.</li>
+</ol><p>No single model is always best. Compare validation performance, test
+performance, residual diagnostics, and uncertainty calibration.</p><hr/><h1 id="tuning-methods">3. Tuning methods</h1><h2 id="manual-configuration">Manual configuration</h2><p>The app trains one model using the values entered by the user.</p><p>Use manual configuration when:</p><ul>
+<li>You already know reasonable values.</li>
+<li>You want a quick fit.</li>
+<li>The model has few hyperparameters.</li>
+<li>You are investigating the effect of one setting.</li>
+</ul><h2 id="grid-search">Grid search</h2><p>For each tunable numeric parameter, specify:</p><ul>
+<li>Minimum</li>
+<li>Maximum</li>
+<li>Number of grid points</li>
+<li>Linear or logarithmic spacing</li>
+</ul><p>The app evaluates combinations formed from the generated values.</p><p>Example:</p><pre class="text"><code>Minimum: 0.001
+Maximum: 100
+Grid points: 6
+Spacing: Logarithmic</code></pre><p>This creates six values spread across several orders of
+magnitude.</p><p>Grid search is useful for small searches, but the number of
+combinations grows rapidly:</p><pre class="text"><code>total candidates =
+points on axis 1 × points on axis 2 × ...</code></pre><p>The app limits excessively large searches.</p><h2 id="ordinary-random-search">Ordinary random search</h2><p>The app independently samples values from each declared range.</p><p>Advantages:</p><ul>
+<li>Usually more efficient than a large grid when many parameters are
+present.</li>
+<li>Can explore values that do not lie on fixed grid lines.</li>
+</ul><p>Limitation:</p><ul>
+<li>Independent random samples can cluster in some areas and leave other
+regions poorly covered.</li>
+</ul><h2 id="latin-hypercube-sampling">Latin hypercube sampling</h2><p>Latin hypercube sampling, or <strong>LHS</strong>, divides each
+continuous parameter range into intervals and samples once from each
+interval before combining the dimensions.</p><p>Advantages:</p><ul>
+<li>More even coverage of each parameter range than ordinary random
+sampling.</li>
+<li>Often useful when the number of trials is limited.</li>
+<li>Particularly suitable for ANN and GP tuning.</li>
+</ul><p>For integer parameters, sampled values are rounded. Duplicate
+configurations may be removed.</p><h2 id="number-of-search-samples">Number of search samples</h2><p>This is the number of candidate configurations for random search or
+LHS.</p><p>More samples provide broader exploration but require more model
+fits.</p><p>Recommended initial values:</p><table>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th style="text-align: right;">Suggested search samples</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ridge</td>
+<td style="text-align: right;">8–16</td>
+</tr>
+<tr class="even">
+<td>Decision tree</td>
+<td style="text-align: right;">10–20</td>
+</tr>
+<tr class="odd">
+<td>Random forest</td>
+<td style="text-align: right;">10–20</td>
+</tr>
+<tr class="even">
+<td>Gaussian process</td>
+<td style="text-align: right;">8–16</td>
+</tr>
+<tr class="odd">
+<td>ANN</td>
+<td style="text-align: right;">8–20</td>
+</tr>
+</tbody>
+</table><p>For ANN tuning, remember that every candidate may run for many
+epochs. Early stopping can reduce the actual workload.</p><h2 id="linear-versus-logarithmic-spacing">Linear versus logarithmic
+spacing</h2><p>Use <strong>linear spacing</strong> when equal absolute changes are
+meaningful.</p><p>Example:</p><pre class="text"><code>Tree depth: 3, 6, 9, 12, 15</code></pre><p>Use <strong>logarithmic spacing</strong> when the useful scale spans
+several powers of ten.</p><p>Examples:</p><pre class="text"><code>Ridge strength: 0.001 to 100
+Learning rate: 0.0001 to 0.01
+GP noise: 0.001 to 1</code></pre><p>All values must be positive for logarithmic spacing.</p><hr/><h1 id="linear-regression">4. Linear regression</h1><h2 id="what-it-does">What it does</h2><p>Linear regression predicts the target as a weighted sum of the
+processed input features:</p><pre class="text"><code>prediction =
+intercept
++ coefficient 1 × feature 1
++ coefficient 2 × feature 2
++ ...</code></pre><p>One-hot encoded categorical columns can also be included.</p><h2 id="step-4-options">Step 4 options</h2><p>Linear regression has no model-specific hyperparameters in this
+version.</p><h2 id="when-to-use-it">When to use it</h2><p>Use linear regression when:</p><ul>
+<li>A roughly linear relationship is plausible.</li>
+<li>Interpretability matters.</li>
+<li>You want a fast baseline.</li>
+<li>The dataset is not extremely high-dimensional.</li>
+<li>Analytical prediction intervals are useful.</li>
+</ul><h2 id="strengths">Strengths</h2><ul>
+<li>Very fast.</li>
+<li>Coefficients can be interpreted.</li>
+<li>Provides analytical confidence and prediction intervals.</li>
+<li>Useful for detecting whether more complex models are necessary.</li>
+</ul><h2 id="limitations">Limitations</h2><ul>
+<li>Does not naturally capture curves, thresholds, or complex
+interactions.</li>
+<li>Sensitive to strong multicollinearity.</li>
+<li>Outliers can have a large effect.</li>
+<li>Analytical uncertainty assumes the linear model and error
+assumptions are reasonably appropriate.</li>
+</ul><h2 id="related-preprocessing-advice">Related preprocessing advice</h2><ul>
+<li>Standardisation is optional for prediction quality, but can improve
+numerical conditioning.</li>
+<li>Removing one reference level from each one-hot encoded categorical
+feature is recommended.</li>
+<li>Inspect residuals for curvature and changing variance.</li>
+</ul><hr/><h1 id="ridge-regression">5. Ridge regression</h1><h2 id="what-it-does-1">What it does</h2><p>Ridge regression is linear regression with a penalty that shrinks
+coefficients toward zero.</p><p>It is useful when:</p><ul>
+<li>Features are correlated.</li>
+<li>There are many processed input columns.</li>
+<li>Ordinary linear regression coefficients are unstable.</li>
+<li>One-hot encoding creates a wide feature matrix.</li>
+</ul><h2 id="ridge-strength-lambda">Ridge strength — lambda</h2><p><strong>Interface label:</strong>
+<code>Ridge strength (lambda)</code></p><p>Lambda controls the amount of coefficient shrinkage.</p><table>
+<thead>
+<tr class="header">
+<th>Lambda</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>0</code></td>
+<td>Behaves like ordinary linear regression</td>
+</tr>
+<tr class="even">
+<td>Small positive value</td>
+<td>Mild shrinkage</td>
+</tr>
+<tr class="odd">
+<td>Large value</td>
+<td>Strong shrinkage; coefficients move closer to zero</td>
+</tr>
+</tbody>
+</table><h3 id="if-lambda-is-too-small">If lambda is too small</h3><ul>
+<li>The model may behave like unstable ordinary linear regression.</li>
+<li>Correlated features can receive large compensating
+coefficients.</li>
+<li>Validation error may be higher.</li>
+</ul><h3 id="if-lambda-is-too-large">If lambda is too large</h3><ul>
+<li>The model can underfit.</li>
+<li>Predictions may be pulled too close to the mean.</li>
+<li>Important relationships can be suppressed.</li>
+</ul><h3 id="suggested-starting-values">Suggested starting values</h3><p>When numeric features are standardised:</p><pre class="text"><code>Manual starting value: 1
+Typical tuning range: 0.001 to 100
+Recommended spacing: logarithmic</code></pre><p>The best scale depends strongly on preprocessing and the number of
+features.</p><h2 id="uncertainty">Uncertainty</h2><p>The current app uses approximate bootstrap intervals for ridge
+regression.</p><p>These are not identical to exact analytical intervals and should be
+evaluated using:</p><ul>
+<li>Test-set coverage</li>
+<li>Mean interval width</li>
+<li>Coverage error</li>
+<li>Interval score</li>
+</ul><hr/><h1 id="decision-tree-regression">6. Decision-tree regression</h1><h2 id="what-it-does-2">What it does</h2><p>A decision tree repeatedly divides observations using rules such
+as:</p><pre class="text"><code>feature A ≤ threshold</code></pre><p>Each final region, called a leaf, returns a prediction based on
+training targets in that leaf.</p><p>Trees can represent nonlinear relationships and feature
+interactions.</p><h2 id="maximum-depth">Maximum depth</h2><p><strong>Interface label:</strong> <code>Maximum depth</code></p><p>Maximum depth limits how many split levels the tree can create.</p><table>
+<colgroup>
+<col style="width: 50%"/>
+<col style="width: 50%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Small</td>
+<td>Simpler tree; more bias; less overfitting</td>
+</tr>
+<tr class="even">
+<td>Large</td>
+<td>More detailed tree; lower training error; greater overfitting
+risk</td>
+</tr>
+</tbody>
+</table><p>Suggested starting value:</p><pre class="text"><code>8</code></pre><p>Typical tuning range:</p><pre class="text"><code>3 to 15</code></pre><p>Watch the training and validation loss versus depth plot. If training
+loss falls but validation loss rises, the tree is becoming too
+complex.</p><h2 id="minimum-rows-per-leaf">Minimum rows per leaf</h2><p><strong>Interface label:</strong>
+<code>Minimum rows per leaf</code></p><p>This is the minimum number of training rows allowed in a terminal
+leaf.</p><table>
+<colgroup>
+<col style="width: 50%"/>
+<col style="width: 50%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Small</td>
+<td>Allows highly specific leaves; more flexible; more overfitting
+risk</td>
+</tr>
+<tr class="even">
+<td>Large</td>
+<td>Produces smoother, more stable predictions; may underfit</td>
+</tr>
+</tbody>
+</table><p>Suggested starting value:</p><pre class="text"><code>5</code></pre><p>Typical tuning range:</p><pre class="text"><code>2 to 30</code></pre><p>For noisy or small datasets, larger leaves are often safer.</p><h2 id="candidate-thresholds-per-feature">Candidate thresholds per
+feature</h2><p><strong>Interface label:</strong>
+<code>Candidate thresholds per feature</code></p><p>For each considered feature, the app does not necessarily test every
+possible split point. This setting limits the approximate number of
+candidate thresholds examined.</p><table>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Small</td>
+<td>Faster training; may miss a useful split</td>
+</tr>
+<tr class="even">
+<td>Large</td>
+<td>More detailed search; slower training</td>
+</tr>
+</tbody>
+</table><p>Suggested starting value:</p><pre class="text"><code>24</code></pre><p>Typical practical range:</p><pre class="text"><code>12 to 48</code></pre><p>Values above the default may help when a feature has a complex
+threshold structure, but they increase fitting time.</p><h2 id="features-considered-per-split">Features considered per
+split</h2><p><strong>Interface label:</strong>
+<code>Features considered per split</code></p><p>Options:</p><h3 id="all">All</h3><p>Every processed feature can be evaluated at each split.</p><p>Recommended for:</p><ul>
+<li>A single decision tree</li>
+<li>Small and medium feature counts</li>
+<li>Maximum deterministic split search</li>
+</ul><h3 id="square-root">Square root</h3><p>Approximately the square root of the processed features is randomly
+considered at each split.</p><p>Example:</p><pre class="text"><code>100 processed features → about 10 considered per split</code></pre><p>This adds randomness and is more commonly useful in forests.</p><h3 id="log2">Log2</h3><p>Approximately <code>log2(number of features) + 1</code> features are
+considered per split.</p><p>This is usually smaller than square root when the feature count is
+large.</p><h2 id="uncertainty-1">Uncertainty</h2><p>The app can calculate an approximate leaf-based interval using target
+variation among training observations in the same terminal leaf.</p><p>Limitations:</p><ul>
+<li>Leaves with few rows provide unreliable uncertainty estimates.</li>
+<li>A single tree does not naturally provide a full predictive
+distribution.</li>
+<li>The interval should be treated as approximate.</li>
+</ul><hr/><h1 id="random-forest-regression">7. Random-forest regression</h1><h2 id="what-it-does-3">What it does</h2><p>A random forest averages predictions from many decision trees. Each
+tree receives a sampled set of rows and may consider a random subset of
+features at each split.</p><p>Averaging reduces the instability of a single tree.</p><h2 id="number-of-trees">Number of trees</h2><p><strong>Interface label:</strong> <code>Number of trees</code></p><table>
+<colgroup>
+<col style="width: 50%"/>
+<col style="width: 50%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Fewer trees</td>
+<td>Faster; noisier ensemble</td>
+</tr>
+<tr class="even">
+<td>More trees</td>
+<td>More stable predictions and uncertainty estimates; slower and
+larger</td>
+</tr>
+</tbody>
+</table><p>Suggested starting value:</p><pre class="text"><code>40</code></pre><p>Typical tuning range:</p><pre class="text"><code>10 to 100</code></pre><p>Increase the number of trees until validation error and interval
+behaviour stabilise. The training-history plot shows error versus the
+number of trees.</p><h2 id="maximum-depth-1">Maximum depth</h2><p>Same basic meaning as for a decision tree.</p><p>Suggested starting value:</p><pre class="text"><code>8</code></pre><p>Deeper trees increase flexibility and computation. Random forests
+tolerate deeper trees better than single trees, but very deep trees can
+still overfit or produce unstable interval estimates.</p><h2 id="minimum-rows-per-leaf-1">Minimum rows per leaf</h2><p>Same basic meaning as for a decision tree.</p><p>Suggested starting value:</p><pre class="text"><code>5</code></pre><p>Larger leaves often improve smoothness and interval stability.</p><h2 id="row-sampling-fraction">Row sampling fraction</h2><p><strong>Interface label:</strong>
+<code>Row sampling fraction</code></p><p>This controls the fraction of training rows sampled for each
+tree.</p><p>Examples:</p><table>
+<colgroup>
+<col style="width: 50%"/>
+<col style="width: 50%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>0.5</code></td>
+<td>Each tree samples about 50% of training rows</td>
+</tr>
+<tr class="even">
+<td><code>0.8</code></td>
+<td>Each tree samples about 80%</td>
+</tr>
+<tr class="odd">
+<td><code>1.0</code></td>
+<td>Each tree samples approximately the full training-set size, with
+sampling behaviour determined by the implementation</td>
+</tr>
+</tbody>
+</table><p>Suggested starting value:</p><pre class="text"><code>0.8</code></pre><p>Lower values:</p><ul>
+<li>Increase diversity between trees.</li>
+<li>Reduce rows available to each tree.</li>
+<li>May help reduce correlation but can increase individual-tree
+error.</li>
+</ul><p>Higher values:</p><ul>
+<li>Give each tree more information.</li>
+<li>Can reduce diversity.</li>
+<li>Increase work per tree.</li>
+</ul><h2 id="candidate-thresholds-per-feature-1">Candidate thresholds per
+feature</h2><p>Same meaning as for a decision tree.</p><p>Suggested starting value:</p><pre class="text"><code>20</code></pre><h2 id="features-considered-per-split-1">Features considered per
+split</h2><h3 id="all-1">All</h3><p>Every processed feature is considered.</p><h3 id="square-root-1">Square root</h3><p>Approximately the square root of the feature count is considered.</p><p>This is the default for the forest in v0.2.1 and generally encourages
+useful diversity.</p><h3 id="log2-1">Log2</h3><p>A smaller random subset is considered.</p><p>This can be useful for very wide datasets or when stronger tree
+diversity is desired.</p><h2 id="uncertainty-2">Uncertainty</h2><p>The app uses variation among individual tree predictions to form an
+approximate ensemble interval.</p><p>Important limitations:</p><ul>
+<li>Between-tree variation is not automatically a calibrated prediction
+interval.</li>
+<li>Trees are correlated, so their spread may underestimate
+uncertainty.</li>
+<li>Test-set coverage should always be checked.</li>
+<li>Increasing the number of trees stabilises the estimate but does not
+guarantee correct coverage.</li>
+</ul><hr/><h1 id="gaussian-process-regression">8. Gaussian-process regression</h1><h2 id="what-it-does-4">What it does</h2><p>A Gaussian process, or GP, defines a distribution over possible
+functions. Predictions include:</p><ul>
+<li>A predictive mean</li>
+<li>A predictive standard deviation</li>
+<li>A native model-based prediction interval</li>
+</ul><p>GPs are especially useful when:</p><ul>
+<li>The dataset is relatively small.</li>
+<li>The target varies smoothly with the input features.</li>
+<li>Predictive uncertainty is important.</li>
+<li>Extrapolation risk needs to be visible.</li>
+</ul><p>Exact GP computation grows rapidly with the number of training rows.
+Use representative-subset modes for larger datasets.</p><hr/><h2 id="gp-training-mode">GP training mode</h2><p><strong>Interface label:</strong> <code>GP training mode</code></p><h3 id="exact-gp">Exact GP</h3><p>Uses every available training row after preprocessing.</p><p>Advantages:</p><ul>
+<li>Uses all training observations.</li>
+<li>Provides the direct exact-GP calculation for the selected kernel and
+parameters.</li>
+</ul><p>Limitations:</p><ul>
+<li>Memory grows approximately with the square of the number of training
+rows.</li>
+<li>Matrix factorisation time grows approximately with the cube of the
+number of rows.</li>
+<li>Model files can be large because prediction requires stored
+training-related state.</li>
+</ul><p>Recommended use:</p><pre class="text"><code>Small datasets, preferably around 1,000 rows or fewer</code></pre><p>The app has a default hard GP-state limit of 2,000 rows.</p><h3 id="representative-subset-gp">Representative-subset GP</h3><p>Uses a selected subset of training rows to construct the GP.</p><p>Advantages:</p><ul>
+<li>Reduces memory and computation.</li>
+<li>Allows GP-style modelling on larger datasets.</li>
+</ul><p>Limitations:</p><ul>
+<li>It is an approximation.</li>
+<li>Information outside the selected subset may be lost.</li>
+<li>It is not a full sparse variational GP.</li>
+</ul><h3 id="automatically-optimise-subset-size">Automatically optimise
+subset size</h3><p>The app evaluates several subset sizes using validation RMSE.</p><p>It then selects:</p><blockquote>
+<p>The smallest subset whose validation RMSE is within the specified
+tolerance of the best candidate.</p>
+</blockquote><p>This balances predictive performance and computational cost.</p><hr/><h2 id="kernel">Kernel</h2><p><strong>Interface label:</strong> <code>Kernel</code></p><p>The kernel defines how similarity between input rows translates into
+similarity of predicted target values.</p><p>Because the app uses one shared length scale, numeric input scaling
+is strongly recommended.</p><h3 id="rbf-squared-exponential">RBF / squared exponential</h3><p>Produces very smooth functions.</p><p>Use when:</p><ul>
+<li>The target is expected to change smoothly.</li>
+<li>Sharp corners or abrupt transitions are unlikely.</li>
+</ul><p>Characteristics:</p><ul>
+<li>Highly smooth.</li>
+<li>Can over-smooth abrupt behaviour.</li>
+<li>A common default.</li>
+</ul><h3 id="matérn-32">Matérn 3/2</h3><p>Allows rougher functions than RBF.</p><p>Use when:</p><ul>
+<li>The relationship is smooth but can change more abruptly.</li>
+<li>RBF appears too smooth.</li>
+</ul><h3 id="matérn-52">Matérn 5/2</h3><p>Intermediate smoothness between RBF and Matérn 3/2.</p><p>Use when:</p><ul>
+<li>You want a smooth function with somewhat more local flexibility than
+RBF.</li>
+</ul><h3 id="rational-quadratic">Rational quadratic</h3><p>Acts like a mixture of RBF behaviours with different length
+scales.</p><p>Use when:</p><ul>
+<li>The target has variation occurring at several characteristic
+scales.</li>
+</ul><p>It has an additional <code>Rational-quadratic alpha</code>
+parameter.</p><h3 id="linear-kernel">Linear kernel</h3><p>Represents primarily linear covariance behaviour.</p><p>Use when:</p><ul>
+<li>A linear relationship is expected.</li>
+<li>You want GP uncertainty around a broadly linear model.</li>
+</ul><p>It does not provide the same nonlinear flexibility as RBF or Matérn
+kernels.</p><hr/><h2 id="length-scale">Length scale</h2><p><strong>Interface label:</strong> <code>Length scale</code></p><p>The length scale controls how far input points can move before their
+predictions become substantially different.</p><table>
+<thead>
+<tr class="header">
+<th>Length scale</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Small</td>
+<td>Function can change rapidly; highly local behaviour</td>
+</tr>
+<tr class="even">
+<td>Large</td>
+<td>Function changes slowly; smoother, broader trends</td>
+</tr>
+</tbody>
+</table><h3 id="if-too-small">If too small</h3><ul>
+<li>The GP may follow local noise.</li>
+<li>Predictions may change sharply between nearby observations.</li>
+<li>Uncertainty can vary rapidly.</li>
+<li>The covariance matrix may become difficult to condition.</li>
+</ul><h3 id="if-too-large">If too large</h3><ul>
+<li>The model may underfit.</li>
+<li>Important local structure can disappear.</li>
+<li>Predictions may become nearly constant or overly smooth.</li>
+</ul><p>Suggested initial value when processed numeric features are
+standardised:</p><pre class="text"><code>1</code></pre><p>Typical tuning range:</p><pre class="text"><code>0.1 to 10</code></pre><p>Recommended spacing:</p><pre class="text"><code>Logarithmic</code></pre><h3 id="shared-length-scale">Shared length scale</h3><p>Version 0.2.1 uses one shared length scale for all processed
+features. It does not yet fit a separate
+automatic-relevance-determination length scale for every feature.</p><hr/><h2 id="signal-variance">Signal variance</h2><p><strong>Interface label:</strong> <code>Signal variance</code></p><p>Signal variance controls the typical magnitude of function variation
+attributed to the underlying GP signal.</p><table>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Small</td>
+<td>Underlying function is expected to vary only modestly</td>
+</tr>
+<tr class="even">
+<td>Large</td>
+<td>Allows larger changes in the latent function</td>
+</tr>
+</tbody>
+</table><p>In the kernel calculation, it acts as the covariance amplitude.</p><h3 id="if-too-small-1">If too small</h3><ul>
+<li>Predictions can be pulled too strongly toward the training-target
+mean.</li>
+<li>The model may underfit genuine variation.</li>
+</ul><h3 id="if-too-large-1">If too large</h3><ul>
+<li>The model may attribute too much variation to the underlying
+function.</li>
+<li>It may interact with the noise setting and length scale in unstable
+ways.</li>
+</ul><p>Suggested starting value:</p><pre class="text"><code>1</code></pre><p>Typical tuning range:</p><pre class="text"><code>0.1 to 10</code></pre><p>Recommended spacing:</p><pre class="text"><code>Logarithmic</code></pre><p>Its appropriate scale depends on the transformed target values used
+during fitting.</p><hr/><h2 id="observation-noise-standard-deviation">Observation-noise standard
+deviation</h2><p><strong>Interface label:</strong>
+<code>Observation-noise standard deviation</code></p><p>This describes the expected random variation in an observed target
+around the smooth underlying GP function.</p><p>Conceptually:</p><pre class="text"><code>observed target = underlying function + random observation noise</code></pre><p>Examples of possible noise sources:</p><ul>
+<li>Measurement error</li>
+<li>Natural variation not represented by the selected features</li>
+<li>Unrecorded operating conditions</li>
+<li>Repeated measurements that differ under nominally identical
+inputs</li>
+</ul><h3 id="units">Units</h3><p>The value is expressed in the units of the target scale used for
+model fitting.</p><p>Examples:</p><ul>
+<li>If the target is fitted in degrees Celsius, the value is in degrees
+Celsius.</li>
+<li>If a natural-log target transformation is used, it is on the
+log-target scale.</li>
+<li>It is not automatically a percentage.</li>
+</ul><h3 id="effect-of-the-value">Effect of the value</h3><table>
+<colgroup>
+<col style="width: 50%"/>
+<col style="width: 50%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Noise standard deviation</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Very small</td>
+<td>GP tries to pass close to training observations</td>
+</tr>
+<tr class="even">
+<td>Moderate</td>
+<td>GP allows observations to deviate from the latent smooth
+function</td>
+</tr>
+<tr class="odd">
+<td>Large</td>
+<td>More variation is treated as noise; predictions become smoother and
+predictive intervals widen</td>
+</tr>
+</tbody>
+</table><h3 id="if-too-small-2">If too small</h3><ul>
+<li>The model may overfit noisy observations.</li>
+<li>Matrix factorisation may be less stable.</li>
+<li>Prediction intervals may be unrealistically narrow.</li>
+</ul><h3 id="if-too-large-2">If too large</h3><ul>
+<li>The model may underfit.</li>
+<li>Real structure may be treated as noise.</li>
+<li>Prediction intervals may be unnecessarily wide.</li>
+</ul><p>Default:</p><pre class="text"><code>0.1</code></pre><p>Typical tuning range in the current interface:</p><pre class="text"><code>0.001 to 1</code></pre><p>Recommended spacing:</p><pre class="text"><code>Logarithmic</code></pre><h3 id="important-scaling-note">Important scaling note</h3><p>The fixed default is not equally meaningful for every target scale.
+Compare it with the standard deviation and typical measurement error of
+the training target.</p><p>For example:</p><pre class="text"><code>Target standard deviation = 100
+Noise standard deviation = 0.1</code></pre><p>would imply almost noise-free observations.</p><p>A reasonable initial estimate may come from:</p><ul>
+<li>Known instrument precision</li>
+<li>Repeat-measurement variability</li>
+<li>Domain expertise</li>
+<li>A small fraction of the training-target standard deviation</li>
+</ul><p>Let validation performance and uncertainty coverage guide tuning.</p><hr/><h2 id="observation-noise-versus-numerical-jitter">Observation noise
+versus numerical jitter</h2><p>These are not the same.</p><table>
+<colgroup>
+<col style="width: 33%"/>
+<col style="width: 33%"/>
+<col style="width: 33%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Setting</th>
+<th>Statistical meaning</th>
+<th>Main purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Observation-noise standard deviation</td>
+<td>Real unexplained or measurement variation</td>
+<td>Model noise and predictive intervals</td>
+</tr>
+<tr class="even">
+<td>Numerical jitter</td>
+<td>Tiny artificial diagonal adjustment</td>
+<td>Stabilise matrix factorisation</td>
+</tr>
+</tbody>
+</table><p>Do not use jitter as a substitute for real observation noise.</p><hr/><h2 id="numerical-jitter">Numerical jitter</h2><p><strong>Interface label:</strong> <code>Numerical jitter</code></p><p>Jitter is a very small positive number added to the diagonal of the
+GP covariance matrix.</p><p>Purpose:</p><ul>
+<li>Improve numerical stability.</li>
+<li>Help Cholesky factorisation when rows are duplicated or nearly
+duplicated.</li>
+<li>Address rounding and conditioning problems.</li>
+</ul><p>Default:</p><pre class="text"><code>0.00000001</code></pre><p>The app automatically increases jitter by factors of ten if
+factorisation fails, up to a limited number of attempts.</p><h3 id="when-to-increase-it-manually">When to increase it manually</h3><p>Increase jitter if you see an error similar to:</p><pre class="text"><code>Covariance matrix is not positive definite</code></pre><p>Possible causes include:</p><ul>
+<li>Duplicate or nearly duplicate processed input rows</li>
+<li>Extremely small noise</li>
+<li>Extreme kernel parameters</li>
+<li>Poor feature scaling</li>
+</ul><p>Increase jitter gradually, for example:</p><pre class="text"><code>1e-8 → 1e-7 → 1e-6</code></pre><p>Large jitter can alter predictions, so it should remain much smaller
+than the main covariance and noise scales.</p><hr/><h2 id="stochastic-kernel-search-iterations">Stochastic kernel-search
+iterations</h2><p><strong>Interface label:</strong>
+<code>Stochastic kernel-search iterations</code></p><p>The app starts from the entered length scale, signal variance, and
+noise standard deviation, then proposes multiplicative changes and keeps
+proposals that reduce the negative log marginal likelihood.</p><table>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>0</code></td>
+<td>Use entered values without internal kernel optimisation</td>
+</tr>
+<tr class="even">
+<td>Small positive value</td>
+<td>Brief local search</td>
+</tr>
+<tr class="odd">
+<td>Larger value</td>
+<td>More proposals and longer fitting</td>
+</tr>
+</tbody>
+</table><p>Default:</p><pre class="text"><code>8</code></pre><p>Maximum in the interface:</p><pre class="text"><code>30</code></pre><p>This is a lightweight stochastic local search, not a guarantee of
+finding the global optimum.</p><h3 id="how-the-internal-gp-optimiser-works">How the internal GP
+optimiser works</h3><p>The GP does not use Adam, stochastic gradient descent, L-BFGS or
+another gradient-based optimiser. It uses a lightweight stochastic local
+search in log-parameter space.</p><ul>
+<li><strong>Lightweight</strong> means that it uses a small
+browser-friendly search procedure without a large numerical-optimisation
+dependency.</li>
+<li><strong>Stochastic</strong> means that candidate parameter changes
+are generated using seeded random numbers.</li>
+<li><strong>Local search</strong> means that it explores values near the
+current best settings instead of systematically searching the entire
+allowed range.</li>
+<li><strong>Log-parameter space</strong> means that positive parameters
+are changed multiplicatively. If a parameter is <code>theta</code>, the
+search changes <code>log(theta)</code> and converts it back with
+<code>exp</code>. This keeps length scale, signal variance, observation
+noise and rational-quadratic alpha positive.</li>
+</ul><p>For one iteration, the app approximately performs these steps:</p><ol type="1">
+<li>Start from the current kernel parameters.</li>
+<li>Propose seeded random multiplicative changes to the parameters
+relevant to the selected kernel.</li>
+<li>Fit the GP covariance system using the proposal.</li>
+<li>Calculate negative log marginal likelihood.</li>
+<li>Keep the proposal only if it lowers that objective.</li>
+<li>Reduce the proposal size gradually during later iterations.</li>
+</ol><p>Because the procedure does not calculate gradients, it does not use a
+learning rate. Its closest analogue is the internal proposal scale,
+which controls the size of random multiplicative changes and is reduced
+automatically.</p><p>This local procedure can improve sensible starting values but can
+miss a better solution farther away. Grid search, ordinary random search
+or Latin hypercube sampling can first explore a wider region using
+validation RMSE; the selected configuration can then receive the final
+local kernel search.</p><p>When external grid, random, or LHS tuning is used, the candidate
+comparison uses validation RMSE. The final selected GP can then run the
+configured kernel-optimisation iterations.</p><hr/><h2 id="rational-quadratic-alpha">Rational-quadratic alpha</h2><p><strong>Interface label:</strong>
+<code>Rational-quadratic alpha</code></p><p>Used only with the rational-quadratic kernel.</p><p>It controls how strongly the kernel behaves like a mixture of
+different length scales.</p><p>Broad interpretation:</p><table>
+<thead>
+<tr class="header">
+<th>Alpha</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Small</td>
+<td>Stronger mixture of multiple scales</td>
+</tr>
+<tr class="even">
+<td>Large</td>
+<td>Becomes more similar to an RBF kernel</td>
+</tr>
+</tbody>
+</table><p>Default:</p><pre class="text"><code>1</code></pre><p>This setting has no effect for RBF, Matérn, linear, or other
+kernels.</p><hr/><h2 id="representative-subset-size">Representative subset size</h2><p><strong>Interface label:</strong>
+<code>Representative subset size</code></p><p>Used in representative-subset mode.</p><p>This is the number of training rows retained for GP covariance
+calculations.</p><table>
+<thead>
+<tr class="header">
+<th>Subset size</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Small</td>
+<td>Faster, less memory, greater approximation error</td>
+</tr>
+<tr class="even">
+<td>Large</td>
+<td>More representative, slower, larger model file</td>
+</tr>
+</tbody>
+</table><p>Default:</p><pre class="text"><code>500</code></pre><p>Allowed range:</p><pre class="text"><code>20 to 2,000</code></pre><p>A suitable value depends on:</p><ul>
+<li>Number of training rows</li>
+<li>Feature-space complexity</li>
+<li>Number of sources or regimes</li>
+<li>Browser memory</li>
+<li>Required accuracy</li>
+</ul><hr/><h2 id="subset-selection">Subset selection</h2><p><strong>Interface label:</strong> <code>Subset selection</code></p><h3 id="farthest-point-sampling">Farthest-point sampling</h3><p>Starts with one row and repeatedly chooses the row farthest from the
+selected set in processed feature space.</p><p>Advantages:</p><ul>
+<li>Encourages broad feature-space coverage.</li>
+<li>Deterministic apart from the initial seeded point.</li>
+<li>Often a good default for smooth GP models.</li>
+</ul><p>Limitations:</p><ul>
+<li>Can emphasise extreme points.</li>
+<li>More computationally expensive than random sampling.</li>
+</ul><h3 id="k-means-representative-sampling">K-means++ representative
+sampling</h3><p>Selects points probabilistically using distance from already selected
+points.</p><p>Advantages:</p><ul>
+<li>Encourages broad coverage.</li>
+<li>Less focused exclusively on the most extreme point than pure
+farthest-point sampling.</li>
+</ul><p>Limitations:</p><ul>
+<li>The current implementation selects representative rows using a
+k-means++-style seeding process; it does not run a full iterative
+k-means optimisation.</li>
+</ul><h3 id="random-sampling">Random sampling</h3><p>Randomly selects training rows using the configured seed.</p><p>Advantages:</p><ul>
+<li>Fast.</li>
+<li>Simple.</li>
+<li>Useful as a baseline.</li>
+</ul><p>Limitations:</p><ul>
+<li>May miss rare regimes or sparse feature-space regions.</li>
+<li>Different seeds can produce different results.</li>
+</ul><hr/><h2 id="automatic-subset-minimum">Automatic subset minimum</h2><p><strong>Interface label:</strong>
+<code>Automatic subset minimum</code></p><p>The smallest subset size considered during automatic subset
+optimisation.</p><p>Default:</p><pre class="text"><code>100</code></pre><p>Choose a smaller value only when:</p><ul>
+<li>The dataset is small.</li>
+<li>The relationship is simple.</li>
+<li>Fast fitting is more important than accuracy.</li>
+</ul><hr/><h2 id="automatic-subset-maximum">Automatic subset maximum</h2><p><strong>Interface label:</strong>
+<code>Automatic subset maximum</code></p><p>The largest subset size considered.</p><p>Default:</p><pre class="text"><code>1,000</code></pre><p>The value cannot exceed the app’s GP hard limit.</p><p>Larger maxima improve the chance of matching exact-GP performance but
+increase computation and model-file size.</p><hr/><h2 id="subset-sizes-evaluated">Subset sizes evaluated</h2><p><strong>Interface label:</strong>
+<code>Subset sizes evaluated</code></p><p>The number of subset-size candidates between the automatic minimum
+and maximum.</p><p>Default:</p><pre class="text"><code>5</code></pre><p>For example:</p><pre class="text"><code>Minimum: 100
+Maximum: 1,000
+Count: 5</code></pre><p>generates approximately evenly spaced candidate sizes.</p><p>More candidates provide a finer comparison but require more GP
+fits.</p><hr/><h2 id="validation-tolerance-for-smaller-subset">Validation tolerance
+for smaller subset</h2><p><strong>Interface label:</strong>
+<code>Validation tolerance for smaller subset</code></p><p>After evaluating subset candidates, the app identifies the best
+validation RMSE. It then selects the smallest subset whose RMSE is
+within this relative tolerance of the best.</p><p>Default:</p><pre class="text"><code>0.01</code></pre><p>This means approximately:</p><pre class="text"><code>within 1% of the best validation RMSE</code></pre><p>Examples:</p><table>
+<thead>
+<tr class="header">
+<th>Tolerance</th>
+<th>Selection behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>0</code></td>
+<td>Select only a subset tied with the best score</td>
+</tr>
+<tr class="even">
+<td><code>0.01</code></td>
+<td>Allow a subset up to 1% worse than the best</td>
+</tr>
+<tr class="odd">
+<td><code>0.05</code></td>
+<td>Allow a subset up to 5% worse, favouring smaller models</td>
+</tr>
+</tbody>
+</table><p>Increasing tolerance prioritises speed and smaller model files over
+the very best validation score.</p><hr/><h2 id="gp-tuning-ranges">GP tuning ranges</h2><p>When automatic tuning is enabled, v0.2.1 exposes:</p><ul>
+<li>Length scale</li>
+<li>Signal variance</li>
+<li>Observation-noise standard deviation</li>
+</ul><p>Suggested default ranges:</p><table>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th style="text-align: right;">Minimum</th>
+<th style="text-align: right;">Maximum</th>
+<th>Spacing</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Length scale</td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: right;">10</td>
+<td>Logarithmic</td>
+</tr>
+<tr class="even">
+<td>Signal variance</td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: right;">10</td>
+<td>Logarithmic</td>
+</tr>
+<tr class="odd">
+<td>Observation-noise standard deviation</td>
+<td style="text-align: right;">0.001</td>
+<td style="text-align: right;">1</td>
+<td>Logarithmic</td>
+</tr>
+</tbody>
+</table><p>Adjust these ranges when the transformed target scale or processed
+feature scale differs greatly from the assumptions behind the
+defaults.</p><hr/><h1 id="artificial-neural-network-regression">9. Artificial
+neural-network regression</h1><h2 id="what-it-does-5">What it does</h2><p>The ANN is a feed-forward dense neural network. It sends processed
+input values through one to three hidden layers and produces one numeric
+output.</p><p>ANNs can represent complex nonlinear relationships and feature
+interactions.</p><p>They usually require:</p><ul>
+<li>More training data than simpler models</li>
+<li>Standardised numeric features</li>
+<li>Careful validation</li>
+<li>Regularisation</li>
+<li>Early stopping</li>
+</ul><hr/><h2 id="hidden-layer-1-neurons">Hidden layer 1 neurons</h2><p><strong>Interface label:</strong>
+<code>Hidden layer 1 neurons</code></p><p>Number of units in the first hidden layer.</p><p>Default:</p><pre class="text"><code>64</code></pre><p>Larger values increase model capacity and trainable parameters.</p><h2 id="hidden-layer-2-neurons">Hidden layer 2 neurons</h2><p><strong>Interface label:</strong>
+<code>Hidden layer 2 neurons</code></p><p>Default:</p><pre class="text"><code>32</code></pre><p>Set to <code>0</code> to remove the second hidden layer.</p><h2 id="hidden-layer-3-neurons">Hidden layer 3 neurons</h2><p><strong>Interface label:</strong>
+<code>Hidden layer 3 neurons</code></p><p>Default:</p><pre class="text"><code>0</code></pre><p>Set above zero to create a third hidden layer.</p><h2 id="architecture-guidance">Architecture guidance</h2><p>Suggested presets:</p><h3 id="small">Small</h3><pre class="text"><code>32 → 16</code></pre><p>Suitable for:</p><ul>
+<li>Small datasets</li>
+<li>Mobile devices</li>
+<li>Quick experiments</li>
+</ul><h3 id="medium">Medium</h3><pre class="text"><code>64 → 32</code></pre><p>Suitable for:</p><ul>
+<li>General desktop use</li>
+<li>Moderate nonlinear relationships</li>
+</ul><h3 id="larger">Larger</h3><pre class="text"><code>128 → 64 → 32</code></pre><p>Suitable for:</p><ul>
+<li>Larger datasets</li>
+<li>Complex relationships</li>
+<li>Desktop devices with adequate memory</li>
+</ul><p>A larger model is not automatically better. If training loss falls
+while validation loss rises, the model is overfitting.</p><hr/><h2 id="activation-function">Activation function</h2><p><strong>Interface label:</strong>
+<code>Activation function</code></p><h3 id="relu">ReLU</h3><pre class="text"><code>max(0, input)</code></pre><p>Advantages:</p><ul>
+<li>Fast</li>
+<li>Common default</li>
+<li>Usually effective for dense regression networks</li>
+</ul><p>Limitations:</p><ul>
+<li>Units can become inactive if their inputs remain negative.</li>
+</ul><h3 id="leaky-relu">Leaky ReLU</h3><p>Like ReLU, but retains a small negative slope.</p><p>Advantages:</p><ul>
+<li>Reduces the risk of permanently inactive units.</li>
+<li>Often a safe alternative to ReLU.</li>
+</ul><h3 id="tanh">Tanh</h3><p>Maps values to approximately <code>-1</code> to <code>1</code>.</p><p>Advantages:</p><ul>
+<li>Smooth</li>
+<li>Can work well for smaller networks and standardised inputs</li>
+</ul><p>Limitations:</p><ul>
+<li>Can saturate and produce small gradients.</li>
+</ul><h3 id="sigmoid">Sigmoid</h3><p>Maps values to approximately <code>0</code> to <code>1</code>.</p><p>Limitations:</p><ul>
+<li>Often saturates in hidden layers.</li>
+<li>Usually not the first choice for modern regression networks.</li>
+</ul><p>Suggested default:</p><pre class="text"><code>ReLU</code></pre><hr/><h2 id="optimiser">Optimiser</h2><p><strong>Interface label:</strong> <code>Optimiser</code></p><h3 id="adam">Adam</h3><p>Adaptive optimiser using running estimates of gradient moments.</p><p>Advantages:</p><ul>
+<li>Usually a strong default.</li>
+<li>Often converges faster with less manual tuning.</li>
+</ul><p>Suggested default learning rate:</p><pre class="text"><code>0.001</code></pre><h3 id="stochastic-gradient-descent">Stochastic gradient descent</h3><p>Uses direct gradient steps.</p><p>Advantages:</p><ul>
+<li>Simpler behaviour.</li>
+<li>Can generalise well with careful tuning.</li>
+</ul><p>Limitations:</p><ul>
+<li>More sensitive to the learning rate.</li>
+<li>May require more epochs.</li>
+<li>Can converge slowly.</li>
+</ul><p>A smaller learning rate is often needed when training becomes
+unstable.</p><hr/><h2 id="learning-rate">Learning rate</h2><p><strong>Interface label:</strong> <code>Learning rate</code></p><p>Controls the size of each weight update.</p><table>
+<colgroup>
+<col style="width: 50%"/>
+<col style="width: 50%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Learning rate</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Too small</td>
+<td>Very slow learning; may stop before reaching a good solution</td>
+</tr>
+<tr class="even">
+<td>Appropriate</td>
+<td>Loss falls steadily</td>
+</tr>
+<tr class="odd">
+<td>Too large</td>
+<td>Loss oscillates, diverges, or becomes non-finite</td>
+</tr>
+</tbody>
+</table><p>Default:</p><pre class="text"><code>0.001</code></pre><p>Typical tuning range:</p><pre class="text"><code>0.0001 to 0.01</code></pre><p>Recommended spacing:</p><pre class="text"><code>Logarithmic</code></pre><p>If training loss becomes <code>NaN</code>, increases sharply, or
+fluctuates severely, reduce the learning rate.</p><hr/><h2 id="batch-size">Batch size</h2><p><strong>Interface label:</strong> <code>Batch size</code></p><p>Number of training rows used for one gradient update.</p><p>Default:</p><pre class="text"><code>32</code></pre><table>
+<thead>
+<tr class="header">
+<th>Batch size</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Small</td>
+<td>Noisier updates; more updates per epoch</td>
+</tr>
+<tr class="even">
+<td>Large</td>
+<td>Smoother updates; more memory; fewer updates per epoch</td>
+</tr>
+</tbody>
+</table><p>Suggested values:</p><pre class="text"><code>16, 32, 64, 128</code></pre><p>Rules:</p><ul>
+<li>Do not set batch size larger than the available training rows unless
+you intentionally want full-batch behaviour.</li>
+<li>Smaller devices may require smaller batches.</li>
+<li>Large batches do not necessarily improve validation
+performance.</li>
+</ul><hr/><h2 id="maximum-epochs">Maximum epochs</h2><p><strong>Interface label:</strong> <code>Maximum epochs</code></p><p>An epoch is one full pass through the training dataset.</p><p>Default:</p><pre class="text"><code>150</code></pre><p>This is an upper limit. Early stopping can end training sooner.</p><p>The Step 6 training-history plot shows:</p><ul>
+<li>Training loss versus epoch</li>
+<li>Validation loss versus epoch</li>
+<li>Best validation epoch</li>
+</ul><p>Do not select the final epoch solely because training loss is lowest.
+The best validation epoch is usually more relevant.</p><hr/><h2 id="dropout-rate">Dropout rate</h2><p><strong>Interface label:</strong> <code>Dropout rate</code></p><p>During training, dropout randomly disables a fraction of hidden
+activations.</p><p>Default:</p><pre class="text"><code>0.1</code></pre><p>Examples:</p><table>
+<thead>
+<tr class="header">
+<th>Rate</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>0</code></td>
+<td>No dropout</td>
+</tr>
+<tr class="even">
+<td><code>0.1</code></td>
+<td>Approximately 10% of eligible hidden activations dropped</td>
+</tr>
+<tr class="odd">
+<td><code>0.3</code></td>
+<td>Stronger regularisation</td>
+</tr>
+<tr class="even">
+<td><code>0.5</code></td>
+<td>Very strong dropout for this type of tabular network</td>
+</tr>
+</tbody>
+</table><p>Benefits:</p><ul>
+<li>Reduces overfitting.</li>
+<li>Supports Monte Carlo dropout uncertainty.</li>
+</ul><p>If too high:</p><ul>
+<li>The network may underfit.</li>
+<li>Training can become slow or unstable.</li>
+<li>Predictions may be overly smooth.</li>
+</ul><p>Typical tuning range:</p><pre class="text"><code>0 to 0.4</code></pre><hr/><h2 id="l2-regularisation">L2 regularisation</h2><p><strong>Interface label:</strong> <code>L2 regularisation</code></p><p>Adds a penalty for large weights.</p><p>Default:</p><pre class="text"><code>0.0001</code></pre><table>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>0</code></td>
+<td>No L2 penalty</td>
+</tr>
+<tr class="even">
+<td>Small positive value</td>
+<td>Mild weight shrinkage</td>
+</tr>
+<tr class="odd">
+<td>Large value</td>
+<td>Strong shrinkage and possible underfitting</td>
+</tr>
+</tbody>
+</table><p>Typical tuning range:</p><pre class="text"><code>0.000001 to 0.01</code></pre><p>Recommended spacing:</p><pre class="text"><code>Logarithmic</code></pre><p>L2 and dropout can both be used, but strong values for both may
+over-regularise the network.</p><hr/><h2 id="early-stopping-patience">Early-stopping patience</h2><p><strong>Interface label:</strong>
+<code>Early-stopping patience</code></p><p>Number of consecutive epochs without sufficient validation
+improvement before training stops.</p><p>Default:</p><pre class="text"><code>20</code></pre><p>Smaller values:</p><ul>
+<li>Stop sooner.</li>
+<li>Reduce computation.</li>
+<li>Risk stopping during a temporary plateau.</li>
+</ul><p>Larger values:</p><ul>
+<li>Allow more time for improvement.</li>
+<li>Increase computation.</li>
+<li>May continue training after overfitting has begun.</li>
+</ul><p>The app restores the weights from the best validation epoch.</p><hr/><h2 id="minimum-validation-improvement">Minimum validation
+improvement</h2><p><strong>Interface label:</strong>
+<code>Minimum validation improvement</code></p><p>The validation loss must improve by at least this amount to reset the
+patience counter.</p><p>Default:</p><pre class="text"><code>0.00001</code></pre><p>If too small:</p><ul>
+<li>Tiny numerical fluctuations may count as improvement.</li>
+<li>Training may continue longer.</li>
+</ul><p>If too large:</p><ul>
+<li>Meaningful small improvements may be ignored.</li>
+<li>Training may stop too early.</li>
+</ul><p>The appropriate value depends on the scale of the internally fitted
+target loss.</p><hr/><h2 id="ann-uncertainty-method">ANN uncertainty method</h2><p><strong>Interface label:</strong>
+<code>ANN uncertainty method</code></p><h3 id="monte-carlo-dropout">Monte Carlo dropout</h3><p>The app keeps dropout active during repeated prediction passes.</p><p>The distribution of stochastic predictions is combined with residual
+variation to form an approximate interval.</p><p>Advantages:</p><ul>
+<li>Requires one trained network.</li>
+<li>Cheaper than training multiple independent models.</li>
+</ul><p>Limitations:</p><ul>
+<li>Approximate.</li>
+<li>Depends on the selected dropout rate.</li>
+<li>May be poorly calibrated.</li>
+<li>A dropout rate of zero provides little model-spread
+information.</li>
+</ul><h3 id="small-deep-ensemble">Small deep ensemble</h3><p>The app trains several independently initialised networks and
+combines their predictions.</p><p>Advantages:</p><ul>
+<li>Often gives more robust variation estimates than one network.</li>
+<li>Captures some sensitivity to initialisation.</li>
+</ul><p>Limitations:</p><ul>
+<li>Multiplies training time and model-file size.</li>
+<li>Still approximate.</li>
+<li>Ensemble members can remain highly correlated.</li>
+</ul><hr/><h2 id="monte-carlo-dropout-passes">Monte Carlo dropout passes</h2><p><strong>Interface label:</strong>
+<code>Monte Carlo dropout passes</code></p><p>Number of stochastic predictions used to estimate the interval.</p><p>Default:</p><pre class="text"><code>50</code></pre><p>Allowed range:</p><pre class="text"><code>10 to 300</code></pre><p>More passes:</p><ul>
+<li>Stabilise estimated quantiles.</li>
+<li>Increase prediction time.</li>
+<li>Do not fix a poorly calibrated model.</li>
+</ul><p>Suggested values:</p><pre class="text"><code>30–50 for routine use
+100 or more for more stable final reporting</code></pre><hr/><h2 id="ensemble-members">Ensemble members</h2><p><strong>Interface label:</strong> <code>Ensemble members</code></p><p>Number of independently initialised networks.</p><p>Default:</p><pre class="text"><code>3</code></pre><p>Allowed range:</p><pre class="text"><code>2 to 7</code></pre><p>More members:</p><ul>
+<li>Improve stability of the ensemble distribution.</li>
+<li>Increase training time and model size almost proportionally.</li>
+</ul><p>Suggested starting value:</p><pre class="text"><code>3</code></pre><hr/><h2 id="ann-parameter-count">ANN parameter count</h2><p>The app estimates the total number of trainable parameters.</p><p>For a dense layer:</p><pre class="text"><code>parameters =
+input units × output units
++ output bias units</code></pre><p>Total parameters are summed across all layers.</p><p>Current safety guidance:</p><table>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Trainable parameters</th>
+<th>App guidance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">Below 50,000</td>
+<td>Normal</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">50,000–250,000</td>
+<td>Suitable for many desktop tasks</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">250,000–500,000</td>
+<td>Performance warning</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">500,000–1,000,000</td>
+<td>Strong warning</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">Above 1,000,000</td>
+<td>Blocked by default</td>
+</tr>
+</tbody>
+</table><p>Recommendations are lower on mobile or memory-constrained
+devices.</p><p>A model with more parameters than training rows is not automatically
+invalid, but it has a higher overfitting risk and generally needs strong
+validation and regularisation.</p><hr/><h2 id="ann-tuning-ranges">ANN tuning ranges</h2><p>Version 0.2.1 exposes the following parameters for automatic
+tuning:</p><ul>
+<li>Hidden layer 1 neurons</li>
+<li>Hidden layer 2 neurons</li>
+<li>Learning rate</li>
+<li>Dropout rate</li>
+<li>L2 regularisation</li>
+</ul><p>Default ranges:</p><table>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th style="text-align: right;">Minimum</th>
+<th style="text-align: right;">Maximum</th>
+<th>Spacing/type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Hidden layer 1</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">128</td>
+<td>Linear integer</td>
+</tr>
+<tr class="even">
+<td>Hidden layer 2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">64</td>
+<td>Linear integer</td>
+</tr>
+<tr class="odd">
+<td>Learning rate</td>
+<td style="text-align: right;">0.0001</td>
+<td style="text-align: right;">0.01</td>
+<td>Logarithmic</td>
+</tr>
+<tr class="even">
+<td>Dropout</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.4</td>
+<td>Linear</td>
+</tr>
+<tr class="odd">
+<td>L2</td>
+<td style="text-align: right;">0.000001</td>
+<td style="text-align: right;">0.01</td>
+<td>Logarithmic</td>
+</tr>
+</tbody>
+</table><p>Random search or LHS is usually more practical than a full ANN
+grid.</p><p>During candidate tuning:</p><ul>
+<li>The validation set selects the candidate.</li>
+<li>Ensemble size is reduced to one for candidate comparison.</li>
+<li>The final chosen configuration can then use the selected uncertainty
+method.</li>
+</ul><hr/><h1 id="models-added-in-v1.0.11">Models added in v1.0.11</h1><h2 id="elastic-net-regression">Elastic-net regression</h2><ul>
+<li><strong>Overall penalty (lambda):</strong> total coefficient
+shrinkage. Zero disables the penalty.</li>
+<li><strong>L1 mixing ratio:</strong> zero is ridge-like, one is
+lasso-like, and intermediate values combine the penalties.</li>
+<li><strong>Maximum coordinate-descent iterations:</strong> fitting
+limit.</li>
+<li><strong>Convergence tolerance:</strong> maximum coefficient change
+required to stop.</li>
+</ul><p>Tune lambda logarithmically and the L1 ratio linearly. Standardised
+inputs and a dropped one-hot reference level are recommended. Intervals
+use an approximate constant residual scale.</p><h2 id="huber-robust-regression">Huber robust regression</h2><ul>
+<li><strong>Huber threshold:</strong> residual size at which
+observations begin to be downweighted.</li>
+<li><strong>Maximum IRLS iterations:</strong> reweighting limit.</li>
+<li><strong>Convergence tolerance:</strong> coefficient-stability
+requirement.</li>
+<li><strong>Numerical ridge stabiliser:</strong> small diagonal
+adjustment; zero is allowed.</li>
+</ul><p>A smaller Huber threshold is more aggressive. Inspect the
+downweighted-row count and residual diagnostics.</p><h2 id="gradient-boosted-trees">Gradient-boosted trees</h2><ul>
+<li><strong>Boosting stages:</strong> number of sequential trees.</li>
+<li><strong>Boosting learning rate:</strong> contribution from each
+stage. Smaller values generally require more stages.</li>
+<li><strong>Tree depth per stage:</strong> interaction complexity.</li>
+<li><strong>Minimum rows per leaf:</strong> smoothness and
+regularisation.</li>
+<li><strong>Row subsampling fraction:</strong> stochastic row sampling
+per stage.</li>
+<li><strong>Candidate thresholds per feature:</strong> split-search
+detail and runtime.</li>
+</ul><p>Use the training/validation learning curve to identify overfitting.
+The interval is an approximate constant residual-scale interval.</p><h2 id="k-nearest-neighbour-regression">k-nearest-neighbour
+regression</h2><ul>
+<li><strong>Number of neighbours:</strong> local sample size.</li>
+<li><strong>Weighting:</strong> uniform or inverse-distance.</li>
+<li><strong>Distance metric:</strong> Manhattan (<code>1</code>) or
+Euclidean (<code>2</code>) power.</li>
+<li><strong>Maximum stored rows:</strong> memory, package-size and
+prediction-time guardrail.</li>
+</ul><p>Standardisation is essential. kNN has no native feature-importance
+chart in this release. Its empirical neighbour interval is
+approximate.</p><h2 id="linear-quantile-regression">Linear quantile regression</h2><ul>
+<li><strong>Central quantile:</strong> point prediction quantile;
+<code>0.5</code> is the conditional median.</li>
+<li><strong>Iterations per fitted quantile:</strong> limit for lower,
+central and upper fits.</li>
+<li><strong>Optimisation learning rate:</strong> initial subgradient
+step size.</li>
+<li><strong>L2 regularisation:</strong> coefficient shrinkage; zero
+disables it.</li>
+</ul><p>The requested interval level determines the final lower and upper
+quantiles. These are conditional quantile estimates, not a finite-sample
+coverage guarantee.</p><p>For complete guidance, see
+<code>EXPANDED_MODELLING_GUIDE.md</code>.</p><h1 id="common-tuning-advice">10. Common tuning advice</h1><h2 id="change-one-thing-at-a-time-when-learning">Change one thing at a
+time when learning</h2><p>Before starting a large search:</p><ol type="1">
+<li>Fit the default.</li>
+<li>Examine training and validation performance.</li>
+<li>Identify signs of underfitting or overfitting.</li>
+<li>Narrow the ranges to plausible values.</li>
+<li>Run random search or LHS.</li>
+</ol><h2 id="signs-of-underfitting">Signs of underfitting</h2><ul>
+<li>Training and validation errors are both high.</li>
+<li>Residual plots show strong structure.</li>
+<li>Predictions vary too little.</li>
+<li>Training loss stops improving at a poor value.</li>
+</ul><p>Possible responses:</p><ul>
+<li>Increase tree depth.</li>
+<li>Reduce minimum leaf size.</li>
+<li>Reduce ridge strength.</li>
+<li>Reduce GP length scale.</li>
+<li>Increase ANN size.</li>
+<li>Reduce ANN regularisation.</li>
+<li>Train ANN longer or adjust the learning rate.</li>
+</ul><h2 id="signs-of-overfitting">Signs of overfitting</h2><ul>
+<li>Training error is much lower than validation error.</li>
+<li>Validation loss rises while training loss continues falling.</li>
+<li>Uncertainty intervals have poor test coverage.</li>
+<li>Predictions are unstable across sources or regimes.</li>
+</ul><p>Possible responses:</p><ul>
+<li>Increase ridge strength.</li>
+<li>Reduce tree depth.</li>
+<li>Increase minimum leaf size.</li>
+<li>Increase forest diversity.</li>
+<li>Increase GP noise or length scale.</li>
+<li>Reduce ANN size.</li>
+<li>Increase dropout or L2.</li>
+<li>Use earlier stopping.</li>
+<li>Add more representative training data.</li>
+</ul><h2 id="use-the-validation-set-not-the-test-set">Use the validation set,
+not the test set</h2><p>Do not repeatedly tune settings after looking at test performance.
+Doing so makes the test set part of model development and weakens its
+role as an independent assessment.</p><h2 id="compare-uncertainty-quality-as-well-as-point-error">Compare
+uncertainty quality as well as point error</h2><p>For models with intervals, examine:</p><ul>
+<li>Coverage</li>
+<li>Mean interval width</li>
+<li>Coverage error</li>
+<li>Interval score</li>
+<li>Coverage by source or regime</li>
+</ul><p>A very wide interval can achieve high coverage without being
+useful.</p><hr/><h1 id="performance-and-safety-limits">11. Performance and safety
+limits</h1><h2 id="decision-tree">Decision tree</h2><p>Cost increases with:</p><ul>
+<li>Training rows</li>
+<li>Processed feature count</li>
+<li>Maximum depth</li>
+<li>Candidate thresholds per feature</li>
+</ul><h2 id="random-forest">Random forest</h2><p>Cost increases approximately with:</p><ul>
+<li>Number of trees</li>
+<li>Rows sampled per tree</li>
+<li>Tree depth</li>
+<li>Processed feature count</li>
+</ul><h2 id="gaussian-process">Gaussian process</h2><p>Exact GP is the most restrictive model.</p><p>Memory is dominated by an approximately <code>n × n</code> covariance
+matrix.</p><p>The app uses a default maximum GP state of:</p><pre class="text"><code>2,000 rows</code></pre><p>Use representative-subset mode for larger training sets.</p><h2 id="ann">ANN</h2><p>Cost increases with:</p><ul>
+<li>Trainable parameter count</li>
+<li>Training rows</li>
+<li>Epochs</li>
+<li>Number of tuning candidates</li>
+<li>Monte Carlo passes</li>
+<li>Ensemble members</li>
+</ul><p>Early stopping is enabled to reduce unnecessary epochs.</p><h2 id="browser-considerations">Browser considerations</h2><p>A configuration that works well on a desktop may be slow or fail on a
+mobile device.</p><p>Before a large job:</p><ul>
+<li>Close unnecessary browser tabs.</li>
+<li>Use the offline package or a stable hosted version.</li>
+<li>Start with fewer candidates.</li>
+<li>Use a smaller GP subset.</li>
+<li>Use a smaller ANN.</li>
+<li>Confirm the workflow on a small sample first.</li>
+<li>Save useful models and results externally.</li>
+</ul><hr/><h1 id="glossary">12. Glossary</h1><h2 id="candidate-configuration">Candidate configuration</h2><p>One complete combination of hyperparameter values evaluated during
+tuning.</p><h2 id="epoch">Epoch</h2><p>One full pass through the ANN training data.</p><h2 id="hyperparameter">Hyperparameter</h2><p>A model setting chosen before or around training, such as tree depth,
+ridge strength, GP length scale, or ANN learning rate.</p><h2 id="kernel-1">Kernel</h2><p>A GP function that measures similarity between processed input
+rows.</p><h2 id="latent-function">Latent function</h2><p>The underlying smooth relationship represented by the GP before
+observation noise is added.</p><h2 id="negative-log-marginal-likelihood">Negative log marginal
+likelihood</h2><p>A GP fitting objective balancing data fit and model complexity. Lower
+values are better for the same data and model formulation.</p><h2 id="observation-noise">Observation noise</h2><p>Random target variation that is not attributed to the underlying GP
+function.</p><h2 id="overfitting">Overfitting</h2><p>Learning training-specific details or noise that do not generalise to
+validation, test, or new data.</p><h2 id="prediction-interval">Prediction interval</h2><p>An interval intended to contain an individual future observation at a
+requested probability level, under the model and method assumptions.</p><h2 id="regularisation">Regularisation</h2><p>A constraint or penalty intended to reduce overfitting, such as ridge
+shrinkage, ANN dropout, or ANN L2.</p><h2 id="representative-subset">Representative subset</h2><p>A selected group of training rows used to approximate a GP that would
+otherwise use the full training dataset.</p><h2 id="trainable-parameter">Trainable parameter</h2><p>A numeric weight or bias learned by an ANN.</p><h2 id="validation-rmse">Validation RMSE</h2><p>Root mean squared error calculated on the validation dataset and used
+to compare model settings.</p><hr/><h1 id="practical-default-configurations">Practical default
+configurations</h1><h2 id="linear-baseline">Linear baseline</h2><pre class="text"><code>Model: Linear regression
+Numeric scaling: Standardise
+Drop one categorical reference level: Yes</code></pre><h2 id="ridge-baseline">Ridge baseline</h2><pre class="text"><code>Lambda: 1
+Tuning range: 0.001–100, logarithmic</code></pre><h2 id="decision-tree-baseline">Decision-tree baseline</h2><pre class="text"><code>Maximum depth: 8
+Minimum rows per leaf: 5
+Candidate thresholds per feature: 24
+Features per split: All</code></pre><h2 id="random-forest-baseline">Random-forest baseline</h2><pre class="text"><code>Number of trees: 40
+Maximum depth: 8
+Minimum rows per leaf: 5
+Row sampling fraction: 0.8
+Candidate thresholds per feature: 20
+Features per split: Square root</code></pre><h2 id="exact-gp-baseline">Exact GP baseline</h2><pre class="text"><code>Mode: Exact GP
+Kernel: RBF
+Length scale: 1
+Signal variance: 1
+Observation-noise standard deviation: 0.1
+Jitter: 1e-8
+Stochastic kernel-search iterations: 8</code></pre><p>Review whether <code>0.1</code> is sensible relative to the fitted
+target scale.</p><h2 id="representative-gp-baseline">Representative GP baseline</h2><pre class="text"><code>Mode: Representative-subset GP
+Subset size: 500
+Subset method: Farthest-point sampling
+Other GP settings: Same as exact GP baseline</code></pre><h2 id="ann-baseline">ANN baseline</h2><pre class="text"><code>Hidden layers: 64 → 32
+Activation: ReLU
+Optimiser: Adam
+Learning rate: 0.001
+Batch size: 32
+Maximum epochs: 150
+Dropout: 0.1
+L2: 0.0001
+Patience: 20
+Minimum improvement: 0.00001
+Uncertainty: Monte Carlo dropout
+MC passes: 50</code></pre><hr/><h2 id="important-interpretation-warning">Important interpretation
+warning</h2><p>Hyperparameters do not have universally optimal values. Their effects
+depend on:</p><ul>
+<li>Training-set size</li>
+<li>Feature scaling</li>
+<li>Target transformation</li>
+<li>Noise level</li>
+<li>Number of processed features</li>
+<li>Split strategy</li>
+<li>Sources and regimes represented in each split</li>
+</ul><p>Use the defaults as starting points, not guaranteed recommendations.
+Final choices should be supported by validation performance and
+confirmed using the untouched test dataset.</p><h1 id="v0.3.0-comparison-set-note">v0.3.0 comparison-set note</h1><p>The Step 5 comparison batch uses fixed manual baseline values for
+each selected model. It does not copy the currently visible Step 4
+hyperparameters to every model family. To include a custom or tuned
+candidate, configure that model in Step 4 and select <strong>Train and
+evaluate</strong>. The result is saved in the same comparison workspace
+and is marked comparable when its data and evaluation setup matches.</p><hr/><h2 id="v1.0-deployment-and-governance">v1.0 deployment and
+governance</h2><p>v1.0 preserves the documented modelling behaviour and adds separate
+deployment editions, versioned governance lifecycle records, monitoring
+and revalidation, model-change assessments, local recovery, stricter
+import/export validation, and optional verification of organizational
+signatures against deployment-pinned public keys. See the package-root
+<code>DEPLOYMENT_GUIDE.md</code>, <code>GOVERNANCE_GUIDE.md</code>,
+<code>MONITORING_GUIDE.md</code>, <code>SECURITY.md</code>, and
+<code>MIGRATION_GUIDE.md</code>.</p></main></div></div></div>
+</body>
+</html>
