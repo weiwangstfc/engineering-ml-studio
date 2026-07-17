@@ -284,3 +284,69 @@ body.prediction-only #step-upload .panel-heading h2::after { content: " — appr
 
 .sidebar-help-card a{justify-self:start;text-align:left;text-decoration:none}
 .sidebar-help-card a:hover{text-decoration:underline}
+
+.sidebar-contact-card {
+  margin-top: 1rem;
+  padding: .85rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+  display: grid;
+  gap: .35rem;
+}
+
+.sidebar-contact-card a {
+  justify-self: start;
+  text-align: left;
+  text-decoration: none;
+}
+
+.sidebar-contact-card a:hover {
+  text-decoration: underline;
+}
+
+/* v1.0.12 sidebar zoom-accessibility patch — version 3
+   Full improvement: minimal scroll fix + proper layout fix + safer bottom spacing. */
+.app-shell,
+.app-container,
+.app-layout,
+.main-layout,
+.layout {
+  min-height: 0;
+}
+
+.app-sidebar,
+.sidebar,
+.side-panel {
+  min-height: 0;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: max(2.5rem, env(safe-area-inset-bottom));
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+
+/* Keep the sidebar reachable on medium and small layouts where the original CSS
+   changes the sidebar from sticky to static and previously hid overflow. */
+@media (max-width: 1100px) {
+  .app-sidebar,
+  .sidebar,
+  .side-panel {
+    height: auto;
+    max-height: 100dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-sidebar,
+  .sidebar,
+  .side-panel {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: max(2.5rem, env(safe-area-inset-bottom));
+  }
+}
