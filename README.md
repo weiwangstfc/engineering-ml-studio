@@ -1,74 +1,71 @@
-# Local Regression Studio
+# Engineering ML Studio
 
-Local Regression Studio is a private, local-first browser application for preparing CSV data, training and comparing regression models, validating results, recording governance decisions, operating approved prediction packages, and monitoring deployed performance.
+> **Provisional name.** Early redevelopment stage — expect significant change.
 
-## Included editions
+Engineering ML Studio is a **browser-first machine-learning platform for engineers**. It runs
+entirely in the browser, keeps data on the user's own machine, and aims to make training,
+exploring, and building small engineering ML projects approachable for people who are not
+machine-learning specialists.
 
-- **Full Studio** — the package root. Supports data preparation, all eleven regression model families, tuning, comparison, validation, approval, prediction, and monitoring. The local launcher starts it with bundled libraries by default; `--hybrid` permits pinned CDN attempts with local fallback.
-- **Prediction-only edition** — `editions/prediction-only/`. Forces approved-package operation and bundled local dependencies. This is an operational workflow guardrail, not an authentication boundary.
-- **Strict-offline Studio** — `editions/strict-offline/`. Includes the complete Studio, forces bundled dependencies, and uses a Content Security Policy without remote script or connection sources.
+## Purpose
 
-## Start locally
+To give engineers a private, no-installation environment where they can load data, train and
+compare models, understand the results, and — when they are ready — grow from no-code use
+toward writing their own Python. The current focus is **regression**.
 
-Extract the ZIP and use one of the launchers:
+## Intended uses
 
-| Edition | Windows | macOS | Linux |
-|---|---|---|---|
-| Full Studio | `start-windows.bat` | `start-macos.command` | `start-linux.sh` |
-| Prediction only | `start-prediction-only-windows.bat` | `start-prediction-only-macos.command` | `start-prediction-only-linux.sh` |
-| Strict offline | `start-strict-offline-windows.bat` | `start-strict-offline-macos.command` | `start-strict-offline-linux.sh` |
+- Learning and **exploration** of regression on engineering data.
+- **Small engineering ML projects** (data preparation → training → validation → prediction → monitoring).
+- Teaching the underlying concepts and, later, the underlying code.
 
-The Python launcher binds only to `127.0.0.1`. You may also deploy any edition with a static web server.
+## Current technical model (confirmed from the source project)
 
-## Model families
+- **Browser-local calculation.** All model training and prediction run client-side in the browser;
+  there is no backend, no account, and no data upload endpoint.
+- **Static web application.** Plain HTML/CSS/JavaScript, no build step, deployed as static files.
+- **Regression-only** at present, across the model families inherited from Local Regression Studio.
 
-1. Linear regression
-2. Ridge regression
-3. Elastic-net regression
-4. Huber robust regression
-5. Decision-tree regression
-6. Random-forest regression
-7. Gradient-boosted trees
-8. k-nearest-neighbour regression
-9. Linear quantile regression
-10. Gaussian-process regression
-11. Feed-forward artificial neural networks
+See [`docs/ARCHITECTURE_AUDIT.md`](docs/ARCHITECTURE_AUDIT.md) for the confirmed technical audit.
 
-## v1.0 governance and deployment additions
+## Attribution and origin
 
-- Versioned model, project, experiment, approved-package, monitoring, and governance records
-- Safe migration of supported earlier project and model schemas
-- Explicit lifecycle states from Draft through Retired
-- Developer, owner, reviewer, and approver records
-- Post-deployment monitoring and revalidation triggers
-- Old-versus-new model change assessments
-- Local recovery snapshots that exclude the original CSV
-- CSV and JSON import limits and structural validation
-- Spreadsheet-formula protection in exported CSV files
-- Runtime edition, network-policy, and dependency-source status
-- Strict-offline and prediction-only distributions
-- SBOM, threat model, security policy, build provenance, and release manifest
-- Optional organizational signature verification using deployment-pinned public keys
+Engineering ML Studio is an **independently maintained derivative**. It was **initially derived from
+Local Regression Studio**, developed by **Yu Duan**.
 
-## Privacy
+- Original project: **Local Regression Studio**
+- Original developer: **Yu Duan**
+- Original source repository: <https://github.com/MartianonEarth/localregressorstudio>
+- Original licence: **MIT** (see [`LICENSES.txt`](LICENSES.txt))
 
-Training data and predictions are processed in the browser. There is no analytics, cloud model-training, remote storage, or CSV-upload endpoint. The Full Studio hybrid build may request pinned public libraries during startup only when hybrid mode is deliberately enabled. The strict-offline and prediction-only editions prohibit those remote requests through build configuration and Content Security Policy.
+Yu Duan and any previous contributors retain full credit for the original work. The original
+copyright and licence notices are preserved unchanged. See [`NOTICE.md`](NOTICE.md) for the full
+attribution statement.
 
-Downloaded models, projects, monitoring records, reports, and predictions may contain sensitive derived information. Store and share them according to your organization’s requirements.
+Engineering ML Studio is currently **led and maintained by Wei Wang at the Science and Technology
+Facilities Council (STFC)**. This reflects current project leadership only; it does not transfer or
+replace the copyright of the original authors. Future development, releases, and roadmap for
+Engineering ML Studio are decided independently (see [`GOVERNANCE.md`](GOVERNANCE.md)).
 
-## Important boundaries
+## Status
 
-- Governance records are not identity authentication, regulatory certification, or a legal electronic signature.
-- Organizational package-signature verification requires trusted public keys to be configured by the deployment administrator. The reference build ships with no trusted organizational keys.
-- The prediction-only edition is not an access-control boundary; use authenticated hosting and operating-system controls when authorization is required.
-- Complete model training remains on the main browser thread in v1.0. Long jobs can still make low-powered devices less responsive.
-- Accessibility improvements are included, but the reference build has not received an independent WCAG conformance certification.
+**Phase 0 — independent project foundation.** No functional application code, dependencies,
+deployment configuration, tests, datasets, or the licence have been changed at this stage; only
+project-foundation documentation has been added. See [`ROADMAP.md`](ROADMAP.md).
 
-See `docs/` for role-specific, security, deployment, migration, governance, monitoring, privacy, and modelling documentation.
+## ⚠️ Important safety notice
 
+Engineering ML Studio is **not a validated safety-critical engineering tool**. It has not been
+qualified, certified, or independently verified for use in safety-critical, regulatory, or
+life-affecting engineering decisions. Results are for exploration, learning, and non-critical work.
+Always independently verify any output before relying on it.
 
-## v1.0.11 maintenance release
+## Documentation
 
-This release keeps the v1.0 governance scope and improves usability around System utilities, data-quality help, comparison batches, validation reports, diagnostics, and monitoring exports.
-# localregressorstudio
-# localregressorstudio
+- [`NOTICE.md`](NOTICE.md) — attribution and origin
+- [`GOVERNANCE.md`](GOVERNANCE.md) — how the project is run
+- [`ROADMAP.md`](ROADMAP.md) — planned phases
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to contribute
+- [`docs/PRODUCT_VISION.md`](docs/PRODUCT_VISION.md) — product vision
+- [`docs/ARCHITECTURE_AUDIT.md`](docs/ARCHITECTURE_AUDIT.md) — confirmed technical audit
+- [`docs/UX_REDESIGN_PLAN.md`](docs/UX_REDESIGN_PLAN.md) — proposed UX redesign
