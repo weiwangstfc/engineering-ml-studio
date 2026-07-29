@@ -101,6 +101,28 @@ Test layout:
 - `tests/unit.spec.js` — focused unit tests of the inherited ML core (`window.MLCore`), run inside
   the browser via `page.evaluate` because the modules bind to the global `window` and are not
   importable in Node.
+- `tests/explore.spec.js` — the landing page, navigation, and the problem-led Explore workflow,
+  including the Phase 2 **Learn** route and the Explore "Continue in Python" call to action.
+
+### Python tests (dataset generator + teaching notebook)
+
+The synthetic-dataset generator and the Phase 2 "Learn the Code" notebook have their own Python
+tests, run with the standard-library test runner:
+
+```bash
+python -m unittest discover -s tests -p "test_*.py" -v
+```
+
+- `tests/test_pipe_dataset.py` — properties of the generated pressure-drop CSV. Needs only `numpy`.
+- `tests/test_notebook_structure.py` — static checks on `notebooks/pipe_pressure_drop.ipynb`
+  (valid, output-free, expected sections, seed, model names, units, disclaimers). Standard-library
+  only, so it runs anywhere.
+- `tests/test_notebook_execution.py` — executes the notebook end-to-end **offline** (from the
+  committed CSV) and checks the metric ranges, model ranking, and engineering checks. It **skips
+  cleanly** if the notebook runtime tooling is absent; to run it, install the notebook dependencies
+  plus `nbclient`/`nbconvert`/`nbformat`/`ipykernel` (see `notebooks/requirements.txt`).
+
+Both suites (browser and Python) run in CI; see `.github/workflows/test.yml`.
 
 ## Deployment (current)
 

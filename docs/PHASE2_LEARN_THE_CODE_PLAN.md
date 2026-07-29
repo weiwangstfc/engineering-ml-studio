@@ -78,8 +78,72 @@ algorithms. It is a **learning and exploration** artefact for **small, non-criti
 15. **Advanced extension suggestions** — cross-validation, feature importance, gradient boosting,
     prediction intervals, trying the reader's own (non-critical) data — clearly flagged as optional.
 
+> **Added during the neural-network increment (Section 16).** A single **optional, advanced** section
+> was appended at the end: a `scikit-learn` neural network (`MLPRegressor` in a `StandardScaler`
+> pipeline, `(32, 16)`, ReLU, fixed seed, early stopping, L2 regularisation) with its loss curve and
+> an actual-vs-predicted plot. It is deliberately last and framed honestly — a more complex model is
+> not automatically more accurate, and here it does **not** beat the Random Forest. This matches the
+> browser's new advanced neural-network option. No PyTorch/TensorFlow; `scikit-learn` stays a
+> notebook-only dependency. See [`NEURAL_NETWORK_DEMO.md`](NEURAL_NETWORK_DEMO.md).
+
 The notebook must **echo the browser wording** (problem-led, plain language, model names as secondary
 detail) so the two experiences reinforce each other.
+
+### 2a. Reconciliation with the Explore code (recorded during implementation Step 2)
+
+Reading `js/explore.js`, `js/ml-core.js`, and `js/platform-core.js` confirmed the exact browser
+workflow and surfaced a few points where the notebook deliberately, and honestly, differs. These are
+recorded here so the plan and the code stay in step.
+
+- **Features and target — identical.** Five numeric inputs (`pipe_length_m`, `pipe_diameter_m`,
+  `flow_velocity_m_s`, `fluid_density_kg_m3`, `dynamic_viscosity_pa_s`) → `pressure_drop_kpa`. The
+  dataset has **no categorical columns**, so preprocessing reduces to **numeric standardisation only**
+  (no one-hot encoding path is exercised).
+- **Split — same ratio, different partition.** Explore uses a fixed **70 / 15 / 15** split
+  (350 / 75 / 75 rows for the 500-row dataset) seeded with **42**. The notebook reproduces the same
+  ratio and seed via scikit-learn `train_test_split`, but the **partition of specific rows differs**
+  because the browser uses its own `mulberry32` shuffle. The exact rows in each set therefore do not
+  match — only the proportions and the reproducibility principle do.
+- **Validation set is defined but unused by these models.** Explore carves a validation set but does
+  **not** tune on it for Linear/Tree/Forest (no hyperparameter search runs). The notebook mirrors this:
+  it trains on the training set and reports on the test set, and explains that the validation slice
+  exists for tuning (an advanced extension), not for these three fixed models.
+- **Preprocessing — standardisation, population std.** Explore standardises numeric features with the
+  population standard deviation (matching scikit-learn `StandardScaler`'s default `ddof=0`). The
+  notebook applies `StandardScaler` to the linear model; trees and forests are scale-invariant, so
+  scaling is unnecessary for them (noted in the notebook).
+- **Model hyperparameters — one deliberate, documented divergence.** Linear = ordinary least squares
+  (Explore's `linear` with `lambda = 0`, mathematically the same fit). Decision Tree = `max_depth=8`,
+  `min_samples_leaf=5` (matches Explore's tree defaults). **Random Forest uses scikit-learn's own
+  defaults** (`n_estimators=100`, `max_features=1.0`, unrestricted depth) rather than Explore's exact
+  forest (40 trees, `max_features='sqrt'`, depth 8). Reason: with only five features, `max_features='sqrt'`
+  restricts each split to ~2 inputs and, under scikit-learn's implementation, the forest then
+  **underperforms the single tree** — which would contradict the teaching order the learner just saw in
+  the browser. The scikit-learn default forest restores the intended, honest ranking. This divergence is
+  stated plainly in the notebook.
+- **Metrics will not match to the digit — and the notebook says so.** Because the browser uses bespoke
+  JavaScript model implementations and a different row partition (`mulberry32` shuffle vs
+  `train_test_split`), exact figures differ from scikit-learn. The table below records the **actual
+  measured test-set results** from both sides (browser: Explore "compare" mode; notebook: executed
+  offline from the committed CSV). It is a factual, side-by-side comparison — the numbers are **not**
+  forced to agree.
+
+  | Model | Browser test R² | Browser test RMSE (kPa) | Notebook test R² | Notebook test RMSE (kPa) |
+  | --- | --- | --- | --- | --- |
+  | Linear Regression | 0.563 | 26.63 | 0.596 | 22.23 |
+  | Decision Tree | 0.679 | 22.84 | 0.780 | 16.39 |
+  | Random Forest | 0.832 | 16.54 | 0.846 | 13.72 |
+
+  The **ranking is identical on both sides** — Linear < Decision Tree < Random Forest — so the teaching
+  story carries across: the linear model under-fits, a single deep tree overfits (its browser/notebook
+  train R² are 0.96/0.94 against much lower test R²), and the random forest is strongest and most
+  stable. The **magnitudes differ**, most visibly in RMSE (different test rows) and for the decision
+  tree, whose browser implementation subsamples split thresholds (`maxThresholds`) and so fits a little
+  less tightly than scikit-learn's exhaustive splitter. The notebook presents this **honestly and does
+  not force exact equality**; the in-app Learn page and the notebook both tell the learner to expect
+  slightly different numbers (see the browser teaching figures in [`EXPLORE_MODE.md`](EXPLORE_MODE.md)).
+  *(Figures captured during implementation Step 14; regenerate by training Explore in "compare" mode and
+  executing the notebook — small run-to-run drift is possible but the ordering is stable.)*
 
 ---
 

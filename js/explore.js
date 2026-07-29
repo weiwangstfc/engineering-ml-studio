@@ -99,15 +99,37 @@
     }
   ];
 
-  var MODEL_LABELS = { linear: 'Linear Regression', tree: 'Decision Tree', forest: 'Random Forest' };
+  var MODEL_LABELS = { linear: 'Linear Regression', tree: 'Decision Tree', forest: 'Random Forest', ann: 'Neural Network' };
 
   // Approaches are the beginner-facing choice; model names are the secondary detail.
+  // The neural network is offered as an *advanced* flexible option, never the default.
   var APPROACHES = {
     simple:   { models: ['linear'] },
     flexible: { models: ['forest'] },
-    compare:  { models: ['linear', 'tree', 'forest'] }
+    advanced: { models: ['ann'] },
+    compare:  { models: ['linear', 'tree', 'forest', 'ann'] }
   };
-  var COMPARE_ORDER = ['linear', 'tree', 'forest'];
+  var COMPARE_ORDER = ['linear', 'tree', 'forest', 'ann'];
+
+  // Neural-network Explore presets. Explore exposes safe presets, not free architecture
+  // editing (full configuration lives in Project mode). Every value is documented in
+  // docs/NEURAL_NETWORK_DEMO.md. The underlying model is the inherited browser network
+  // in js/advanced-core.js, reached through the standard model adapter.
+  var ANN_ARCH_PRESETS = {
+    // Small: one hidden layer of 16 units — conceptually (16,).
+    small:  { hidden1: 16, hidden2: 0,  label: 'Small network (one hidden layer, 16 neurons)' },
+    // Medium: two hidden layers, 32 then 16 — conceptually (32, 16).
+    medium: { hidden1: 32, hidden2: 16, label: 'Medium network (two hidden layers, 32 → 16 neurons)' }
+  };
+  // Training length maps to a documented maximum number of epochs (early stopping may end sooner).
+  var ANN_TRAINING_PRESETS = { quick: 150, standard: 300, longer: 600 };
+  // Fixed, safe defaults for everything Explore does not expose.
+  var ANN_SAFE_DEFAULTS = {
+    activation: 'relu', optimizer: 'adam', batchSize: 32,
+    l2: 0.0005, dropout: 0, patience: 25, minDelta: 1e-5,
+    earlyStopping: true, ensembleSize: 1
+  };
+  var ANN_LR_DEFAULT = 0.01; // higher than Project's 0.001 default because Explore caps epochs for speed
 
   // Deterministic, sensible defaults shared with Project mode.
   var PREPROCESS = {
@@ -280,14 +302,27 @@
 
   function updateApproachControls() {
     state.approach = selectedApproach();
-    // Tree/forest controls are only relevant when a flexible model is involved.
+    // Tree/forest controls are only relevant when a flexible tree-based model is involved.
     var usesTrees = state.approach === 'flexible' || state.approach === 'compare';
+    // Neural-network preset controls appear for the advanced approach (and in compare).
+    var usesAnn = state.approach === 'advanced' || state.approach === 'compare';
     var depth = el('exploreDepthField');
     var trees = el('exploreTreesField');
     if (depth) depth.classList.toggle('is-hidden', !usesTrees);
     if (trees) trees.classList.toggle('is-hidden', !usesTrees);
+    var annControls = el('exploreAnnControls');
+    if (annControls) annControls.classList.toggle('is-hidden', !usesAnn);
     var controls = el('exploreControls');
-    if (controls) controls.classList.toggle('is-hidden', !usesTrees);
+    if (controls) controls.classList.toggle('is-hidden', !usesTrees && !usesAnn);
+  }
+
+  // Read the selected neural-network preset values (with safe fallbacks).
+  function selectedAnnPreset() {
+    var arch = document.querySelector('input[name="exploreAnnArch"]:checked');
+    var archKey = arch && ANN_ARCH_PRESETS[arch.value] ? arch.value : 'small';
+    var lengthSel = el('exploreAnnTraining');
+    var lengthKey = lengthSel && ANN_TRAINING_PRESETS[lengthSel.value] ? lengthSel.value : 'standard';
+    return { archKey: archKey, lengthKey: lengthKey };
   }
 
   function clampInt(value, min, max, fallback) {
@@ -307,6 +342,22 @@
         minLeaf: 5, sampleRate: 0.8, maxThresholds: 20, maxFeatures: 'sqrt', maxRowsPerTree: 20000
       };
     }
+    if (modelType === 'ann') {
+      var preset = selectedAnnPreset();
+      var arch = ANN_ARCH_PRESETS[preset.archKey];
+      var lr = ANN_LR_DEFAULT;
+      var lrField = el('exploreAnnLearningRate');
+      if (lrField && lrField.value !== '' && isFinite(Number(lrField.value))) {
+        lr = Math.max(0.0001, Math.min(0.5, Number(lrField.value)));
+      }
+      return Object.assign({}, ANN_SAFE_DEFAULTS, {
+        hidden1: arch.hidden1, hidden2: arch.hidden2, hidden3: 0,
+        epochs: ANN_TRAINING_PRESETS[preset.lengthKey],
+        learningRate: lr,
+        // Record which presets produced this run, for the interpretation text.
+        _archKey: preset.archKey, _lengthKey: preset.lengthKey
+      });
+    }
     return {}; // linear
   }
 
@@ -315,6 +366,7 @@
     var ML = global.MLCore;
     var split = ML.splitRows(dataset.rows, dataset.target, SPLIT);
     var rawTrain = split.training.map(function (e) { return e.row; });
+    var rawValidation = (split.validation || []).map(function (e) { return e.row; });
     var rawTest = split.test.map(function (e) { return e.row; });
     var pre = ML.fitPreprocessor(rawTrain, dataset.features, PREPROCESS, dataset.profiles);
     if (!pre.outputNames.length) throw new Error('No usable features remain for this example.');
@@ -322,8 +374,23 @@
     var tTest = ML.transformRows(rawTest, pre, dataset.target, true);
     var tt = ML.fitTargetTransform(tTrain.y, 'none');
     var yTrain = ML.applyTargetTransform(tTrain.y, tt);
+
+    // The neural network benefits from a real validation set for honest early stopping.
+    // Other models ignore these fields, so this stays a contained, model-specific addition.
+    var fitParams = params;
+    if (modelType === 'ann' && rawValidation.length) {
+      var tVal = ML.transformRows(rawValidation, pre, dataset.target, true);
+      fitParams = Object.assign({}, params, {
+        _validationX: tVal.X,
+        _validationY: ML.applyTargetTransform(tVal.y, tt)
+      });
+    }
+
     var adapter = global.LRSPlatform.getModelAdapter(modelType);
-    return Promise.resolve(adapter.fit(tTrain.X, yTrain, params, SEED)).then(function (model) {
+    var startedAt = (global.performance && global.performance.now) ? global.performance.now() : null;
+    return Promise.resolve(adapter.fit(tTrain.X, yTrain, fitParams, SEED)).then(function (model) {
+      var trainingMs = (startedAt != null && global.performance && global.performance.now)
+        ? (global.performance.now() - startedAt) : null;
       ML.fitSmearing(tt, yTrain, adapter.predict(model, tTrain.X));
       var predTrain = ML.inverseTargetTransform(adapter.predict(model, tTrain.X), tt, true);
       var predTest = ML.inverseTargetTransform(adapter.predict(model, tTest.X), tt, true);
@@ -333,12 +400,37 @@
         actual: tTest.y.slice(),
         predicted: predTest.slice(),
         params: params,
-        counts: { training: tTrain.y.length, test: tTest.y.length },
+        counts: { training: tTrain.y.length, validation: rawValidation.length, test: tTest.y.length },
+        // Iterative-training diagnostics (neural network / other iterative models).
+        training: summariseTraining(model, params, trainingMs),
         // Kept for the deterministic engineering checks in stage 4.
         model: model, adapter: adapter, pre: pre, tt: tt,
         rawTrain: rawTrain, features: dataset.features, target: dataset.target
       };
     });
+  }
+
+  // Extract a compact, honest training summary from an iterative model (e.g. the ANN).
+  // Returns null for non-iterative models so callers can simply test for its presence.
+  function summariseTraining(model, params, trainingMs) {
+    var history = model && model.trainingHistory;
+    if (!history || !history.length || !isFinite(Number(history[0].epoch))) return null;
+    var maxEpochs = Number((params && params.epochs)) || history[history.length - 1].epoch;
+    var ranEpochs = history[history.length - 1].epoch;
+    var bestEpoch = Number(model.bestEpoch) || ranEpochs;
+    return {
+      history: history.map(function (h) {
+        return { epoch: h.epoch, trainLoss: h.trainLoss, validationLoss: h.validationLoss };
+      }),
+      maxEpochs: maxEpochs,
+      ranEpochs: ranEpochs,
+      bestEpoch: bestEpoch,
+      // Early stopping fired if training halted before the configured maximum.
+      earlyStopped: ranEpochs < maxEpochs,
+      finalTrainLoss: history[history.length - 1].trainLoss,
+      finalValidationLoss: history[history.length - 1].validationLoss,
+      trainingMs: trainingMs
+    };
   }
 
   function setBusy(busy, message) {
@@ -381,6 +473,7 @@
       renderComparison();
       renderFocusSelector();
       renderPlot(state.focusModel);
+      renderLossCurve(state.focusModel);
       renderInterpretation(state.focusModel);
       renderEngineering(state.focusModel);
       var next = el('exploreToStage4');
@@ -458,6 +551,46 @@
     global.Plotly.react('explorePlot', traces, layout, { responsive: true, displaylogo: false, modeBarButtonsToRemove: ['lasso2d', 'select2d'] });
   }
 
+  // Advanced diagnostic: the neural-network training (loss) curve. This is deliberately
+  // secondary to the main result — it lives in a collapsed card and only appears for the ANN.
+  // The curve is never fabricated: it is drawn only from the model's recorded trainingHistory.
+  function renderLossCurve(modelType) {
+    var card = el('exploreLossCard');
+    if (!card) return;
+    var res = state.results[modelType];
+    var t = res && res.training;
+    if (modelType !== 'ann' || !t || !t.history || !t.history.length || !global.Plotly) {
+      card.classList.add('is-hidden');
+      return;
+    }
+    card.classList.remove('is-hidden');
+    var epochs = t.history.map(function (h) { return h.epoch; });
+    var traces = [
+      { x: epochs, y: t.history.map(function (h) { return h.trainLoss; }),
+        mode: 'lines', type: 'scatter', name: 'Training loss', line: { color: '#125f76' } }
+    ];
+    var hasVal = t.history.some(function (h) { return isFinite(h.validationLoss); });
+    if (hasVal) {
+      traces.push({ x: epochs, y: t.history.map(function (h) { return h.validationLoss; }),
+        mode: 'lines', type: 'scatter', name: 'Validation loss', line: { color: '#a52b2b', dash: 'dot' } });
+    }
+    var layout = {
+      title: { text: 'Training loss per epoch', font: { size: 15 } },
+      xaxis: { title: { text: 'Epoch' }, automargin: true },
+      yaxis: { title: { text: 'Loss (scaled units)' }, automargin: true, rangemode: 'tozero' },
+      margin: { l: 60, r: 20, t: 50, b: 55 }, legend: { orientation: 'h', y: -0.25 },
+      paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', hovermode: 'closest'
+    };
+    global.Plotly.react('exploreLossPlot', traces, layout, { responsive: true, displaylogo: false, modeBarButtonsToRemove: ['lasso2d', 'select2d'] });
+    var note = el('exploreLossNote');
+    if (note) {
+      note.textContent = t.earlyStopped
+        ? ('Training stopped early at epoch ' + t.bestEpoch + ' of a maximum of ' + t.maxEpochs +
+           ' because the validation loss stopped improving. A falling curve that flattens out is the sign of convergence.')
+        : ('Training ran for the full ' + t.maxEpochs + ' epochs. If the curve is still falling at the right-hand edge, a longer training length may help; if it has flattened, the network has effectively converged.');
+    }
+  }
+
   // --- Stage 4: deterministic, rule-based interpretation -------------------------
   function r2Quality(r2) {
     if (!isFinite(r2)) return 'could not be computed';
@@ -519,6 +652,10 @@
       cards.push({ title: 'Is it overfitting?', body: of.text, level: of.level });
     }
 
+    if (modelType === 'ann') {
+      annInterpretationCards(res).forEach(function (c) { cards.push(c); });
+    }
+
     cards.push({
       title: 'Reading the actual-vs-predicted plot',
       body: 'Each point is one test row. The horizontal axis is the true ' + escapeHtml(target) +
@@ -531,6 +668,87 @@
       var cls = 'explore-insight' + (c.level ? ' level-' + c.level : '');
       return '<div class="' + cls + '"><h3>' + c.title + '</h3><p>' + c.body + '</p></div>';
     }).join('');
+  }
+
+  // Deterministic, rule-based interpretation specific to the neural network (Stage 4).
+  // No external service is used; every statement is derived from the measured numbers.
+  function annInterpretationCards(res) {
+    var cards = [];
+    var t = res.training;
+    var preset = res.params || {};
+    var archLabel = (ANN_ARCH_PRESETS[preset._archKey] || {}).label || 'the selected architecture';
+
+    // Convergence / training-length feedback.
+    if (t) {
+      var convBody, convLevel = null;
+      if (t.earlyStopped) {
+        convBody = 'Training stopped early at epoch ' + t.bestEpoch + ' of a maximum of ' + t.maxEpochs +
+          ' because the validation loss stopped improving. That is the expected, healthy outcome: the network ' +
+          'settled rather than training needlessly.';
+      } else {
+        convBody = 'Training ran for the full ' + t.maxEpochs + ' epochs without early stopping. If the validation ' +
+          'loss was still falling at the end, a longer training length may help a little; if it had flattened, the ' +
+          'network has effectively converged.';
+        convLevel = 'medium';
+      }
+      if (isFinite(t.trainingMs)) {
+        convBody += ' Training took about ' + (t.trainingMs / 1000).toFixed(1) + ' s in your browser (' +
+          archLabel.toLowerCase() + ').';
+      }
+      cards.push({ title: 'Did the neural network converge?', body: convBody, level: convLevel });
+    }
+
+    // Did it improve on the simple trend? (Only when Linear Regression was also trained.)
+    var linear = state.results.linear;
+    if (linear && isFinite(linear.testMetrics.r2) && isFinite(res.testMetrics.r2)) {
+      var dR2 = res.testMetrics.r2 - linear.testMetrics.r2;
+      var better = dR2 > 0.02, worse = dR2 < -0.02;
+      cards.push({
+        title: 'Did it beat the simple trend?',
+        body: better
+          ? ('On test data the neural network explains more of the variation than Linear Regression (test R² ' +
+             fmtR2(res.testMetrics.r2) + ' vs ' + fmtR2(linear.testMetrics.r2) + '), so it is capturing nonlinear ' +
+             'behaviour the straight-line model cannot.')
+          : (worse
+             ? ('On test data the neural network does <strong>not</strong> beat Linear Regression (test R² ' +
+                fmtR2(res.testMetrics.r2) + ' vs ' + fmtR2(linear.testMetrics.r2) + '). A more complex model is not ' +
+                'automatically better — here the extra flexibility did not pay off.')
+             : ('The neural network performs about the same as Linear Regression on test data (test R² ' +
+                fmtR2(res.testMetrics.r2) + ' vs ' + fmtR2(linear.testMetrics.r2) + '), so the added complexity ' +
+                'brought little benefit here.')),
+        level: worse ? 'medium' : null
+      });
+    }
+
+    // Was the extra complexity worthwhile versus the tree ensemble? (Only when Forest was trained.)
+    var forest = state.results.forest;
+    if (forest && isFinite(forest.testMetrics.r2) && isFinite(res.testMetrics.r2)) {
+      var vsForest = res.testMetrics.r2 - forest.testMetrics.r2;
+      cards.push({
+        title: 'Is the neural network better than the tree ensemble?',
+        level: 'medium',
+        body: (vsForest > 0.02
+          ? 'Here the neural network edges ahead of the Random Forest on test data'
+          : (vsForest < -0.02
+            ? 'Here the Random Forest actually does better than the neural network on test data'
+            : 'Here the neural network and the Random Forest perform about the same on test data')) +
+          ' (test R² ' + fmtR2(res.testMetrics.r2) + ' vs ' + fmtR2(forest.testMetrics.r2) + '). ' +
+          'On small tabular engineering datasets like this one, well-tuned tree-based methods are often as good as, ' +
+          'or better than, a neural network. Good performance here does not establish that neural networks are ' +
+          'superior in general.'
+      });
+    }
+
+    // Fixed cautions that always apply.
+    cards.push({
+      title: 'What this result does — and does not — show',
+      level: 'medium',
+      body: 'This is one synthetic dataset with a fixed random seed. The numbers show what happened here; they do ' +
+        'not prove one model is best in general. As with every model in this tool, predictions outside the ' +
+        'demonstrated data range are extrapolation and can be unreliable, and physical validation and engineering ' +
+        'judgement are still required — a neural network does not change that.'
+    });
+    return cards;
   }
 
   // Beginner-friendly, deterministic model descriptions (see docs/EXPLORE_MODE.md).
@@ -549,6 +767,12 @@
       return 'A Random Forest combines many decision trees and averages them, which makes it more stable than a ' +
         'single tree. It handles nonlinear relationships well, but it is less transparent than a straight-line ' +
         'model and it may extrapolate poorly beyond the range of the training data.';
+    }
+    if (modelType === 'ann') {
+      return 'A Neural Network combines layers of simple mathematical units to learn complex nonlinear ' +
+        'relationships. It can be powerful, but it normally needs scaled data, careful tuning and sufficient ' +
+        'training data. It has more settings, trains more slowly, and can overfit more easily than the simpler ' +
+        'models — and a more complex model is not automatically more accurate or more suitable for engineering use.';
     }
     return '';
   }
@@ -698,6 +922,7 @@
     var wrap = el('exploreComparisonWrap'); if (wrap) wrap.classList.add('is-hidden');
     var focus = el('exploreFocusWrap'); if (focus) focus.classList.add('is-hidden');
     var card = el('explorePlotCard'); if (card) card.classList.add('is-hidden');
+    var lossCard = el('exploreLossCard'); if (lossCard) { lossCard.classList.add('is-hidden'); lossCard.open = false; }
     var next = el('exploreToStage4'); if (next) next.disabled = true;
     var interp = el('exploreInterpretation'); if (interp) interp.innerHTML = '';
     var eng = el('exploreEngineering'); if (eng) eng.innerHTML = '';
@@ -740,6 +965,7 @@
       state.focusModel = focus.value;
       renderComparison();
       renderPlot(state.focusModel);
+      renderLossCurve(state.focusModel);
       renderInterpretation(state.focusModel);
       renderEngineering(state.focusModel);
     });

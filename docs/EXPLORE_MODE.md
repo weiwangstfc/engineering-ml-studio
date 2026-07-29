@@ -39,8 +39,11 @@ Project · About) and two primary routes:
 - **Build a project** → the full inherited eight-stage workflow, now labelled **Project mode**
   (unchanged in behaviour). See [`BASELINE_BEHAVIOUR.md`](BASELINE_BEHAVIOUR.md).
 
-A third route, **Learn with Python**, is shown as *Coming later* and is intentionally not yet
-implemented.
+A third route, **Learn with Python**, is now active (Phase 2): it opens a **Learn** page that links
+to a guided Jupyter notebook reproducing this same pressure-drop workflow in Python. Explore's Stage 4
+also offers a **"Continue in Python"** call to action to the same page. See
+[`PHASE2_LEARN_THE_CODE_PLAN.md`](PHASE2_LEARN_THE_CODE_PLAN.md) and
+[`../notebooks/README.md`](../notebooks/README.md).
 
 ## The four stages (problem-led)
 
@@ -53,14 +56,19 @@ implemented.
 2. **Choose an approach.** The primary choice is phrased as an engineering decision, **not** an
    algorithm name:
    - **Start with a simple trend** *(uses Linear Regression)* — the default.
-   - **Try a more flexible relationship** *(uses Random Forest)* — reveals two beginner controls
+   - **Try a tree-based flexible relationship** *(uses Random Forest)* — reveals two beginner controls
      (number of trees, maximum depth).
-   - **Compare approaches** *(Linear Regression, Decision Tree and Random Forest)* — trains all three
-     so the beginner can see the trade-off.
+   - **Try an advanced flexible model** *(uses a Neural Network)* — an **advanced**, non-default
+     option that reveals safe neural-network presets (size and training length; learning rate under an
+     "Advanced setting"). See [`NEURAL_NETWORK_DEMO.md`](NEURAL_NETWORK_DEMO.md).
+   - **Compare approaches** *(Linear Regression, Decision Tree, Random Forest and Neural Network)* —
+     trains all four so the beginner can see the trade-off.
 
    Fine print explains *why* a flexible model can fit a curved relationship that a straight-line trend
-   misses, and warns that a very flexible model can **overfit** (memorise the training data and
-   generalise poorly). A collapsed glossary gives one honest sentence per model (see below).
+   misses, warns that a very flexible model can **overfit** (memorise the training data and generalise
+   poorly), and states plainly that **a more complex model is not automatically more accurate or more
+   suitable for engineering use**. A collapsed glossary gives one honest sentence per model (see
+   below). The neural network is deliberately offered as an *advanced* option, never the default.
 3. **Train and compare predictions.** A single **"Train and show predictions"** action runs the
    chosen approach(es). Results appear as a small table with the **target unit shown in every column
    header** — *Test RMSE (kPa)*, *Test R²*, *Training RMSE (kPa)* — and an **actual-vs-predicted**
@@ -80,8 +88,8 @@ implemented.
      **no external AI service is called**.
 
 Every stage carries brief *What you are doing / Why it matters / What to look for* guidance, and
-back/next controls. You can restart, return to the landing page, or continue into Project mode at any
-time.
+back/next controls. You can restart, return to the landing page, continue into Project mode, or
+**continue in Python** (to the Learn page and its notebook) at any time from Stage 4.
 
 ## Beginner model explanations (honest, one sentence each)
 
@@ -97,6 +105,10 @@ Shown as secondary glossary detail, deliberately avoiding overstatement:
 - **Random Forest** — **combines many trees** and averages them; usually **more stable and accurate**
   than a single tree, but **less transparent**, and like all these models it can **extrapolate
   poorly** outside the range it was trained on.
+- **Neural network** — **combines layers of simple units** to learn nonlinear relationships; flexible
+  and powerful, but it needs its inputs put on a **common scale**, has **more settings**, **trains
+  more slowly**, and can **overfit** small datasets. Offered as an advanced option, not the default,
+  and — importantly — not automatically better than the simpler models above.
 
 ## The bundled dataset (synthetic, physically-informed)
 
@@ -117,9 +129,15 @@ project: [`examples/pipe_pressure_drop_sample.csv`](../examples/pipe_pressure_dr
   | --- | --- | --- | --- | --- |
   | Linear Regression | ~0.56 | ~26.6 | ~21.1 | captures the main trend, misses the curve (under-fits) |
   | Decision Tree | ~0.68 | ~22.8 | ~6.2 | large train/test gap → clear over-fitting |
-  | Random Forest | ~0.83 | ~16.5 | ~10.2 | best generalisation |
+  | Random Forest | ~0.83 | ~16.5 | ~10.2 | best of the simpler models |
+  | Neural Network (Small preset) | ~0.99 | ~4.8 | ~3.1 | fits this smooth synthetic data very well *here* — but see the caveat below |
 
   (Indicative values from a representative run; see the generator and tests for exact reproduction.)
+  The neural network fits this particular smooth, low-noise synthetic function extremely well in the
+  browser; in the `scikit-learn` notebook the same-shaped network does **not** beat the Random Forest.
+  That divergence is deliberate and honest — a single strong score does not prove one model type is
+  superior. See [`NEURAL_NETWORK_DEMO.md`](NEURAL_NETWORK_DEMO.md) for the full browser-vs-notebook
+  comparison.
 - **Generator:** [`scripts/generate_pipe_pressure_drop.py`](../scripts/generate_pipe_pressure_drop.py)
   documents the equation, assumptions, sampling ranges, noise model, and limitations; it is
   deterministic (numpy `default_rng`, fixed seed) and validates its own output (positive Δp, finite
@@ -172,6 +190,14 @@ never mutates Project state.
 - Decision Tree: `{ maxDepth: 8 (user 2–15), minLeaf: 5, maxThresholds: 24, maxFeatures: 'all' }`.
 - Random Forest: `{ nTrees: 40 (user 10–120), maxDepth: 8 (user 2–15), minLeaf: 5, sampleRate: 0.8,
   maxThresholds: 20, maxFeatures: 'sqrt', maxRowsPerTree: 20000 }`.
+- Neural Network (**advanced option, not the default**): safe presets only — size *Small* `(16,)`
+  (default) or *Medium* `(32, 16)`; training length *Quick* / *Standard* (default) / *Longer* → 150 /
+  300 / 600 max epochs; learning rate `0.01` (default, under a collapsed "Advanced setting", clamped
+  `0.0001–0.5`). Fixed safe defaults: `activation: relu`, `optimizer: adam`, `batchSize: 32`,
+  `l2: 0.0005`, `dropout: 0`, early stopping on (`patience: 25`, `minDelta: 1e-5`), seed 42. Inputs
+  are standardised and the target is scaled internally, with predictions returned in kPa. The network
+  is the **inherited** implementation in `js/advanced-core.js` reached through the same model adapter —
+  no new algorithm and no new dependency. See [`NEURAL_NETWORK_DEMO.md`](NEURAL_NETWORK_DEMO.md).
 
 ## Implementation
 
@@ -194,12 +220,17 @@ without horizontal scrolling. This is sound accessible practice, not a full WCAG
 
 ## Deliberate non-goals (this prototype)
 
-- No new ML algorithms, no changes to existing ML calculations.
+- No new ML algorithms and no changes to existing ML calculations. The neural network offered in
+  Explore is the **already-inherited** network in `js/advanced-core.js`, surfaced through the existing
+  model adapter with a thin preset/UI layer — it is not a new or duplicated model, and it adds no
+  runtime dependency (no TensorFlow.js, Pyodide, or server-side compute).
 - No frontend framework, bundler, server, database, accounts, or cloud/AI APIs; Plotly is not
   replaced.
 - No changes to Project mode's layout or logic, and no removal of preprocessing, diagnostics, export,
   prediction, monitoring, or governance features. The inherited datasets are **not** deleted.
-- No real Python/notebook integration (the "Learn with Python" route is *Coming later*).
+- The Python/notebook link is one-way and static: Explore does **not** transfer its in-browser
+  state, models, or numbers to the notebook — the Learn page simply points to a notebook that
+  reproduces the same workflow independently (see Phase 2).
 - No deployment or GitHub Pages changes.
 
 ## Limitations (stated honestly)
@@ -222,12 +253,22 @@ loads; both routes offered; Project reveals its workflow; return home; the four 
 pressure-drop framing; Stage 1 units/target/trend/disclaimer and the inline SVG schematic; Stage 2
 showing **approaches (not algorithm names)** with *simple* as default, model names as secondary
 detail, and the glossary; the simple approach training Linear with a **kPa** metric header; the
-flexible approach revealing its controls and using Random Forest; the flexible approach achieving a
-higher test R² than linear (read from live in-browser results); *Compare* producing three rows and a
-focus selector; the actual-vs-predicted plot labelled in kPa; Stage 4 reading (R² + kPa) and the
-engineering trend/extrapolation checks; the secondary generic example being labelled a maths
-demonstration; no non-local network requests; keyboard reachability; and no horizontal overflow at a
-narrow viewport.
+tree-based flexible approach revealing its controls and using Random Forest; the flexible approach
+achieving a higher test R² than linear (read from live in-browser results); *Compare* producing four
+rows (Linear, Tree, Forest, Neural Network) and a focus selector; the actual-vs-predicted plot
+labelled in kPa; Stage 4 reading (R² + kPa) and the engineering trend/extrapolation checks; the
+secondary generic example being labelled a maths demonstration; no non-local network requests;
+keyboard reachability; and no horizontal overflow at a narrow viewport.
+
+The neural network is covered by dedicated tests: the **advanced** option is offered but **not**
+checked by default; selecting it reveals only the safe presets with the learning rate hidden under an
+"Advanced setting" and a plain-language scaling note; it trains a network that reports finite metrics
+in **kPa**; results are **deterministic** across a fresh reload (same RMSE/R²); the training-curve
+diagnostic starts collapsed; the Stage 4 interpretation names convergence, the comparison to the tree
+ensemble ("does not establish" superiority), extrapolation, and physical validation; and training the
+network makes no non-local requests. `tests/unit.spec.js` adds browser-network unit checks
+(determinism for a fixed seed, finite/correctly-shaped predictions and recorded training history, the
+Small preset learning a synthetic function, and early stopping respecting the epoch cap).
 
 `tests/test_pipe_dataset.py` (Python `unittest`, standard library + numpy) covers the generator:
 expected columns/units, requested row count, strictly-positive and finite pressure drops, sensible

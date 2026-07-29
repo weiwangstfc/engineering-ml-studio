@@ -1,14 +1,60 @@
 # Project Status — Engineering ML Studio
 
-Concise, factual snapshot during **Phase 1** (first prototype increment). For detail see
+Concise, factual snapshot during **Phase 2** (first "Learn the Code" prototype increment), building
+on the delivered Phase 1 Explore mode. For detail see
 [`ARCHITECTURE_AUDIT.md`](ARCHITECTURE_AUDIT.md), [`ROADMAP.md`](../ROADMAP.md),
-[`EXPLORE_MODE.md`](EXPLORE_MODE.md), and [`UX_REDESIGN_PLAN.md`](UX_REDESIGN_PLAN.md).
+[`EXPLORE_MODE.md`](EXPLORE_MODE.md), [`PHASE2_LEARN_THE_CODE_PLAN.md`](PHASE2_LEARN_THE_CODE_PLAN.md),
+and [`UX_REDESIGN_PLAN.md`](UX_REDESIGN_PLAN.md).
 
-## Phase 1 prototype (this stage)
+## Phase 2 prototype (this stage)
+
+- **First "Learn the Code" pathway.** A single, high-quality guided Jupyter notebook,
+  `notebooks/pipe_pressure_drop.ipynb`, reproduces the Explore pressure-drop activity in Python: the
+  same dataset, the same five inputs and target, the same fixed seed (42), and the same three models
+  (Linear Regression, Decision Tree, Random Forest) using `pandas`, `scikit-learn` and `matplotlib`.
+  It is committed output-free and runs end-to-end offline from the committed CSV.
+- **New in-app Learn page** (`#view-learn`, added to the router; nav is now Home · Explore · Project ·
+  Learn · About). It explains the notebook, links to **Google Colab** and a **local Jupyter** run
+  (text links, not an external badge image, to respect the CSP), states honestly that the numbers
+  differ slightly from the browser, and repeats the synthetic-data caution.
+- **"Continue in Python" call to action** at the end of the Explore workflow (Stage 4) linking to the
+  Learn page; the landing "Learn with Python" card is now active.
+- **Neural network added as an advanced flexible model (not the beginner default).** Explore gains a
+  fourth approach ("try an advanced flexible model") and a four-way *Compare* (Linear, Decision Tree,
+  Random Forest, Neural Network); the model names stay secondary and the simple trend remains the
+  default. It **reuses the inherited browser network** (`js/advanced-core.js`) through the existing
+  model adapter — **no new algorithm and no new runtime dependency** — with safe presets only (size
+  Small `(16,)` default / Medium `(32, 16)`; training length Quick/Standard/Longer; learning rate
+  under a collapsed "Advanced setting"), automatic input/target scaling with results in kPa, honest
+  training feedback (convergence/early stopping, a collapsed loss-curve diagnostic), a deterministic
+  Stage 4 interpretation, and an optional advanced Section 16 in the notebook (`scikit-learn`
+  `MLPRegressor`). Framed honestly throughout: a more complex model is not automatically more
+  accurate; on small tabular data tree methods are often as good or better (the browser and notebook
+  deliberately disagree on whether the network wins). See
+  [`NEURAL_NETWORK_DEMO.md`](NEURAL_NETWORK_DEMO.md).
+- **`scikit-learn` is a notebook-only dependency.** It is *not* used by the browser runtime, which
+  keeps its own in-browser model code. Because the two implementations differ, the exact figures are
+  not identical by design — the teaching narrative (linear under-fits, a deep tree overfits, the
+  forest is strongest) is what is preserved. One deliberate, documented divergence: the notebook's
+  Random Forest uses scikit-learn defaults rather than Explore's `max_features='sqrt'`, because the
+  latter would break the pedagogical ordering.
+- **Architectural boundaries preserved.** No browser-to-notebook state transfer, no dynamic code
+  generation, no Python-in-browser, no accounts or cloud, no Project-mode redesign, no second
+  notebook, no new datasets, no new ML algorithm, no new runtime dependency, and no licence/attribution
+  change. New/changed files: `notebooks/pipe_pressure_drop.ipynb`, `notebooks/README.md`,
+  `notebooks/requirements.txt`, `tests/test_notebook_structure.py`, `tests/test_notebook_execution.py`,
+  `.github/workflows/test.yml` (new `notebooks` job), `js/modes.js`, `index.html` (nav, landing card,
+  Explore CTA, `#view-learn`), `css/explore.css`, and Phase 2 docs. The neural-network addition
+  further touched `js/explore.js`, `index.html` (Explore Stage 2/3), `css/app.css`,
+  `tests/explore.spec.js`, `tests/unit.spec.js`, `docs/NEURAL_NETWORK_DEMO.md`, and the notebook.
+  Project-mode ML code, `js/advanced-core.js`, and `js/ml-core.js` are unchanged. All prior tests
+  remain green alongside the new notebook, browser, and unit tests.
+
+## Phase 1 prototype (delivered)
 
 - **New landing page** with a global top navigation (Home · Explore · Project · About) and two
-  primary routes: *Explore with an example* and *Build a project*. A third route, *Learn with
-  Python*, is shown as **Coming later**.
+  primary routes: *Explore with an example* and *Build a project*. (A third route, *Learn with
+  Python*, was shown as *Coming later* in Phase 1 and is now active — see the Phase 2 section above.)
 - **New Explore mode (problem-led, engineering-focused):** one guided, four-stage workflow —
   *understand the pressure-drop problem → choose an approach → train and compare predictions →
   interpret the engineering meaning* — built around a concrete mechanical/thermal engineering example
@@ -57,10 +103,12 @@ Concise, factual snapshot during **Phase 1** (first prototype increment). For de
 - **Difficult beginner interface:** a single dense page exposing all steps and options at once.
 - **Specialist terminology** throughout, aimed at ML-literate users rather than engineers.
 - **Long workflow** with no guided or minimal entry path.
-- **Limited notebook integration:** no current path from the UI to Python/Jupyter.
+- **Early notebook integration:** one guided notebook (pressure drop) reachable from the UI via a
+  Learn page and an Explore call to action; broader UI↔code coverage is still to come.
 - **Tightly coupled architecture (confirmed):** `js/app.js` (~2238 lines) mixes UI and control flow
   and depends on many global modules loaded in a fixed manual order.
-- **No beginner learning pathway** yet.
+- **Single learning pathway:** only the pressure-drop notebook exists so far; other topics and a
+  fuller step-by-step "Learn the Code" experience are not yet built.
 
 ## Phase 0 completion criteria
 
@@ -89,8 +137,9 @@ Concise, factual snapshot during **Phase 1** (first prototype increment). For de
 ## Not yet done (deferred, needs approval)
 
 - Remaining Phase 1 items: configurable Project mode, wider engineering-language pass across Project
-  mode, additional built-in engineering datasets, and real Jupyter/Python integration (currently
-  *Coming later*).
+  mode, and additional built-in engineering datasets.
+- Remaining Phase 2 items: further "Learn the Code" notebooks beyond pressure drop, and deeper links
+  between individual UI actions and their equivalent Python.
 - Refactoring `js/app.js` or the Project-mode layout (deliberately avoided; Explore reuses the shared
   `MLCore`/`LRSPlatform` functions instead of the DOM-coupled `trainAndEvaluate`).
 - Test coverage for the predict and monitor stages and the full validation/approval/export flow

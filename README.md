@@ -63,7 +63,29 @@ Full instructions, browser requirements, and how to run the automated tests are 
 
 ## Status
 
-**Phase 1 prototype (in progress): landing page + problem-led engineering Explore mode.** On top of
+**Phase 2 prototype (in progress): the first "Learn the Code" pathway.** Building on the Explore
+mode, this stage adds a guided **Jupyter notebook** that reproduces the *same* pressure-drop
+activity in Python — the same dataset, the same five inputs and target, the same fixed random seed
+(42) and the same three models — using `pandas`, `scikit-learn` and `matplotlib`. A new in-app
+**Learn** page links out to the notebook (Google Colab or a local Jupyter run) and a **"Continue in
+Python"** call to action appears at the end of the Explore workflow. The notebook is deliberately
+faithful to Explore but **not numerically identical**: Explore runs its own in-browser model code
+while the notebook uses scikit-learn, so the exact figures differ — the *teaching narrative* (linear
+under-fits, a deep tree overfits, the forest is strongest) is what carries across. This connection
+is one-way and static: **no browser state is transferred, no Python runs in the browser, and no
+account or cloud service is involved.** See
+[`docs/PHASE2_LEARN_THE_CODE_PLAN.md`](docs/PHASE2_LEARN_THE_CODE_PLAN.md) and
+[`notebooks/README.md`](notebooks/README.md).
+
+Phase 2 also adds a **neural network** as an **advanced, flexible option — not the beginner
+default**. Explore gains a fourth approach ("try an advanced flexible model"), the four-way *Compare*
+now includes it, and the notebook gains an optional advanced section. It reuses the **inherited**
+browser network (no new dependency, no server compute) with safe presets, and is framed honestly: a
+more complex model is not automatically more accurate, and on small tabular data well-tuned
+tree-based methods are often as good or better. See
+[`docs/NEURAL_NETWORK_DEMO.md`](docs/NEURAL_NETWORK_DEMO.md).
+
+**Phase 1 prototype: landing page + problem-led engineering Explore mode.** On top of
 the reproducible baseline, this stage adds a new **landing page** and a beginner-friendly **Explore
 mode**. Explore is now **problem-led and focused on engineering**: it starts from a concrete
 mechanical/thermal question — **predicting the pressure drop along a pipe** — rather than from
@@ -96,7 +118,9 @@ and [`docs/BASELINE_TEST_REPORT.md`](docs/BASELINE_TEST_REPORT.md).
   [`docs/EXPLORE_MODE.md`](docs/EXPLORE_MODE.md).
 - **Project** — the full inherited workflow (upload → features → preprocess → model → split →
   diagnostics → predict → monitor, plus governance), unchanged.
-- **Learn with Python** — *coming later* (not yet implemented).
+- **Learn with Python** — a guided Jupyter notebook that reproduces the Explore pressure-drop
+  workflow in Python (`pandas` + `scikit-learn`). New in Phase 2. See
+  [`notebooks/README.md`](notebooks/README.md) and the in-app **Learn** page.
 
 ## ⚠️ Important safety notice
 
@@ -113,7 +137,10 @@ Always independently verify any output before relying on it.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to contribute
 - [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — local run and test instructions
 - [`docs/EXPLORE_MODE.md`](docs/EXPLORE_MODE.md) — the Phase 1 Explore-mode prototype
+- [`docs/NEURAL_NETWORK_DEMO.md`](docs/NEURAL_NETWORK_DEMO.md) — the neural network as an advanced option (browser + notebook)
 - [`docs/PHASE1_IMPLEMENTATION_PLAN.md`](docs/PHASE1_IMPLEMENTATION_PLAN.md) — Phase 1 plan
+- [`docs/PHASE2_LEARN_THE_CODE_PLAN.md`](docs/PHASE2_LEARN_THE_CODE_PLAN.md) — Phase 2 "Learn the Code" plan
+- [`notebooks/README.md`](notebooks/README.md) — the Phase 2 teaching notebook
 - [`docs/BASELINE_BEHAVIOUR.md`](docs/BASELINE_BEHAVIOUR.md) — current behaviour the tests protect
 - [`docs/BASELINE_TEST_REPORT.md`](docs/BASELINE_TEST_REPORT.md) — baseline test run and tooling
 - [`docs/PRODUCT_VISION.md`](docs/PRODUCT_VISION.md) — product vision

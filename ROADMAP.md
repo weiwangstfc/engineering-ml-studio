@@ -41,15 +41,31 @@ Make the existing regression capability genuinely approachable. Priorities:
 - **Improved navigation**. — *global top nav (Home · Explore · Project · About) added.*
 - **Clearer diagnostics**. — *plain-language, rule-based result explanations added in Explore.*
 - **Responsive interface**. — *new views reflow to narrow/mobile widths.*
-- **Connection to Jupyter notebooks**. — *not started; shown as "Learn with Python — Coming later".*
+- **Connection to Jupyter notebooks**. — *first pathway delivered in Phase 2 (see below): a guided
+  notebook reproducing the Explore pressure-drop workflow, reachable from a new in-app **Learn** page
+  and a "Continue in Python" call to action in Explore.*
 
 > The first Phase 1 increment (landing page + one guided Explore workflow) is a **prototype**. The
 > remaining Phase 1 items above are still to come.
 
-## Phase 2 — Guided learning pathway
+## Phase 2 — Guided learning pathway (in progress)
 
 - Step-by-step guidance that teaches regression concepts in engineering terms.
-- "Learn the Code" pathway that reveals the equivalent Python for actions taken in the UI.
+- "Learn the Code" pathway that reveals the equivalent Python for actions taken in the UI. — *first
+  pathway delivered as a **prototype**: a single high-quality Jupyter notebook
+  (`notebooks/pipe_pressure_drop.ipynb`) reproducing the Explore pressure-drop activity in Python
+  (`pandas` + `scikit-learn`), with a matching in-app **Learn** page and an Explore "Continue in
+  Python" link. The connection is one-way and static — no browser-to-notebook state transfer, no
+  Python in the browser, no accounts or cloud. Numbers differ slightly from the browser (different
+  model implementations); the teaching narrative is preserved. See
+  [`docs/PHASE2_LEARN_THE_CODE_PLAN.md`](docs/PHASE2_LEARN_THE_CODE_PLAN.md) and
+  [`notebooks/README.md`](notebooks/README.md). Further notebooks and deeper UI↔code links still to come.*
+- **Neural network as an advanced flexible model (not the beginner default).** — *delivered as part of
+  Phase 2: Explore gains a fourth "try an advanced flexible model" approach and a four-way compare, the
+  notebook gains an optional advanced section, and the honest framing (more complex ≠ more accurate;
+  tree methods are often as good on small tabular data) is carried throughout. It reuses the
+  **inherited** browser network with safe presets — no new algorithm and no new runtime dependency. See
+  [`docs/NEURAL_NETWORK_DEMO.md`](docs/NEURAL_NETWORK_DEMO.md).*
 - In-context explanations of diagnostics and validation.
 
 ## Phase 3 — Small engineering project capability
@@ -57,6 +73,10 @@ Make the existing regression capability genuinely approachable. Priorities:
 - Robust support for realistic small engineering projects end-to-end.
 - Reusable project templates and built-in engineering datasets expanded.
 - Stronger validation, monitoring, and governance flows for real (non-critical) use.
+- **Expose the neural network's full configuration in Project mode through clearly-labelled
+  _Advanced_ settings** (layers, neurons, activation, learning rate, max iterations, regularisation,
+  early stopping, seed). The network already exists in Project mode; this is a UI/labelling task
+  deferred here as part of the wider Project-mode redesign — not a new algorithm.
 
 ## Phase 4 — Additional Engineering ML modules
 
