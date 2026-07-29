@@ -13,13 +13,22 @@ Each item is tagged:
 The automated tests that back the **[Confirmed]** items live in `tests/smoke.spec.js` and
 `tests/unit.spec.js`. See [`DEVELOPMENT.md`](DEVELOPMENT.md) for how to run them.
 
+> **Phase 1 entry-path change.** As of the Phase 1 prototype, the application opens on a new
+> **landing page**, and the inherited eight-stage workflow is now reached by choosing **Project
+> mode** (top nav → Project, or the landing-page route). The workflow's behaviour below is
+> **unchanged**; only the entry path is new. The smoke tests reflect this with a single
+> `enterProjectMode()` step and continue to assert every original behaviour. The new landing page and
+> Explore mode have their own behaviour documented in [`EXPLORE_MODE.md`](EXPLORE_MODE.md) and tested
+> in `tests/explore.spec.js`.
+
 ## Application shell and startup
 
 - **[Confirmed]** Loading `/?localOnly=1` over HTTP produces no fatal JavaScript errors; the app
   finishes bootstrapping (signalled by `window.LocalRegressionApp` being defined).
-- **[Confirmed]** The principal container (`main.app-shell`) and the page heading (`h1`) are
-  visible. The current heading text is **"Local Regression Studio"** — this is inherited and is
-  intentionally unchanged at this stage.
+- **[Confirmed]** After entering **Project mode**, the principal container (`main.app-shell`) and the
+  Project page heading (`#view-project h1`) are visible. The Project heading text is
+  **"Local Regression Studio"** — this is inherited and is intentionally unchanged at this stage.
+  (The new landing page carries its own heading, **"Engineering ML Studio"**.)
 - **[Confirmed]** With `?localOnly=1`, only bundled libraries under `vendor/` are used; no external
   (non-local) network requests are made during the load-and-train workflow.
 - **[Inferred]** Without `?localOnly=1` the app runs in "hybrid mode" and may load a pinned CDN

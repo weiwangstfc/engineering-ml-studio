@@ -7,9 +7,243 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
   <title>Local Regression Studio v1.0.11</title>
   <link rel="stylesheet" href="./css/app.css">
+  <link rel="stylesheet" href="./css/explore.css">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
+
+  <a class="skip-link" href="#modeMain">Skip to content</a>
+  <nav class="top-nav" aria-label="Primary">
+    <a class="brand" href="#home" data-mode="home">Engineering&nbsp;ML&nbsp;Studio</a>
+    <ul class="nav-links">
+      <li><a href="#home" data-mode="home" data-nav="home">Home</a></li>
+      <li><a href="#explore" data-mode="explore" data-nav="explore">Explore</a></li>
+      <li><a href="#project" data-mode="project" data-nav="project">Project</a></li>
+      <li><a href="#about" data-mode="about" data-nav="about">About</a></li>
+    </ul>
+    <span id="modeIndicator" class="mode-indicator" aria-live="polite"></span>
+  </nav>
+
+  <div id="modeMain">
+
+  <!-- ===================== HOME / LANDING ===================== -->
+  <section id="view-home" class="view" aria-labelledby="homeHeading" tabindex="-1">
+    <div class="hero">
+      <p class="eyebrow">Browser-only machine learning for engineers</p>
+      <h1 id="homeHeading">Engineering ML Studio</h1>
+      <p class="hero-lead">Explore, understand and apply machine-learning regression methods to
+        engineering data directly in your browser.</p>
+      <ul class="hero-points">
+        <li><strong>Runs locally.</strong> Calculations run in your browser.</li>
+        <li><strong>Private.</strong> Data you load is not sent to an application server.</li>
+        <li><strong>For learning and small projects.</strong> Built for exploration and small engineering datasets.</li>
+        <li><strong>Not safety-critical.</strong> This is not a validated safety-critical analysis tool.</li>
+      </ul>
+
+      <div class="route-grid">
+        <article class="route-card">
+          <h2>Explore with an example</h2>
+          <p>Learn how regression models work using a guided engineering example. No coding or data
+            upload is required.</p>
+          <button class="button primary large" data-mode="explore" type="button">Start exploring</button>
+        </article>
+        <article class="route-card">
+          <h2>Build a project</h2>
+          <p>Upload a small dataset and use the full model-development, diagnostics and validation
+            workflow.</p>
+          <button class="button primary large" data-mode="project" type="button">Open Project mode</button>
+        </article>
+      </div>
+
+      <div class="route-secondary">
+        <div class="route-secondary-item">
+          <h3>Learn with Python <span class="badge">Coming later</span></h3>
+          <p>Connect these browser activities to Python and Jupyter notebooks.</p>
+          <button class="button secondary" type="button" disabled aria-disabled="true">Coming later</button>
+        </div>
+        <details class="route-secondary-item">
+          <summary>Open saved work &middot; more options</summary>
+          <p>Open an existing project, a fitted model, or an approved prediction package. These open
+            in Project mode.</p>
+          <button class="button secondary" data-mode="project" type="button">Go to Project mode</button>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== EXPLORE MODE ===================== -->
+  <section id="view-explore" class="view is-hidden" aria-labelledby="exploreHeading" tabindex="-1">
+    <div class="explore-shell">
+      <header class="explore-header">
+        <p class="eyebrow">Guided engineering example &middot; Explore mode</p>
+        <h1 id="exploreHeading">Predict pressure drop in a pipe</h1>
+        <ol class="explore-steps" id="exploreSteps" aria-label="Explore progress">
+          <li data-stage="1" class="is-current"><span>1</span> Understand the problem</li>
+          <li data-stage="2"><span>2</span> Choose an approach</li>
+          <li data-stage="3"><span>3</span> Train and compare predictions</li>
+          <li data-stage="4"><span>4</span> Interpret the engineering meaning</li>
+        </ol>
+      </header>
+
+      <!-- Stage 1: understand the problem -->
+      <section class="explore-stage" id="explore-stage-1" aria-labelledby="exploreStage1Heading">
+        <h2 id="exploreStage1Heading" class="explore-stage-title">Understand the pressure-drop problem</h2>
+        <div class="info-box">
+          <strong>What you are doing:</strong> getting to know the engineering problem before modelling it.
+          <strong>Why it matters:</strong> knowing the inputs, the target and the expected physical trends helps you judge whether a model is sensible.
+          <strong>What to look for:</strong> the units, the range of the data, and that this is a synthetic demonstration.
+        </div>
+        <div id="exploreProblem" class="explore-problem"><!-- problem description injected by explore.js --></div>
+        <details class="explore-other-examples">
+          <summary>Use a different example</summary>
+          <p class="fine-print">The pressure-drop problem is the main engineering example. A generic
+            nonlinear dataset is also available purely as a mathematical demonstration.</p>
+          <div id="exploreExampleSwitch" class="explore-switch"><!-- example switch injected by explore.js --></div>
+        </details>
+        <div class="explore-nav">
+          <button class="button secondary" data-mode="home" type="button">Back to home</button>
+          <button class="button primary" id="exploreToStage2" type="button">Next: choose an approach</button>
+        </div>
+      </section>
+
+      <!-- Stage 2: choose an approach -->
+      <section class="explore-stage is-hidden" id="explore-stage-2" aria-labelledby="exploreStage2Heading">
+        <h2 id="exploreStage2Heading" class="explore-stage-title">Choose an approach</h2>
+        <div class="info-box">
+          <strong>What you are doing:</strong> deciding how much flexibility the tool should use to learn the relationship.
+          <strong>Why it matters:</strong> a simple trend is easy to read, while a flexible relationship can fit curved, nonlinear behaviour.
+          <strong>What to look for:</strong> start simple, then try a more flexible approach and see whether it does better.
+        </div>
+        <div class="model-grid explore-approach-grid" role="radiogroup" aria-label="Modelling approach">
+          <label class="model-card"><input type="radio" name="exploreApproach" value="simple" checked>
+            <span><strong>Start with a simple trend</strong>
+              <small>Fits a single, easy-to-read weighted relationship between the inputs and the pressure drop.</small>
+              <small class="explore-model-name">Uses Linear Regression</small>
+            </span></label>
+          <label class="model-card"><input type="radio" name="exploreApproach" value="flexible">
+            <span><strong>Try a more flexible relationship</strong>
+              <small>Lets the tool bend and curve to follow nonlinear behaviour, which usually fits this problem better — but it can overfit if given too much freedom.</small>
+              <small class="explore-model-name">Uses Random Forest</small>
+            </span></label>
+          <label class="model-card"><input type="radio" name="exploreApproach" value="compare">
+            <span><strong>Compare approaches</strong>
+              <small>Trains all three and shows them side by side, so you can see the difference for yourself.</small>
+              <small class="explore-model-name">Linear Regression, Decision Tree and Random Forest</small>
+            </span></label>
+        </div>
+        <p class="fine-print explore-approach-note">The simple trend is a good starting point. Pressure
+          drop depends on the inputs in a curved, nonlinear way, so a more flexible relationship often
+          fits it better. The trade-off is that a very flexible model can <em>overfit</em> — following
+          the training data too closely and generalising worse to new conditions.</p>
+        <details class="explore-model-details">
+          <summary>What do these model names mean?</summary>
+          <ul class="explore-model-glossary">
+            <li><strong>Linear Regression</strong> learns a weighted relationship: each input is
+              multiplied by a number and the results are added up. Easy to interpret, but it may
+              struggle with nonlinearity.</li>
+            <li><strong>Decision Tree</strong> divides the input conditions into regions and predicts a
+              value for each. It captures nonlinear behaviour, but a deep tree may overfit.</li>
+            <li><strong>Random Forest</strong> combines many trees for a more stable prediction. It is
+              less transparent than a single relationship and may extrapolate poorly beyond the data.</li>
+          </ul>
+        </details>
+        <div class="explore-controls is-hidden" id="exploreControls">
+          <label id="exploreDepthField" class="is-hidden">Maximum depth
+            <input type="number" id="exploreMaxDepth" min="2" max="15" step="1" value="8">
+            <small>How many yes/no splits deep each tree can grow. Larger can fit more detail but may overfit.</small>
+          </label>
+          <label id="exploreTreesField" class="is-hidden">Number of trees
+            <input type="number" id="exploreNTrees" min="10" max="120" step="5" value="40">
+            <small>How many trees vote in the forest. More trees are steadier but slower.</small>
+          </label>
+        </div>
+        <div class="explore-nav">
+          <button class="button secondary" id="exploreBackTo1" type="button">Back</button>
+          <button class="button primary" id="exploreToStage3" type="button">Next: train and compare predictions</button>
+        </div>
+      </section>
+
+      <!-- Stage 3: train and compare predictions -->
+      <section class="explore-stage is-hidden" id="explore-stage-3" aria-labelledby="exploreStage3Heading">
+        <h2 id="exploreStage3Heading" class="explore-stage-title">Train and compare predictions</h2>
+        <div class="info-box">
+          <strong>What you are doing:</strong> fitting the chosen approach on training data and checking it on held-back test data.
+          <strong>Why it matters:</strong> test performance shows how well it predicts pressure drop for unseen conditions.
+          <strong>What to look for:</strong> a lower prediction error (RMSE, in kPa) and points near the diagonal.
+        </div>
+        <div class="action-row wrap">
+          <button class="button primary" id="exploreTrainBtn" type="button">Train and show predictions</button>
+          <span id="exploreTrainStatus" class="status-pill status-loading is-hidden" aria-live="polite"></span>
+        </div>
+        <div class="table-wrap explore-results-table is-hidden" id="exploreComparisonWrap">
+          <table id="exploreComparison"></table>
+        </div>
+        <label class="explore-focus is-hidden" id="exploreFocusWrap">Show predictions for
+          <select id="exploreFocusModel"></select>
+        </label>
+        <div class="chart-card prediction-chart-card is-hidden" id="explorePlotCard">
+          <div class="chart-title"><h3>Actual vs predicted (test data)</h3></div>
+          <div class="plot" id="explorePlot"></div>
+          <p class="fine-print">Each point is a test row. Points on the dashed diagonal are perfect predictions.</p>
+        </div>
+        <div class="explore-nav">
+          <button class="button secondary" id="exploreBackTo2" type="button">Back</button>
+          <button class="button primary" id="exploreToStage4" type="button" disabled>Next: interpret the engineering meaning</button>
+        </div>
+      </section>
+
+      <!-- Stage 4: interpret the engineering meaning -->
+      <section class="explore-stage is-hidden" id="explore-stage-4" aria-labelledby="exploreStage4Heading">
+        <h2 id="exploreStage4Heading" class="explore-stage-title">Interpret the engineering meaning</h2>
+        <div class="info-box">
+          <strong>What you are doing:</strong> reading a plain-language summary of what the model learned.
+          <strong>Why it matters:</strong> metrics and predictions only help if you know what they mean in engineering terms.
+          <strong>What to look for:</strong> sensible physical trends, errors in kPa, and honest limits.
+        </div>
+        <div id="exploreInterpretation" class="explore-interpretation" aria-live="polite"></div>
+        <div id="exploreEngineering" class="explore-interpretation explore-engineering" aria-live="polite"></div>
+        <div class="warning-box">
+          <strong>Important:</strong> good test performance does not guarantee safe extrapolation.
+          Predictions outside the range of the training data — or for different fluids, geometries or
+          flow conditions — can be unreliable. This is a synthetic demonstration, not a validated
+          engineering result, and it does not replace engineering judgement.
+        </div>
+        <div class="explore-nav">
+          <button class="button secondary" id="exploreBackTo3" type="button">Back</button>
+          <button class="button secondary" id="exploreRestart" type="button">Start over</button>
+          <button class="button primary" data-mode="project" type="button">Continue in Project mode</button>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ===================== ABOUT ===================== -->
+  <section id="view-about" class="view is-hidden" aria-labelledby="aboutHeading" tabindex="-1">
+    <div class="about-shell">
+      <h1 id="aboutHeading">About Engineering ML Studio</h1>
+      <p>Engineering ML Studio is a browser-based tool for exploring, understanding and applying
+        machine-learning regression to engineering data. It is aimed at engineers rather than
+        machine-learning specialists.</p>
+      <ul>
+        <li>All calculations run locally in your browser; data you load is not sent to any
+          application server.</li>
+        <li>It is intended for learning, exploration and small engineering projects.</li>
+        <li>It is <strong>not</strong> a validated safety-critical analysis tool. Always
+          independently verify any output before relying on it.</li>
+      </ul>
+      <h2>Attribution</h2>
+      <p>Engineering ML Studio is an independently maintained derivative of
+        <strong>Local Regression Studio</strong>, developed by <strong>Yu Duan</strong> and released
+        under the MIT licence. Yu Duan and previous contributors retain copyright in the original
+        code. Copyright in new Engineering ML Studio contributions developed under this STFC project
+        is held by UK Research and Innovation (UKRI), unless otherwise stated. The project is led and
+        maintained by Wei Wang at STFC. See <code>NOTICE.md</code> and <code>LICENSES.txt</code>.</p>
+      <p><button class="button secondary" data-mode="home" type="button">Back to home</button></p>
+    </div>
+  </section>
+
+  <!-- ===================== PROJECT MODE (existing application, unchanged) ===================== -->
+  <div id="view-project" class="view is-hidden">
   <header class="app-header">
     <div>
       <p class="eyebrow">Governed browser-only machine learning · v1.0.11</p>
@@ -477,6 +711,9 @@
       </section>
     </section>
   </main>
+  </div><!-- /#view-project -->
+
+  </div><!-- /#modeMain -->
 
   <dialog id="privacyDialog">
     <h2>Privacy and network behaviour</h2>

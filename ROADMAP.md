@@ -20,20 +20,31 @@ releases; effort goes into making them approachable and well-explained.
 - Confirm licence and attribution obligations.
 - **No functional code, dependency, deployment, test, dataset, or licence changes.**
 
-## Phase 1 — User-friendly regression prototype
+## Phase 1 — User-friendly regression prototype (in progress)
 
 Make the existing regression capability genuinely approachable. Priorities:
 
-- New **landing page**.
-- Beginner **Explore mode**.
-- Configurable **Project mode**.
-- **Progressive disclosure** of advanced options.
-- Built-in **engineering datasets**.
-- **Simpler engineering language** throughout the interface.
-- **Improved navigation**.
-- **Clearer diagnostics**.
-- **Responsive interface**.
-- **Connection to Jupyter notebooks**.
+- New **landing page**. — *first prototype delivered.*
+- Beginner **Explore mode**. — *delivered as a **problem-led, engineering-focused** four-stage flow
+  built around predicting pressure drop in a pipe (understand the problem → choose an approach → train
+  and compare → interpret the engineering meaning); see [`docs/EXPLORE_MODE.md`](docs/EXPLORE_MODE.md).*
+- Configurable **Project mode**. — *preserved unchanged and reachable from the landing page;
+  configurability not yet started.*
+- **Progressive disclosure** of advanced options. — *begun on the landing page ("Open saved work ·
+  more options") and in Explore (only 1–2 beginner controls exposed).*
+- Built-in **engineering datasets**. — *first synthetic, documented, physically-informed engineering
+  dataset added (pipe pressure drop, from the Darcy–Weisbach equation) as the Explore-mode primary
+  example; a training demonstration, not a design tool. More engineering datasets still to come.*
+- **Simpler engineering language** throughout the interface. — *applied within the new landing/Explore
+  views, now framed around an engineering problem rather than model names; Project-mode wording
+  unchanged.*
+- **Improved navigation**. — *global top nav (Home · Explore · Project · About) added.*
+- **Clearer diagnostics**. — *plain-language, rule-based result explanations added in Explore.*
+- **Responsive interface**. — *new views reflow to narrow/mobile widths.*
+- **Connection to Jupyter notebooks**. — *not started; shown as "Learn with Python — Coming later".*
+
+> The first Phase 1 increment (landing page + one guided Explore workflow) is a **prototype**. The
+> remaining Phase 1 items above are still to come.
 
 ## Phase 2 — Guided learning pathway
 

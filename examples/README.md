@@ -4,13 +4,33 @@ This directory holds the small example CSV files bundled with the application. T
 what is **confirmed** and what is **reasonable inference** about their provenance, so that their
 status is never overstated.
 
-> ✅ **Reuse status confirmed.** Yu Duan has confirmed that these bundled example datasets may be
-> reused under the **MIT licence** (see [`../LICENSES.txt`](../LICENSES.txt)). They were introduced
-> by Yu Duan as part of the original Local Regression Studio work.
+The files fall into two groups:
 
-## Summary of provenance (all three files)
+- **Inherited from Local Regression Studio** (`house_prices_sample.csv`,
+  `nonlinear_regression_sample.csv`, `nonlinear_prediction_sample.csv`) — introduced by Yu Duan;
+  reusable under the MIT licence (confirmed).
+- **New to Engineering ML Studio** (`pipe_pressure_drop_sample.csv`) — a documented, deterministic,
+  **synthetic physically-informed** dataset created for the problem-led Explore mode, with a committed
+  generator script. See [its own section](#pipe_pressure_drop_samplecsv-new-explore-mode-primary).
 
-- **[Confirmed]** All three CSVs were introduced in commit **`11ae72e`** ("app body").
+> ✅ **Reuse status confirmed.** Yu Duan has confirmed that the **inherited** bundled example datasets
+> may be reused under the **MIT licence** (see [`../LICENSES.txt`](../LICENSES.txt)). They were
+> introduced by Yu Duan as part of the original Local Regression Studio work. The **new**
+> `pipe_pressure_drop_sample.csv` is released under the same MIT terms, with copyright in the new
+> contribution held by UKRI.
+
+> ℹ️ **Explore-mode change.** The beginner **Explore** mode is now problem-led and uses
+> `pipe_pressure_drop_sample.csv` as its primary example; `nonlinear_regression_sample.csv` is kept as
+> a clearly-labelled secondary "generic nonlinear" demonstration. `house_prices_sample.csv` has been
+> **removed from the Explore path** but the file is **retained** here (unchanged) for Project mode and
+> compatibility.
+
+## Summary of provenance (inherited files)
+
+*(Applies to the three inherited files. The new `pipe_pressure_drop_sample.csv` has its own section
+below, with full generator documentation.)*
+
+- **[Confirmed]** All three inherited CSVs were introduced in commit **`11ae72e`** ("app body").
 - **[Confirmed]** Author of the introducing commit: **Yu Duan** — `MarLen <y.duan@imperial.ac.uk>`,
   dated **2026-07-16**.
 - **[Confirmed]** **Reuse is permitted under the MIT licence**, as confirmed by Yu Duan. The files
@@ -76,11 +96,57 @@ status is never overstated.
 
 ---
 
+## `pipe_pressure_drop_sample.csv` (new — Explore mode primary)
+
+- **Location:** `examples/pipe_pressure_drop_sample.csv`
+- **Rows:** 500 (plus header)
+- **Columns (units embedded in the names):** `pipe_length_m`, `pipe_diameter_m`, `flow_velocity_m_s`,
+  `fluid_density_kg_m3`, `dynamic_viscosity_pa_s`, `pressure_drop_kpa` (target).
+- **Purpose:** the primary, problem-led **Explore**-mode demonstration — predict the pressure drop
+  along a pipe from its geometry and the flow conditions (a core mechanical/thermal engineering
+  quantity).
+- **Status:** **synthetic, documented, physically-informed — a training demonstration only.** It is
+  **not** experimental, validated, safety-grade, or design-quality data, and must not be used for real
+  design decisions.
+- **Governing physics:** the **Darcy–Weisbach** equation Δp = f·(L/D)·(ρ·v²/2), with the Darcy
+  friction factor *f* obtained from the Reynolds number Re = ρvD/μ — laminar `f = 64/Re` for
+  Re < 2300, and the explicit **Haaland** correlation for turbulent flow. Absolute wall roughness is
+  held constant at ε = 0.045 mm (typical commercial steel) and is **documented, not an input feature**.
+- **Assumptions / simplifications:** fully-developed, steady, single-phase, incompressible, Newtonian
+  flow in a straight, constant-diameter, circular pipe; no fittings, bends, entrance, or elevation
+  losses (friction only); a hard laminar/turbulent switch at Re = 2300 (real transitional flow is not
+  modelled in detail — a deliberate, small kink that a flexible model can capture but a single linear
+  fit cannot).
+- **Sampling ranges:** length 2–30 m (uniform); diameter 0.02–0.20 m (log-uniform); velocity
+  0.5–4.0 m/s (uniform); density 850–1050 kg/m³ (uniform); viscosity 3×10⁻⁴–2×10⁻³ Pa·s (log-uniform).
+- **Noise model:** each pressure drop is multiplied by `exp(N(0, σ))` with σ = 0.05 (~5% relative
+  scatter) — multiplicative lognormal noise, so values stay strictly positive.
+- **Determinism:** generated with numpy `default_rng(seed)`, default **seed = 42**; the same seed, row
+  count, and numpy version reproduce byte-identical output.
+- **Generator (documented, reproducible):**
+  [`../scripts/generate_pipe_pressure_drop.py`](../scripts/generate_pipe_pressure_drop.py). Regenerate
+  the bundled file with:
+
+  ```bash
+  python3 scripts/generate_pipe_pressure_drop.py --rows 500 --seed 42
+  ```
+
+- **Tests:** [`../tests/test_pipe_dataset.py`](../tests/test_pipe_dataset.py) checks the columns/units,
+  row count, strictly-positive/finite values, sensible ranges, determinism, and that the committed CSV
+  matches a fresh default generation byte-for-byte.
+- **Introducing author / copyright:** new Engineering ML Studio contribution (Wei Wang, STFC);
+  copyright in this new contribution held by **UKRI**.
+- **Licence:** MIT (the project's existing terms; see [`../LICENSES.txt`](../LICENSES.txt)).
+
+---
+
 ## Recommended follow-up (optional)
 
 - Reuse permission is **confirmed** (MIT, per Yu Duan); no further licensing action is required to
   use these files as examples.
-- Optionally, record or add a generator script and a short data dictionary for each file, so the
-  synthetic construction is reproducible and documented.
+- The new `pipe_pressure_drop_sample.csv` already ships with a documented generator and data
+  dictionary (above); the same could optionally be added retrospectively for the inherited files.
+- Optionally, record or add a generator script and a short data dictionary for each inherited file, so
+  the synthetic construction is reproducible and documented.
 - Continue to avoid describing these datasets as derived from real physical or experimental data
   unless such an origin is ever positively established.

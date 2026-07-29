@@ -1,0 +1,219 @@
+/* Engineering ML Studio — Phase 1 landing page + Explore mode styles.
+ *
+ * This stylesheet only adds what the new landing / Explore views need. It reuses
+ * the existing design tokens (:root in css/app.css) and shared component classes
+ * (.button, .model-card, .info-box, .warning-box, .chart-card, .plot, .table-wrap,
+ * .badge, .status-pill, .action-row, .eyebrow). Project mode is untouched. */
+
+/* --- View switching ---------------------------------------------------------- */
+.view { outline: none; }
+.is-hidden { display: none !important; }
+
+/* --- Top navigation ---------------------------------------------------------- */
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  background: var(--primary); color: #fff; padding: .6rem 1rem; border-radius: 0 0 8px 0;
+}
+.skip-link:focus { left: 0; }
+
+.top-nav {
+  display: flex; align-items: center; gap: 1rem 1.5rem; flex-wrap: wrap;
+  padding: .7rem clamp(1rem, 4vw, 2.5rem);
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 20;
+}
+.top-nav .brand {
+  font-weight: 800; font-size: 1.05rem; color: var(--primary-strong);
+  text-decoration: none; letter-spacing: .01em;
+}
+.top-nav .nav-links {
+  list-style: none; display: flex; gap: .25rem; flex-wrap: wrap; margin: 0; padding: 0;
+}
+.top-nav .nav-links a {
+  display: inline-block; padding: .45rem .8rem; border-radius: 8px;
+  color: var(--muted); text-decoration: none; font-weight: 650;
+}
+.top-nav .nav-links a:hover { background: var(--surface-soft); color: var(--text); }
+.top-nav .nav-links a.is-active { background: var(--accent); color: var(--primary-strong); }
+.top-nav .mode-indicator {
+  margin-left: auto; color: var(--muted); font-size: .82rem; font-weight: 650;
+}
+
+/* --- Shared shell for the new full-width views ------------------------------- */
+.hero, .explore-shell, .about-shell {
+  max-width: 1000px; margin: 0 auto; padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem) 4rem;
+}
+.hero .eyebrow, .explore-header .eyebrow { color: var(--primary); opacity: 1; }
+
+/* --- Landing / hero ---------------------------------------------------------- */
+.hero h1 { margin: .25rem 0 .6rem; font-size: clamp(1.9rem, 4.5vw, 3rem); }
+.hero-lead { font-size: clamp(1.05rem, 2.2vw, 1.3rem); line-height: 1.5; max-width: 60ch; color: var(--text); }
+.hero-points {
+  list-style: none; padding: 0; margin: 1.25rem 0 2rem;
+  display: grid; gap: .6rem; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 800px;
+}
+.hero-points li {
+  padding: .7rem .9rem; background: var(--surface-soft); border: 1px solid var(--line);
+  border-radius: 10px; font-size: .9rem; line-height: 1.4;
+}
+
+.route-grid {
+  display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: .5rem;
+}
+.route-card {
+  display: flex; flex-direction: column; gap: .6rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 1.25rem; box-shadow: var(--shadow);
+}
+.route-card h2 { margin: 0; font-size: 1.2rem; }
+.route-card p { margin: 0; color: var(--muted); line-height: 1.5; flex: 1; }
+.route-card .button { align-self: flex-start; margin-top: .4rem; }
+
+.route-secondary {
+  display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 1.5rem;
+}
+.route-secondary-item {
+  border: 1px dashed var(--line); border-radius: 12px; padding: 1rem; background: var(--surface-soft);
+}
+.route-secondary-item h3 { margin: 0 0 .4rem; font-size: 1rem; display: flex; align-items: center; gap: .5rem; }
+.route-secondary-item p { margin: 0 0 .7rem; color: var(--muted); font-size: .88rem; line-height: 1.45; }
+.route-secondary-item summary { cursor: pointer; font-weight: 700; }
+.route-secondary-item summary:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+/* --- Explore mode ------------------------------------------------------------ */
+.explore-header h1 { margin: .25rem 0 1rem; font-size: clamp(1.6rem, 3.5vw, 2.2rem); }
+
+.explore-steps {
+  list-style: none; display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin: 0 0 1.5rem;
+}
+.explore-steps li {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .5rem .85rem; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface); color: var(--muted); font-size: .85rem; font-weight: 650;
+}
+.explore-steps li span {
+  display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--line); color: var(--text); font-size: .78rem; flex: 0 0 auto;
+}
+.explore-steps li.is-current { border-color: var(--primary); background: var(--accent); color: var(--primary-strong); }
+.explore-steps li.is-current span { background: var(--primary); color: #fff; }
+.explore-steps li.is-done span { background: var(--success); color: #fff; }
+
+.explore-stage { margin-bottom: 1rem; }
+.explore-stage-title { margin: 0 0 .5rem; font-size: 1.35rem; }
+
+/* Stage 1: the engineering problem */
+.explore-problem { display: grid; gap: 1rem; }
+.explore-problem-intro { margin: 0; line-height: 1.6; max-width: 72ch; }
+.explore-schematic-wrap {
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft);
+  padding: 1rem; display: grid; place-items: center;
+}
+.explore-schematic { width: 100%; max-width: 420px; height: auto; }
+.explore-problem-grid { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.explore-problem-card {
+  border: 1px solid var(--line); border-radius: 12px; padding: 1rem; background: var(--surface);
+}
+.explore-problem-card h3 { margin: 0 0 .5rem; font-size: 1rem; }
+.explore-input-list { margin: 0; padding-left: 1.1rem; display: grid; gap: .3rem; line-height: 1.4; }
+.explore-target { margin: 0 0 .4rem; font-size: 1.1rem; font-weight: 700; color: var(--primary-strong); }
+.explore-unit { color: var(--muted); font-weight: 600; }
+.explore-disclaimer { line-height: 1.5; }
+
+/* Stage 1: secondary "use a different example" switch */
+.explore-other-examples {
+  border: 1px dashed var(--line); border-radius: 12px; padding: .8rem 1rem;
+  background: var(--surface-soft); margin-top: .5rem;
+}
+.explore-other-examples summary { cursor: pointer; font-weight: 700; }
+.explore-other-examples summary:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.explore-switch { display: grid; gap: .6rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: .5rem; }
+.explore-switch-option {
+  display: flex; align-items: flex-start; gap: .6rem; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 10px; padding: .7rem .8rem; background: var(--surface);
+}
+.explore-switch-option input { width: auto; min-height: auto; margin-top: .2rem; flex: 0 0 auto; }
+.explore-switch-option:has(input:checked) { border-color: var(--primary); background: var(--accent); }
+.explore-switch-option span { display: grid; gap: .15rem; }
+.explore-switch-option small { color: var(--muted); }
+
+/* Stage 2: approach cards + model glossary */
+.explore-model-name { color: var(--primary-strong); font-weight: 700; }
+.explore-approach-note { max-width: 72ch; line-height: 1.5; margin: 1rem 0 .5rem; }
+.explore-model-details {
+  border: 1px solid var(--line); border-radius: 12px; padding: .8rem 1rem; background: var(--surface-soft);
+}
+.explore-model-details summary { cursor: pointer; font-weight: 700; }
+.explore-model-details summary:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.explore-model-glossary { margin: .6rem 0 0; padding-left: 1.1rem; display: grid; gap: .4rem; line-height: 1.5; }
+
+/* Stage 3: focus selector when comparing */
+.explore-focus {
+  display: inline-flex; align-items: center; gap: .5rem; margin: 1rem 0 .25rem; font-weight: 650;
+}
+.explore-focus select { min-height: auto; padding: .35rem .5rem; }
+
+.explore-controls {
+  display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1rem; max-width: 640px;
+}
+.explore-controls label small { color: var(--muted); font-weight: 400; line-height: 1.35; }
+
+.explore-nav {
+  display: flex; justify-content: space-between; gap: .7rem; flex-wrap: wrap; margin-top: 1.5rem;
+}
+.explore-nav .button.primary { margin-left: auto; }
+
+.explore-shell .status-pill {
+  background: var(--accent); color: var(--primary-strong); border: 1px solid #b9dce4;
+}
+.explore-results-table table { font-size: .9rem; }
+.explore-results-table tr.is-selected { background: var(--accent); font-weight: 700; }
+.explore-results-table tr.is-selected td { font-weight: 700; }
+
+/* Rule-based interpretation cards */
+.explore-interpretation { display: grid; gap: .8rem; margin-top: .5rem; }
+.explore-insight {
+  border: 1px solid var(--line); border-left: 4px solid var(--primary);
+  border-radius: 10px; padding: .85rem 1rem; background: var(--surface);
+}
+.explore-insight h3 { margin: 0 0 .35rem; font-size: 1rem; }
+.explore-insight p { margin: 0; line-height: 1.5; color: var(--text); }
+.explore-insight.level-high { border-left-color: var(--danger); background: #fff6f6; }
+.explore-insight.level-medium { border-left-color: var(--warning-line); background: var(--warning-bg); }
+.explore-insight.level-low { border-left-color: var(--success); background: var(--success-bg); }
+
+/* Stage 4: engineering interpretation */
+.explore-engineering { margin-top: 1.25rem; }
+.explore-engineering-title { margin: 0 0 .25rem; font-size: 1.2rem; }
+.explore-trend-list { margin: .5rem 0; padding-left: 1.1rem; display: grid; gap: .45rem; line-height: 1.5; }
+.explore-trend-list li.trend-ok { list-style: none; position: relative; padding-left: 1.4rem; }
+.explore-trend-list li.trend-ok::before { content: "✓"; position: absolute; left: 0; color: var(--success); font-weight: 700; }
+.explore-trend-list li.trend-warn { list-style: none; position: relative; padding-left: 1.4rem; }
+.explore-trend-list li.trend-warn::before { content: "!"; position: absolute; left: 0; color: var(--danger); font-weight: 700; }
+.explore-insight .fine-print { margin-top: .4rem; }
+
+/* --- About ------------------------------------------------------------------- */
+.about-shell h1 { margin: .25rem 0 1rem; }
+.about-shell h2 { margin: 1.5rem 0 .5rem; font-size: 1.2rem; }
+.about-shell p, .about-shell li { line-height: 1.6; max-width: 70ch; }
+.about-shell ul { padding-left: 1.2rem; }
+
+/* --- Focus visibility (accessibility) --------------------------------------- */
+.top-nav a:focus-visible,
+.button:focus-visible,
+.route-card:focus-within,
+.explore-switch-option:focus-within,
+.view:focus-visible {
+  outline: 3px solid var(--primary); outline-offset: 2px;
+}
+
+/* --- Responsive -------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .hero-points, .route-grid, .route-secondary, .explore-controls,
+  .explore-problem-grid, .explore-switch { grid-template-columns: 1fr; }
+  .top-nav { gap: .5rem 1rem; }
+  .top-nav .mode-indicator { margin-left: 0; width: 100%; }
+  .explore-nav { flex-direction: column; align-items: stretch; }
+  .explore-nav .button { width: 100%; margin-left: 0; }
+}
