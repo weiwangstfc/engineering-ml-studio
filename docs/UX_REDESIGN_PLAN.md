@@ -1,6 +1,24 @@
 # UX Redesign Plan — Engineering ML Studio
 
-> **Proposal only — do not implement yet.** This is a Phase 1 planning document.
+> **Status update (Phase 1).** The **first increment of this plan is now prototyped**: a new landing
+> page and a guided beginner **Explore mode**, with **Project mode** preserving the inherited workflow
+> unchanged. Explore has since been revised to be **problem-led and engineering-focused** — it opens on
+> a concrete mechanical/thermal problem (**predicting pressure drop in a pipe**) rather than asking the
+> beginner to pick a dataset or a model by name. Its four stages are *understand the problem → choose
+> an approach → train and compare predictions → interpret the engineering meaning*; the approach choice
+> uses plain engineering language with algorithm names as secondary detail, and results are reported in
+> physical units (kPa). This directly advances several proposals below — an engineering-framed entry
+> point, a built-in engineering dataset, simpler language, and plain-language diagnostics. See
+> [`EXPLORE_MODE.md`](EXPLORE_MODE.md) and
+> [`PHASE1_IMPLEMENTATION_PLAN.md`](PHASE1_IMPLEMENTATION_PLAN.md). The remainder of this document
+> stays a **proposal** for later increments (configurable Project mode, wider language pass,
+> additional datasets, notebook integration). One deviation from the original proposal below: the
+> landing page currently offers **two** primary routes (Explore, Project) with *Learn with Python*
+> shown as **Coming later**, rather than three live entry points, because no real notebook
+> integration exists yet.
+>
+> **Proposal note (later increments):** the sections below are not yet implemented beyond the first
+> increment described above.
 >
 > **Source basis note:** No screenshots are stored in the repository. This plan is therefore based
 > on the **confirmed application structure** (`index.html`, `css/app.css`, and the module map in

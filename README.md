@@ -63,12 +63,40 @@ Full instructions, browser requirements, and how to run the automated tests are 
 
 ## Status
 
-**Independent project foundation, with a reproducible baseline.** The inherited application is
-unchanged in behaviour; this stage added a documented local-run procedure and an automated **test
-foundation** (dev-only) that pins down current behaviour before any UX redesign. No user-facing
-functionality, deployment configuration, datasets, or the licence have been changed. See
-[`ROADMAP.md`](ROADMAP.md), [`docs/BASELINE_BEHAVIOUR.md`](docs/BASELINE_BEHAVIOUR.md), and
-[`docs/BASELINE_TEST_REPORT.md`](docs/BASELINE_TEST_REPORT.md).
+**Phase 1 prototype (in progress): landing page + problem-led engineering Explore mode.** On top of
+the reproducible baseline, this stage adds a new **landing page** and a beginner-friendly **Explore
+mode**. Explore is now **problem-led and focused on engineering**: it starts from a concrete
+mechanical/thermal question — **predicting the pressure drop along a pipe** — rather than from
+machine-learning terminology. Its four guided stages are *understand the problem → choose an approach →
+train and compare predictions → interpret the engineering meaning*. The primary choice is framed as an
+engineering decision ("start with a simple trend" / "try a more flexible relationship" / "compare
+approaches") with the model names (Linear Regression, Random Forest, Decision Tree) shown only as
+secondary detail. Results, plots, and the rule-based interpretation are reported in **physical units
+(kPa)** and include an engineering-trend and extrapolation check.
+
+The example is a new **synthetic, documented, physically-informed** dataset
+(`examples/pipe_pressure_drop_sample.csv`, generated from the **Darcy–Weisbach** equation by a
+committed, deterministic script) — a **training demonstration, not an engineering design tool**. The
+inherited eight-stage application is **preserved unchanged as "Project mode"**. No ML algorithms were
+changed, no inherited datasets were deleted (the house-price example was removed only from the beginner
+Explore path), and no licences or deployment configuration were changed. See
+[`docs/EXPLORE_MODE.md`](docs/EXPLORE_MODE.md),
+[`examples/README.md`](examples/README.md), and
+[`docs/PHASE1_IMPLEMENTATION_PLAN.md`](docs/PHASE1_IMPLEMENTATION_PLAN.md).
+
+The prior stage established an **independent project foundation with a reproducible baseline**: a
+documented local-run procedure and an automated **test foundation** (dev-only) that pins down current
+behaviour. See [`ROADMAP.md`](ROADMAP.md), [`docs/BASELINE_BEHAVIOUR.md`](docs/BASELINE_BEHAVIOUR.md),
+and [`docs/BASELINE_TEST_REPORT.md`](docs/BASELINE_TEST_REPORT.md).
+
+### Modes
+
+- **Explore** — a guided, no-code, **problem-led** introduction to regression built around an
+  engineering example (predicting pressure drop in a pipe). New in Phase 1. See
+  [`docs/EXPLORE_MODE.md`](docs/EXPLORE_MODE.md).
+- **Project** — the full inherited workflow (upload → features → preprocess → model → split →
+  diagnostics → predict → monitor, plus governance), unchanged.
+- **Learn with Python** — *coming later* (not yet implemented).
 
 ## ⚠️ Important safety notice
 
@@ -84,6 +112,8 @@ Always independently verify any output before relying on it.
 - [`ROADMAP.md`](ROADMAP.md) — planned phases
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to contribute
 - [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — local run and test instructions
+- [`docs/EXPLORE_MODE.md`](docs/EXPLORE_MODE.md) — the Phase 1 Explore-mode prototype
+- [`docs/PHASE1_IMPLEMENTATION_PLAN.md`](docs/PHASE1_IMPLEMENTATION_PLAN.md) — Phase 1 plan
 - [`docs/BASELINE_BEHAVIOUR.md`](docs/BASELINE_BEHAVIOUR.md) — current behaviour the tests protect
 - [`docs/BASELINE_TEST_REPORT.md`](docs/BASELINE_TEST_REPORT.md) — baseline test run and tooling
 - [`docs/PRODUCT_VISION.md`](docs/PRODUCT_VISION.md) — product vision

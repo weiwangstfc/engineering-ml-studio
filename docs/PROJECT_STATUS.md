@@ -1,8 +1,38 @@
 # Project Status — Engineering ML Studio
 
-Concise, factual snapshot at the end of **Phase 0**. For detail see
-[`ARCHITECTURE_AUDIT.md`](ARCHITECTURE_AUDIT.md), [`ROADMAP.md`](../ROADMAP.md), and
-[`UX_REDESIGN_PLAN.md`](UX_REDESIGN_PLAN.md).
+Concise, factual snapshot during **Phase 1** (first prototype increment). For detail see
+[`ARCHITECTURE_AUDIT.md`](ARCHITECTURE_AUDIT.md), [`ROADMAP.md`](../ROADMAP.md),
+[`EXPLORE_MODE.md`](EXPLORE_MODE.md), and [`UX_REDESIGN_PLAN.md`](UX_REDESIGN_PLAN.md).
+
+## Phase 1 prototype (this stage)
+
+- **New landing page** with a global top navigation (Home · Explore · Project · About) and two
+  primary routes: *Explore with an example* and *Build a project*. A third route, *Learn with
+  Python*, is shown as **Coming later**.
+- **New Explore mode (problem-led, engineering-focused):** one guided, four-stage workflow —
+  *understand the pressure-drop problem → choose an approach → train and compare predictions →
+  interpret the engineering meaning* — built around a concrete mechanical/thermal engineering example
+  (predicting **pressure drop in a pipe**), not around model names. The approach choice is framed in
+  plain engineering language (simple trend / more flexible relationship / compare) with algorithm
+  names shown only as secondary detail; results and the **rule-based** interpretation are given in
+  physical units (kPa) with an engineering-trend and extrapolation check. See
+  [`EXPLORE_MODE.md`](EXPLORE_MODE.md).
+- **New synthetic engineering dataset (a demonstration, not a design tool):**
+  `examples/pipe_pressure_drop_sample.csv`, generated deterministically from the **Darcy–Weisbach**
+  equation by the documented, committed script `scripts/generate_pipe_pressure_drop.py`. Clearly
+  labelled synthetic; SI units embedded in the column names. See
+  [`../examples/README.md`](../examples/README.md).
+- **Project mode preserved unchanged:** the inherited eight-stage workflow now lives inside a
+  `#view-project` container, reachable from the landing page; its layout, logic, and ML algorithms
+  are untouched.
+- **No new ML algorithms, licences, or deployment changes; no inherited datasets deleted.** The
+  house-price example was removed only from the beginner Explore path (its CSV is retained for Project
+  mode); the generic nonlinear example is kept as a clearly-labelled secondary maths demonstration.
+  New/changed files: `js/explore.js`, `index.html` (Explore section), `css/explore.css`,
+  `scripts/generate_pipe_pressure_drop.py`, `examples/pipe_pressure_drop_sample.csv`,
+  `tests/explore.spec.js`, `tests/test_pipe_dataset.py`, and Phase 1 docs. All inherited baseline
+  tests remain green, alongside the rewritten Explore Playwright suite and the new Python generator
+  tests.
 
 ## Current working capability
 
@@ -58,7 +88,11 @@ Concise, factual snapshot at the end of **Phase 0**. For detail see
 
 ## Not yet done (deferred, needs approval)
 
-- Any UX redesign or code refactoring (e.g. new landing page, beginner Explore mode).
+- Remaining Phase 1 items: configurable Project mode, wider engineering-language pass across Project
+  mode, additional built-in engineering datasets, and real Jupyter/Python integration (currently
+  *Coming later*).
+- Refactoring `js/app.js` or the Project-mode layout (deliberately avoided; Explore reuses the shared
+  `MLCore`/`LRSPlatform` functions instead of the DOM-coupled `trainAndEvaluate`).
 - Test coverage for the predict and monitor stages and the full validation/approval/export flow
   (the current baseline covers load → train → metrics; see
   [`BASELINE_BEHAVIOUR.md`](BASELINE_BEHAVIOUR.md)).

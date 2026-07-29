@@ -41,6 +41,17 @@ function instrument(page) {
   return { pageErrors, externalRequests };
 }
 
+// Phase 1 note: a new landing page is now the default view and the inherited
+// eight-stage application lives inside `#view-project`, hidden until the user
+// chooses Project mode. These baseline tests therefore add ONE new step —
+// entering Project mode — before driving the unchanged Project workflow. No
+// original assertion is removed or weakened.
+async function enterProjectMode(page) {
+  await page.waitForFunction(() => !!window.EMSModes);
+  await page.locator('.top-nav [data-nav="project"]').click();
+  await expect(page.locator('#view-project')).toBeVisible();
+}
+
 // Drive the app from a blank page to a trained linear model on the house dataset.
 // Returns the collectors so individual tests can make focused assertions.
 async function loadDatasetAndTrain(page) {
@@ -48,6 +59,7 @@ async function loadDatasetAndTrain(page) {
 
   await page.goto('/?localOnly=1');
   await page.waitForFunction(() => !!(window.LocalRegressionApp && window.LocalRegressionApp.version));
+  await enterProjectMode(page); // Phase 1: reveal the inherited Project workflow.
 
   // (3) Load the bundled example dataset via the file input (hidden, set directly).
   await page.setInputFiles('#csvFile', HOUSE_CSV);
@@ -84,15 +96,19 @@ test.describe('Engineering ML Studio — baseline browser application', () => {
 
   test('2. principal UI container and title are visible', async ({ page }) => {
     await page.goto('/?localOnly=1');
+    await page.waitForFunction(() => !!(window.LocalRegressionApp && window.LocalRegressionApp.version));
+    await enterProjectMode(page); // Project mode hosts the inherited shell + header.
     await expect(page.locator('main.app-shell')).toBeVisible();
-    await expect(page.locator('h1')).toBeVisible();
-    // Baseline title is inherited and MUST NOT change in this stage.
-    await expect(page.locator('h1')).toContainText('Local Regression Studio');
+    // Scope to the Project view: the landing page also has an <h1>.
+    await expect(page.locator('#view-project h1')).toBeVisible();
+    // Baseline Project title is inherited and MUST NOT change in this stage.
+    await expect(page.locator('#view-project h1')).toContainText('Local Regression Studio');
   });
 
   test('3. a bundled example dataset can be loaded', async ({ page }) => {
     await page.goto('/?localOnly=1');
     await page.waitForFunction(() => !!(window.LocalRegressionApp && window.LocalRegressionApp.version));
+    await enterProjectMode(page);
     await page.setInputFiles('#csvFile', HOUSE_CSV);
     await expect(page.locator('#datasetSummary')).toContainText(/row|column/i);
     await expect(page.locator('#targetColumn option', { hasText: 'price' })).toHaveCount(1);
@@ -101,6 +117,7 @@ test.describe('Engineering ML Studio — baseline browser application', () => {
   test('4. the workflow can progress to feature and target selection', async ({ page }) => {
     await page.goto('/?localOnly=1');
     await page.waitForFunction(() => !!(window.LocalRegressionApp && window.LocalRegressionApp.version));
+    await enterProjectMode(page);
     await page.setInputFiles('#csvFile', HOUSE_CSV);
     await page.selectOption('#targetColumn', 'price');
     await page.click('#autoFeaturesBtn');
@@ -122,6 +139,7 @@ test.describe('Engineering ML Studio — baseline browser application', () => {
   test('7. navigation between key workflow stages works (stages unlock in order)', async ({ page }) => {
     await page.goto('/?localOnly=1');
     await page.waitForFunction(() => !!(window.LocalRegressionApp && window.LocalRegressionApp.version));
+    await enterProjectMode(page);
 
     // Downstream stages start locked.
     await expect(page.locator('#step-features')).toHaveClass(/locked/);

@@ -99,6 +99,9 @@
       await loadScript('./js/validation-core.js', 'LRSValidation', 15000);
       await loadScript('./js/approval-core.js', 'LRSApproval', 15000);
       await loadScript('./js/app.js', 'LocalRegressionApp', 15000);
+      // Phase 1: mode/router layer + Explore controller (built on the modules above).
+      await loadScript('./js/modes.js', 'EMSModes', 15000);
+      await loadScript('./js/explore.js', 'EMSExplore', 15000);
     } catch (error) {
       const region = document.getElementById('alertRegion');
       if (region) region.innerHTML = `<div class="alert error"><strong>Application startup failed.</strong><br>${escapeHtml(error.message)}</div>`;
