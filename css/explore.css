@@ -193,6 +193,25 @@
 .explore-trend-list li.trend-warn::before { content: "!"; position: absolute; left: 0; color: var(--danger); font-weight: 700; }
 .explore-insight .fine-print { margin-top: .4rem; }
 
+/* --- Explore "Continue in Python" call-to-action ----------------------------- */
+.explore-cta {
+  margin-top: 1.2rem; padding: 1rem 1.1rem; border-radius: 10px;
+  background: var(--accent); border: 1px solid #b9dce4; line-height: 1.5;
+  display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem;
+}
+.explore-cta .button { margin-left: auto; }
+
+/* --- Learn the Code view ----------------------------------------------------- */
+.learn-shell h2 { margin: 1.6rem 0 .6rem; font-size: 1.2rem; }
+.learn-shell .route-grid { margin-top: 1.2rem; }
+.learn-shell .route-card .button { align-self: flex-start; }
+.learn-code {
+  margin: .2rem 0 .6rem; padding: .7rem .8rem; border-radius: 8px;
+  background: var(--surface-soft); border: 1px solid var(--line);
+  font-size: .82rem; line-height: 1.5; overflow-x: auto; white-space: pre;
+}
+.learn-code code { background: none; padding: 0; }
+
 /* --- About ------------------------------------------------------------------- */
 .about-shell h1 { margin: .25rem 0 1rem; }
 .about-shell h2 { margin: 1.5rem 0 .5rem; font-size: 1.2rem; }
@@ -216,4 +235,6 @@
   .top-nav .mode-indicator { margin-left: 0; width: 100%; }
   .explore-nav { flex-direction: column; align-items: stretch; }
   .explore-nav .button { width: 100%; margin-left: 0; }
+  .explore-cta { flex-direction: column; align-items: stretch; }
+  .explore-cta .button { width: 100%; margin-left: 0; }
 }

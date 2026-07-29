@@ -12,10 +12,23 @@
 > [`EXPLORE_MODE.md`](EXPLORE_MODE.md) and
 > [`PHASE1_IMPLEMENTATION_PLAN.md`](PHASE1_IMPLEMENTATION_PLAN.md). The remainder of this document
 > stays a **proposal** for later increments (configurable Project mode, wider language pass,
-> additional datasets, notebook integration). One deviation from the original proposal below: the
-> landing page currently offers **two** primary routes (Explore, Project) with *Learn with Python*
-> shown as **Coming later**, rather than three live entry points, because no real notebook
-> integration exists yet.
+> additional datasets, deeper notebook integration).
+>
+> **Phase 2 update.** The third entry point, **Learn with Python**, is now live: the landing page
+> offers all three routes, a **Learn** page (`#view-learn`) links to a guided Jupyter notebook that
+> reproduces the Explore pressure-drop workflow in Python, and Explore's Stage 4 offers a "Continue in
+> Python" call to action. This is a first, deliberately narrow slice of the Learn-the-Code pathway
+> proposed below — one notebook, a static one-way link, no browser-to-notebook state transfer. See
+> [`PHASE2_LEARN_THE_CODE_PLAN.md`](PHASE2_LEARN_THE_CODE_PLAN.md) and
+> [`../notebooks/README.md`](../notebooks/README.md).
+>
+> Phase 2 also introduces a **neural network** as an **advanced, non-default** option in Explore (a
+> fourth approach and a four-way compare) using the **inherited** browser network via progressive
+> disclosure — safe presets up front, learning rate behind an "Advanced setting", the training-loss
+> curve as a collapsed diagnostic. This exercises the tiered-exposure and
+> essential-vs-advanced-diagnostics proposals below on a real model. Full neural-network configuration
+> in **Project mode** remains a later increment (see [`../ROADMAP.md`](../ROADMAP.md) Phase 3 and
+> [`NEURAL_NETWORK_DEMO.md`](NEURAL_NETWORK_DEMO.md)).
 >
 > **Proposal note (later increments):** the sections below are not yet implemented beyond the first
 > increment described above.
@@ -71,7 +84,9 @@
 ## Proposed Learn the Code pathway
 
 - For key UI actions, show the **equivalent Python** (e.g. scikit-learn-style snippets).
-- Offer export/"open in Jupyter" so users can continue in a notebook (Phase 1 roadmap item).
+- Offer "open in Jupyter" so users can continue in a notebook. — *first slice delivered in Phase 2: a
+  guided notebook reproducing the Explore pressure-drop workflow, reachable from the Learn page and an
+  Explore "Continue in Python" link. Per-action inline Python snippets are still to come.*
 - Frame the no-code UI as a bridge to writing code, not a replacement.
 
 ## Advanced Validation and Governance pathway

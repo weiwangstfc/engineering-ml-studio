@@ -20,6 +20,18 @@ The automated tests that back the **[Confirmed]** items live in `tests/smoke.spe
 > `enterProjectMode()` step and continue to assert every original behaviour. The new landing page and
 > Explore mode have their own behaviour documented in [`EXPLORE_MODE.md`](EXPLORE_MODE.md) and tested
 > in `tests/explore.spec.js`.
+>
+> **Phase 2 note.** The top navigation now also includes a **Learn** entry (Home · Explore · Project ·
+> Learn · About), and a new `#view-learn` page links to the teaching notebook. This does not change
+> Project-mode behaviour; the notebook is a separate, static Python artefact. See
+> [`PHASE2_LEARN_THE_CODE_PLAN.md`](PHASE2_LEARN_THE_CODE_PLAN.md).
+>
+> Phase 2 also adds a **neural network** to **Explore** as an advanced, non-default option (and an
+> optional notebook section). It reuses the **inherited** browser network (`js/advanced-core.js`)
+> through the existing model adapter, so the inherited ML core and Project-mode behaviour documented
+> below are **unchanged**. New Explore/NN behaviour is covered in
+> [`EXPLORE_MODE.md`](EXPLORE_MODE.md) and [`NEURAL_NETWORK_DEMO.md`](NEURAL_NETWORK_DEMO.md), and
+> tested in `tests/explore.spec.js` and `tests/unit.spec.js`.
 
 ## Application shell and startup
 

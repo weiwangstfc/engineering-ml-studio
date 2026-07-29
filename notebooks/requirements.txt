@@ -1,0 +1,15 @@
+# Minimal dependencies for the Engineering ML Studio "Learn the Code" notebooks.
+#
+# These are the only packages the teaching notebook itself needs. They are all
+# pre-installed in Google Colab, so Colab users can ignore this file. Local
+# Jupyter users can install them with:
+#
+#     python -m pip install -r notebooks/requirements.txt
+#
+# Version floors are deliberately loose so the notebook works both on a recent
+# local install and on Colab's current stack. No GPU or heavy dependencies.
+
+numpy>=1.26
+pandas>=2.0
+scikit-learn>=1.4
+matplotlib>=3.6

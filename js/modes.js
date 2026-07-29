@@ -8,8 +8,8 @@
 (function (global) {
   'use strict';
 
-  var VIEWS = ['home', 'explore', 'project', 'about'];
-  var LABELS = { home: 'Home', explore: 'Explore', project: 'Project', about: 'About' };
+  var VIEWS = ['home', 'explore', 'project', 'learn', 'about'];
+  var LABELS = { home: 'Home', explore: 'Explore', project: 'Project', learn: 'Learn', about: 'About' };
 
   function el(id) { return document.getElementById(id); }
   function viewEl(mode) { return el('view-' + mode); }

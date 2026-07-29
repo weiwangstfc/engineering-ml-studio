@@ -19,6 +19,7 @@
       <li><a href="#home" data-mode="home" data-nav="home">Home</a></li>
       <li><a href="#explore" data-mode="explore" data-nav="explore">Explore</a></li>
       <li><a href="#project" data-mode="project" data-nav="project">Project</a></li>
+      <li><a href="#learn" data-mode="learn" data-nav="learn">Learn</a></li>
       <li><a href="#about" data-mode="about" data-nav="about">About</a></li>
     </ul>
     <span id="modeIndicator" class="mode-indicator" aria-live="polite"></span>
@@ -57,9 +58,10 @@
 
       <div class="route-secondary">
         <div class="route-secondary-item">
-          <h3>Learn with Python <span class="badge">Coming later</span></h3>
-          <p>Connect these browser activities to Python and Jupyter notebooks.</p>
-          <button class="button secondary" type="button" disabled aria-disabled="true">Coming later</button>
+          <h3>Learn with Python <span class="badge">New</span></h3>
+          <p>Reproduce the pressure-drop Explore activity in a guided Python notebook — see the code
+            behind the browser.</p>
+          <button class="button secondary" data-mode="learn" type="button">Learn with Python</button>
         </div>
         <details class="route-secondary-item">
           <summary>Open saved work &middot; more options</summary>
@@ -121,20 +123,28 @@
               <small class="explore-model-name">Uses Linear Regression</small>
             </span></label>
           <label class="model-card"><input type="radio" name="exploreApproach" value="flexible">
-            <span><strong>Try a more flexible relationship</strong>
+            <span><strong>Try a tree-based flexible relationship</strong>
               <small>Lets the tool bend and curve to follow nonlinear behaviour, which usually fits this problem better — but it can overfit if given too much freedom.</small>
               <small class="explore-model-name">Uses Random Forest</small>
             </span></label>
+          <label class="model-card"><input type="radio" name="exploreApproach" value="advanced">
+            <span><strong>Try an advanced flexible model</strong>
+              <small>A neural network learns nonlinear behaviour by combining layers of simple units. It is more advanced: it needs scaled inputs, has more settings, trains more slowly, and can overfit small datasets.</small>
+              <small class="explore-model-name">Uses a Neural Network</small>
+            </span></label>
           <label class="model-card"><input type="radio" name="exploreApproach" value="compare">
             <span><strong>Compare approaches</strong>
-              <small>Trains all three and shows them side by side, so you can see the difference for yourself.</small>
-              <small class="explore-model-name">Linear Regression, Decision Tree and Random Forest</small>
+              <small>Trains all four and shows them side by side, so you can see the difference for yourself.</small>
+              <small class="explore-model-name">Linear Regression, Decision Tree, Random Forest and Neural Network</small>
             </span></label>
         </div>
         <p class="fine-print explore-approach-note">The simple trend is a good starting point. Pressure
           drop depends on the inputs in a curved, nonlinear way, so a more flexible relationship often
           fits it better. The trade-off is that a very flexible model can <em>overfit</em> — following
-          the training data too closely and generalising worse to new conditions.</p>
+          the training data too closely and generalising worse to new conditions.
+          <strong>A more complex model is not automatically more accurate or more suitable for
+          engineering use.</strong> On small tabular datasets like this one, a neural network may not
+          beat a well-tuned tree-based method.</p>
         <details class="explore-model-details">
           <summary>What do these model names mean?</summary>
           <ul class="explore-model-glossary">
@@ -145,6 +155,10 @@
               value for each. It captures nonlinear behaviour, but a deep tree may overfit.</li>
             <li><strong>Random Forest</strong> combines many trees for a more stable prediction. It is
               less transparent than a single relationship and may extrapolate poorly beyond the data.</li>
+            <li><strong>Neural network</strong> combines layers of simple units to learn nonlinear
+              relationships. It is flexible and powerful, but needs its inputs put on a common scale,
+              has more settings to choose, trains more slowly, and can overfit small datasets. It is
+              offered here as an advanced option, not the default.</li>
           </ul>
         </details>
         <div class="explore-controls is-hidden" id="exploreControls">
@@ -156,6 +170,35 @@
             <input type="number" id="exploreNTrees" min="10" max="120" step="5" value="40">
             <small>How many trees vote in the forest. More trees are steadier but slower.</small>
           </label>
+          <div id="exploreAnnControls" class="explore-ann-controls is-hidden">
+            <fieldset class="explore-ann-arch">
+              <legend>Network size</legend>
+              <label class="explore-radio"><input type="radio" name="exploreAnnArch" value="small" checked>
+                <span>Small network — one hidden layer of 16 neurons. A safe, quick starting point.</span></label>
+              <label class="explore-radio"><input type="radio" name="exploreAnnArch" value="medium">
+                <span>Medium network — two hidden layers of 32 then 16 neurons. More capacity, a little slower.</span></label>
+            </fieldset>
+            <label id="exploreAnnTrainingField">Training length
+              <select id="exploreAnnTraining">
+                <option value="quick">Quick (fewer passes over the data)</option>
+                <option value="standard" selected>Standard</option>
+                <option value="longer">Longer (more passes, slower)</option>
+              </select>
+              <small>How many times the network is allowed to pass over the training data. Training may
+                stop earlier automatically once it stops improving.</small>
+            </label>
+            <p class="fine-print explore-ann-scaling">The inputs are automatically put on a common scale
+              before training (the network needs this), and predictions are converted back to kPa, so the
+              errors and charts stay in real pressure units. You do not need to configure any of this.</p>
+            <details class="explore-ann-advanced">
+              <summary>Advanced setting</summary>
+              <label id="exploreAnnLearningRateField">Learning rate
+                <input type="number" id="exploreAnnLearningRate" min="0.0001" max="0.5" step="0.0001" value="0.01">
+                <small>How big a step the network takes when it adjusts itself. The default (0.01) is a
+                  safe choice; very large values can make training unstable.</small>
+              </label>
+            </details>
+          </div>
         </div>
         <div class="explore-nav">
           <button class="button secondary" id="exploreBackTo1" type="button">Back</button>
@@ -186,6 +229,11 @@
           <div class="plot" id="explorePlot"></div>
           <p class="fine-print">Each point is a test row. Points on the dashed diagonal are perfect predictions.</p>
         </div>
+        <details class="chart-card explore-loss-card is-hidden" id="exploreLossCard">
+          <summary>Advanced diagnostic: neural-network training curve</summary>
+          <div class="plot" id="exploreLossPlot"></div>
+          <p class="fine-print" id="exploreLossNote"></p>
+        </details>
         <div class="explore-nav">
           <button class="button secondary" id="exploreBackTo2" type="button">Back</button>
           <button class="button primary" id="exploreToStage4" type="button" disabled>Next: interpret the engineering meaning</button>
@@ -208,12 +256,87 @@
           flow conditions — can be unreliable. This is a synthetic demonstration, not a validated
           engineering result, and it does not replace engineering judgement.
         </div>
+        <div class="explore-cta">
+          <strong>Ready to see the code?</strong> Reproduce this same pressure-drop workflow in a
+          guided Python notebook — same dataset, same models, same fixed seed.
+          <button class="button primary" data-mode="learn" type="button">Continue in Python</button>
+        </div>
         <div class="explore-nav">
           <button class="button secondary" id="exploreBackTo3" type="button">Back</button>
           <button class="button secondary" id="exploreRestart" type="button">Start over</button>
-          <button class="button primary" data-mode="project" type="button">Continue in Project mode</button>
+          <button class="button secondary" data-mode="project" type="button">Continue in Project mode</button>
         </div>
       </section>
+    </div>
+  </section>
+
+  <!-- ===================== LEARN THE CODE ===================== -->
+  <section id="view-learn" class="view is-hidden" aria-labelledby="learnHeading" tabindex="-1">
+    <div class="learn-shell about-shell">
+      <p class="eyebrow">Learn the Code &middot; the Python behind Explore</p>
+      <h1 id="learnHeading">Reproduce the pressure-drop workflow in Python</h1>
+      <p>You have used the browser <strong>Explore</strong> mode to predict the pressure drop of a
+        fluid flowing through a pipe. This guided Jupyter notebook reproduces the <em>same</em>
+        activity in Python, so you can read, run and change the code behind it — the same dataset, the
+        same five inputs and target, the same fixed random seed (42) and the same three models.</p>
+
+      <div class="info-box">
+        <strong>What you will do:</strong> load the dataset with <code>pandas</code>, split it
+        reproducibly, fit Linear Regression, a Decision Tree and a Random Forest with
+        <code>scikit-learn</code>, compare them with RMSE and R² in kPa, plot actual vs predicted, and
+        interpret the result like an engineer (trend checks, plausibility and an extrapolation
+        warning). No prior machine-learning experience is assumed; about 30–45 minutes.
+      </div>
+
+      <div class="route-grid">
+        <article class="route-card">
+          <h2>Open in Google Colab</h2>
+          <p>One click, nothing to install — <code>pandas</code>, <code>scikit-learn</code> and
+            <code>matplotlib</code> are already available. Needs a Google account and internet; the
+            notebook loads the dataset from this project's committed copy on GitHub.</p>
+          <a class="button primary large"
+             href="https://colab.research.google.com/github/weiwangstfc/engineering-ml-studio/blob/main/notebooks/pipe_pressure_drop.ipynb"
+             target="_blank" rel="noopener noreferrer">Open in Google Colab</a>
+        </article>
+        <article class="route-card">
+          <h2>Run locally in Jupyter</h2>
+          <p>Fully offline, using your own checkout of the repository. Install the minimal
+            dependencies, then open the notebook:</p>
+          <pre class="learn-code"><code>python -m pip install -r notebooks/requirements.txt
+jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
+          <a class="button secondary"
+             href="https://github.com/weiwangstfc/engineering-ml-studio/blob/main/notebooks/pipe_pressure_drop.ipynb"
+             target="_blank" rel="noopener noreferrer">View the notebook on GitHub</a>
+        </article>
+      </div>
+
+      <h2>What the notebook covers</h2>
+      <ul>
+        <li>The pressure-drop problem in plain engineering language, with the expected physical trends.</li>
+        <li>Loading and inspecting the dataset; a reproducible train/test split with a fixed seed.</li>
+        <li>Fitting and comparing Linear Regression, a Decision Tree and a Random Forest.</li>
+        <li>RMSE and R² in kPa, an actual-vs-predicted plot, and a look at overfitting.</li>
+        <li>Engineering interpretation: trend checks, plausibility, and staying inside the data range.</li>
+        <li>Short exercises and optional advanced extensions.</li>
+      </ul>
+
+      <div class="info-box">
+        <strong>Numbers will differ slightly from the browser — that is expected.</strong> The
+        notebook uses <code>scikit-learn</code> and its own random split, while Explore uses its own
+        in-browser model code, so the exact figures are not identical. The <em>story</em> is the same:
+        the linear model under-fits, a single deep tree overfits, and the random forest is strongest.
+      </div>
+
+      <div class="warning-box">
+        <strong>Important:</strong> the dataset is a <strong>synthetic</strong> teaching demonstration
+        generated from the Darcy–Weisbach equation. It is not experimental, validated or safety-grade
+        data, and neither the notebook nor this tool should be used for real engineering design.
+      </div>
+
+      <div class="explore-nav">
+        <button class="button secondary" data-mode="home" type="button">Back to home</button>
+        <button class="button secondary" data-mode="explore" type="button">Back to Explore</button>
+      </div>
     </div>
   </section>
 

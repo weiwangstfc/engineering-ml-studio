@@ -1,8 +1,10 @@
 # Baseline automated tests for Engineering ML Studio.
 #
 # This workflow runs the Playwright smoke and unit tests against the static
-# browser application. It does NOT build, deploy, publish, or contact any
-# external/cloud/AI service, and it uses no secrets.
+# browser application, plus the Python tests for the synthetic dataset and the
+# "Learn the Code" teaching notebook. It does NOT build, deploy, publish, or
+# contact any external/cloud/AI service, and it uses no secrets. The only
+# network access is installing pinned open-source packages from PyPI and npm.
 name: tests
 
 on:
@@ -57,3 +59,33 @@ jobs:
           path: playwright-report/
           retention-days: 7
           if-no-files-found: ignore
+
+  # Python tests: the synthetic dataset generator and the Learn the Code
+  # teaching notebook (structure checks + a full offline end-to-end execution).
+  # No deploy, no secrets, no external AI service; the notebook loads the
+  # committed local CSV, so its run needs no network for data.
+  notebooks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install notebook and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # numpy is needed by the dataset generator tests.
+          python -m pip install "numpy>=1.26,<2"
+          # The notebook's own runtime dependencies.
+          python -m pip install -r notebooks/requirements.txt
+          # Tooling to execute and validate the notebook.
+          python -m pip install "nbclient>=0.9" "nbconvert>=7" "nbformat>=5.9" "ipykernel>=6"
+
+      - name: Run Python tests (dataset + notebook)
+        env:
+          MPLBACKEND: Agg
+        run: python -m unittest discover -s tests -p "test_*.py" -v
