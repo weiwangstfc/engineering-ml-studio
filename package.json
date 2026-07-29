@@ -1,0 +1,15 @@
+{
+  "name": "engineering-ml-studio",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Development and test tooling for Engineering ML Studio. The browser application itself has NO runtime npm dependencies; everything here is for local development and automated testing only.",
+  "scripts": {
+    "serve": "python3 -m http.server 8000",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.49.1"
+  }
+}
