@@ -53,10 +53,24 @@ Make the existing regression capability genuinely approachable. Priorities:
   time-series, or design-of-experiments modules) — **after** the guided regression experience is solid.
 - New algorithms are added deliberately, not as a headline goal.
 
-## Under consideration (not current functionality)
+## Distribution and offline strategy (decided)
 
-- **Offline distribution model (`editions/` + OS launchers).** The original Local Regression Studio
-  documentation describes strict-offline and prediction-only *editions* and per-OS launcher scripts
-  for a packaged offline distribution. **These are inherited/historical and are not part of this
-  repository or the current GitHub Pages deployment.** Whether Engineering ML Studio adopts, drops,
-  or replaces this distribution model is an open future decision, not a present feature.
+- **Primary supported mode:** a **browser-based web application**.
+- **Primary deployment:** a **static website** (currently GitHub Pages via branch serving).
+- **Local development:** a simple, documented local HTTP server (see
+  [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md)). No packaged editions or platform launchers.
+- The application already runs fully in the browser with no backend, and can run offline with
+  bundled libraries (`?localOnly=1`).
+
+### Not adopted
+
+- **Packaged `editions/` and OS launcher scripts.** The original Local Regression Studio
+  documentation described strict-offline and prediction-only *editions* and per-OS launcher scripts
+  for a packaged offline distribution. **These are inherited/historical, are not part of this
+  repository, and are not being recreated.**
+
+### Possible future extension (not part of the baseline)
+
+- An optional **installable/offline download** (e.g. a Progressive Web App or a downloadable static
+  bundle) *may* be considered later. It is **not** part of the current baseline and would be a
+  deliberate future decision, not a present feature.

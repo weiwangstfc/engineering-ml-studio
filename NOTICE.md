@@ -47,17 +47,17 @@ Third-party components inherited from the original project retain their own lice
 - **Papa Parse v5.5.4** — MIT, loaded from a pinned CDN URL in hybrid mode only.
 - **CSV Lite** — local parser included as part of the original application.
 
-## Formal institutional IP wording — still to be confirmed
+## Copyright in new contributions
 
-The **current project leadership** (Wei Wang at STFC) is stated factually above. Separately, the
-**formal institutional intellectual-property position** for Engineering ML Studio — for example any
-STFC copyright assertion over *new* contributions, or a formal maintainer/owning entity — has **not
-yet been confirmed** and is deliberately not asserted here.
+Yu Duan and previous contributors **retain copyright** in the original Local Regression Studio code.
+That original code remains subject to [`LICENSES.txt`](LICENSES.txt).
+
+Copyright in **new contributions** developed for Engineering ML Studio under this STFC project is
+held by **UK Research and Innovation (UKRI)**, unless otherwise stated. This does **not** alter the
+copyright or attribution of the original Local Regression Studio code and earlier contributions, and
+it does **not** imply that UKRI owns the original work or that any copyright has been transferred.
+
+Engineering ML Studio is led and maintained by **Wei Wang at STFC**.
 
 For reference, the original notices record **OPTIBAYES LAB LTD** (England and Wales, company number
 16391767) as maintainer of the *original* Local Regression Studio work; that record is unchanged.
-
-> **Note — requires confirmation:** Any formal copyright or ownership wording for Engineering ML
-> Studio (including whether STFC asserts copyright over new contributions) must be confirmed with
-> the relevant parties before it is stated as fact or used in a public release. Until then, no such
-> claim is made.

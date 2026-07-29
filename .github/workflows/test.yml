@@ -1,0 +1,59 @@
+# Baseline automated tests for Engineering ML Studio.
+#
+# This workflow runs the Playwright smoke and unit tests against the static
+# browser application. It does NOT build, deploy, publish, or contact any
+# external/cloud/AI service, and it uses no secrets.
+name: tests
+
+on:
+  push:
+    branches:
+      - "foundation/**"
+      - develop
+      - main
+  pull_request:
+
+# Allow a newer push to cancel an in-progress run for the same ref.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: npm
+
+      # Python 3 is used only as a static file server for the app under test.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dev/test dependencies
+        run: npm ci
+
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Run baseline tests
+        run: npm test
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore

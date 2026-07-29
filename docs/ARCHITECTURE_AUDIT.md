@@ -123,17 +123,14 @@ Findings are marked **[Confirmed]** (verified by inspecting the files) or **[Ass
 
 1. ~~Should a conventional, verbatim `LICENSE` file be added alongside `LICENSES.txt`?~~
    **Decided (Phase 0):** keep `LICENSES.txt` exactly as-is; do **not** add or rewrite a `LICENSE`.
-2. ~~Provenance and licence of the bundled example datasets.~~ **Documented (Phase 0)** in
-   `examples/README.md`. Remaining open point: reuse/licence status still requires confirmation
-   before any dataset is promoted as an official training resource.
-3. **Formal institutional IP wording.** Current project leadership (Wei Wang at STFC) is stated as
-   fact in `NOTICE.md`. Any *formal* copyright/ownership assertion (e.g. STFC copyright over new
-   contributions) is **not yet confirmed** and remains open.
-4. **`editions/` and launcher scripts — decision deferred.** No current code, deployment, or test
-   depends on them (see below). References remain only in inherited app source (`index.html`) and
-   the original project's documentation, describing the original packaged offline distribution.
-   Whether Engineering ML Studio adopts, drops, or replaces that distribution model is a future
-   (Phase 1+) decision; nothing is recreated or removed at Phase 0.
+2. ~~Provenance and licence of the bundled example datasets.~~ **Resolved.** Documented in
+   `examples/README.md`; Yu Duan has confirmed the datasets are reusable under the **MIT licence**.
+3. ~~Formal institutional IP wording.~~ **Resolved.** Copyright in new Engineering ML Studio
+   contributions under this STFC project is held by **UKRI**, without altering the original work's
+   copyright or attribution; the project is led and maintained by Wei Wang at STFC (see `NOTICE.md`).
+4. ~~`editions/` and launcher scripts — decision deferred.~~ **Resolved.** The primary supported mode
+   is the browser-based static web app; packaged `editions/` and OS launchers are **not** being
+   recreated (see `../ROADMAP.md`). Remaining references exist only in inherited files (see below).
 5. Historical commit message `9f2effa` references the `Yu-optibayeslab` repo; history is preserved
    unchanged, so this remains as a factual artefact of the source history.
 
@@ -143,7 +140,9 @@ Findings are marked **[Confirmed]** (verified by inspecting the files) or **[Ass
   referenced by application JavaScript. The runtime notion of an "edition" is a single build-config
   value (`edition:'full-studio'` in `js/build-config.js`), not a directory.
 - **[Confirmed]** Deployment is GitHub Pages branch serving (`CNAME`, `.nojekyll`); it does not use
-  launchers. There are no tests. Therefore nothing functional depends on editions/launchers.
+  launchers. Therefore nothing functional depends on editions/launchers. (An automated **test
+  foundation** was added later — Playwright smoke + ML-core unit tests, dev-only — see
+  `DEVELOPMENT.md`; it does not depend on editions/launchers either.)
 - **[Confirmed]** Remaining textual references are in inherited files only: `index.html` (UI text),
   and the original docs `PRIVACY.md`, `SECURITY.md`, `THREAT_MODEL.md`, `docs/html/*`. These are the
   original author's materials describing the original distribution and are left unmodified at Phase 0.

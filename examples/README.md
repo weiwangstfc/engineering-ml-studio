@@ -1,25 +1,26 @@
 # Example datasets — provenance and reuse status
 
 This directory holds the small example CSV files bundled with the application. This document records
-what is **confirmed**, what is **reasonable inference**, and what is **unresolved** about their
-provenance, so that reuse status is never overstated.
+what is **confirmed** and what is **reasonable inference** about their provenance, so that their
+status is never overstated.
 
-> ⚠️ **Provenance and reuse status require confirmation before any dataset here is promoted as an
-> official training resource.** Nothing below establishes an open licence for these files.
+> ✅ **Reuse status confirmed.** Yu Duan has confirmed that these bundled example datasets may be
+> reused under the **MIT licence** (see [`../LICENSES.txt`](../LICENSES.txt)). They were introduced
+> by Yu Duan as part of the original Local Regression Studio work.
 
 ## Summary of provenance (all three files)
 
 - **[Confirmed]** All three CSVs were introduced in commit **`11ae72e`** ("app body").
 - **[Confirmed]** Author of the introducing commit: **Yu Duan** — `MarLen <y.duan@imperial.ac.uk>`,
   dated **2026-07-16**.
-- **[Confirmed]** They are covered by the repository's existing licence file
-  [`../LICENSES.txt`](../LICENSES.txt) only insofar as they are part of the original work; there is
-  **no separate dataset licence or attribution statement** in the repository.
-- **[Reasonable inference]** The files appear **programmatically generated** for demonstration (see
-  per-file evidence below).
-- **[Unresolved]** No generator script, data dictionary, or source citation is present. Whether the
-  data are fully synthetic, derived from real data, or transformed from an external source **cannot
-  be confirmed** from the repository alone.
+- **[Confirmed]** **Reuse is permitted under the MIT licence**, as confirmed by Yu Duan. The files
+  are covered by the repository's existing licence file [`../LICENSES.txt`](../LICENSES.txt) as part
+  of the original work; there is no separate dataset licence file, and none is required.
+- **[Reasonable inference]** The files appear **programmatically generated / synthetic** for
+  demonstration (see per-file evidence below). No claim is made that they originate from physical
+  experiments or real-world measurements.
+- **[Not documented]** No generator script or data dictionary is included, so the exact generating
+  functions are not recorded here.
 
 ---
 
@@ -37,7 +38,8 @@ provenance, so that reuse status is never overstated.
 - **Evidence:** sequential synthetic identifiers (`P0001`, `P0002`, …); small, tidy categorical
   vocabularies; filename contains `sample`; no missing values observed in spot checks.
 - **Introducing commit / author:** `11ae72e` — Yu Duan (`MarLen <y.duan@imperial.ac.uk>`), 2026-07-16.
-- **Licence / attribution:** none specific to the dataset; see `../LICENSES.txt`.
+- **Licence / attribution:** reusable under the MIT licence (confirmed by Yu Duan); see
+  `../LICENSES.txt`.
 - **Unresolved concern:** cannot confirm whether values are purely synthetic or modelled on real
   market data.
 
@@ -52,7 +54,8 @@ provenance, so that reuse status is never overstated.
 - **Evidence:** `x1` is a clean evenly-spaced sweep from `-3.0` to `3.0` (a linspace);
   `time` is a simple integer sequence; filename contains `sample`; tidy categorical vocabularies.
 - **Introducing commit / author:** `11ae72e` — Yu Duan (`MarLen <y.duan@imperial.ac.uk>`), 2026-07-16.
-- **Licence / attribution:** none specific to the dataset; see `../LICENSES.txt`.
+- **Licence / attribution:** reusable under the MIT licence (confirmed by Yu Duan); see
+  `../LICENSES.txt`.
 - **Unresolved concern:** the exact generating function and any noise model are not documented.
 
 ## `nonlinear_prediction_sample.csv`
@@ -66,14 +69,18 @@ provenance, so that reuse status is never overstated.
 - **Evidence:** same schema and structure as `nonlinear_regression_sample.csv`; evenly-spaced `x1`;
   filename contains `sample`.
 - **Introducing commit / author:** `11ae72e` — Yu Duan (`MarLen <y.duan@imperial.ac.uk>`), 2026-07-16.
-- **Licence / attribution:** none specific to the dataset; see `../LICENSES.txt`.
+- **Licence / attribution:** reusable under the MIT licence (confirmed by Yu Duan); see
+  `../LICENSES.txt`.
 - **Unresolved concern:** relationship to the regression file (e.g. shared generator/seed) is not
   documented.
 
 ---
 
-## Recommended follow-up (not done at Phase 0)
+## Recommended follow-up (optional)
 
-- Confirm with Yu Duan whether these datasets are fully synthetic and freely reusable.
-- If confirmed synthetic, record the generator (or add one) and a clear reuse statement.
-- If any dataset derives from real or external data, record the source and its licence before reuse.
+- Reuse permission is **confirmed** (MIT, per Yu Duan); no further licensing action is required to
+  use these files as examples.
+- Optionally, record or add a generator script and a short data dictionary for each file, so the
+  synthetic construction is reproducible and documented.
+- Continue to avoid describing these datasets as derived from real physical or experimental data
+  unless such an origin is ever positively established.

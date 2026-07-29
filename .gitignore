@@ -1,0 +1,6 @@
+# Development / test tooling only — never part of the browser runtime.
+node_modules/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
