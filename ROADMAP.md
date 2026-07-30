@@ -68,15 +68,25 @@ Make the existing regression capability genuinely approachable. Priorities:
   [`docs/NEURAL_NETWORK_DEMO.md`](docs/NEURAL_NETWORK_DEMO.md).*
 - In-context explanations of diagnostics and validation.
 
-## Phase 3 — Small engineering project capability
+## Phase 3 — Small engineering project capability (in progress)
 
+- **Six-stage Project-mode presentation shell.** — *first increment delivered as a **prototype**:
+  Project mode now presents six user-facing stages (Load data · Choose inputs and quantity to predict ·
+  Prepare data · Choose and train models · Evaluate results · Predict, export and monitor) over the
+  unchanged eight internal panels, with engineering language, per-stage guidance, model grouping
+  (Recommended vs Other), and progressive disclosure for advanced modelling and governance controls.
+  A **thin presentation and navigation layer only** — no calculation, adapter, default, pipeline order,
+  governance rule or export format changed. See
+  [`docs/PHASE3_PROJECT_MODE_UX_PLAN.md`](docs/PHASE3_PROJECT_MODE_UX_PLAN.md) and
+  [`docs/PROJECT_MODE_STAGE_MAPPING.md`](docs/PROJECT_MODE_STAGE_MAPPING.md).*
 - Robust support for realistic small engineering projects end-to-end.
 - Reusable project templates and built-in engineering datasets expanded.
 - Stronger validation, monitoring, and governance flows for real (non-critical) use.
 - **Expose the neural network's full configuration in Project mode through clearly-labelled
   _Advanced_ settings** (layers, neurons, activation, learning rate, max iterations, regularisation,
-  early stopping, seed). The network already exists in Project mode; this is a UI/labelling task
-  deferred here as part of the wider Project-mode redesign — not a new algorithm.
+  early stopping, seed). — *increment 1 surfaces the existing ANN controls under the **Advanced model
+  settings** disclosure and marks the network as an advanced option; a dedicated ANN random seed is
+  still deferred (the network shares the global split seed). Not a new algorithm.*
 
 ## Phase 4 — Additional Engineering ML modules
 

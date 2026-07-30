@@ -351,3 +351,180 @@ body.prediction-only #step-upload .panel-heading h2::after { content: " — appr
     padding-bottom: max(2.5rem, env(safe-area-inset-bottom));
   }
 }
+
+/* ==========================================================================
+   Phase 3 (increment 1) — Project mode six-stage presentation shell.
+   Presentation only: labels, grouping, disclosure and navigation styling.
+   No underlying panel, control, calculation or contract is affected.
+   ========================================================================== */
+
+/* ========================================================================
+   Project mode — professional application shell.
+   A compact top bar, a ~220px workflow navigator and a dominant workspace
+   showing ONE stage at a time. All rules are scoped under #view-project (or
+   under .app-topbar / .app-footer, which exist only inside it) so the shared
+   .eyebrow / .subtitle / .status-pill / .fine-print classes are untouched.
+   ======================================================================== */
+
+/* Application top bar */
+.app-topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.5rem clamp(1rem,2.5vw,1.75rem);background:linear-gradient(135deg,#0b4052,#14758d);color:#fff}
+.app-topbar-brand{display:flex;align-items:center;gap:.6rem;min-width:0}
+.app-topbar-brand h1{margin:0;font-size:1.02rem;font-weight:700;color:#fff;white-space:nowrap}
+.app-mode-chip{flex:none;padding:.12rem .55rem;border-radius:999px;background:rgba(255,255,255,.18);font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.app-project-status{padding-left:.7rem;border-left:1px solid rgba(255,255,255,.3);font-size:.8rem;color:rgba(255,255,255,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-topbar-actions{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.app-topbar .topbar-action{appearance:none;display:inline-flex;align-items:center;gap:.3rem;padding:.32rem .62rem;border:1px solid rgba(255,255,255,.28);border-radius:7px;background:transparent;color:#fff;font:inherit;font-size:.8rem;line-height:1;cursor:pointer;text-decoration:none}
+.app-topbar .topbar-action:hover{background:rgba(255,255,255,.16)}
+.app-topbar .topbar-action:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+/* "Local processing" status disclosure (privacy wording, out of the rail) */
+.local-processing{position:relative}
+.local-processing>summary{list-style:none;display:inline-flex;align-items:center;gap:.4rem;padding:.32rem .62rem;border:1px solid rgba(255,255,255,.28);border-radius:7px;font-size:.8rem;cursor:pointer;user-select:none}
+.local-processing>summary::-webkit-details-marker{display:none}
+.local-processing .local-dot{width:.55rem;height:.55rem;border-radius:50%;background:#5ad19a;box-shadow:0 0 0 3px rgba(90,209,154,.25)}
+.local-processing[open]>summary{background:rgba(255,255,255,.16)}
+.local-processing-body{position:absolute;right:0;top:calc(100% + .4rem);width:16rem;padding:.75rem .85rem;border-radius:10px;background:var(--surface);color:var(--text);box-shadow:0 10px 30px rgba(0,0,0,.25);border:1px solid var(--line);z-index:30;font-size:.82rem;line-height:1.5}
+.local-processing-body strong{display:block;margin-bottom:.25rem}
+.local-processing-body p{margin:0}
+
+/* Language control, restyled for the dark top bar */
+.app-topbar .language-control{display:inline-flex;align-items:center;gap:.35rem;color:#fff;font-size:.78rem}
+.app-topbar .language-control-label{color:rgba(255,255,255,.85)}
+.app-topbar .language-control select{padding:.3rem .5rem;border-radius:7px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;font:inherit;font-size:.78rem}
+.app-topbar .language-control select option{color:#12303a}
+
+/* Single-stage workspace: only the active panel is shown */
+#view-project .panel:not(.is-active-panel){display:none}
+
+/* Application footer / status bar */
+.app-footer{display:flex;flex-wrap:wrap;align-items:flex-start;gap:1rem 2rem;max-width:1600px;margin:0 auto;padding:1rem clamp(1rem,2.5vw,1.75rem);border-top:1px solid var(--line);color:var(--muted);font-size:.8rem}
+.app-footer-group{display:flex;flex-direction:column;gap:.15rem}
+.app-footer-title{font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.app-footer .text-button{color:var(--primary);text-align:left;padding:0}
+.app-footer-credit{flex:1 1 100%;margin:.3rem 0 0;color:var(--muted)}
+
+/* ------------------------------------------------------------------------
+   Six-stage sidebar navigation (self-contained).
+
+   The nav list deliberately does NOT carry the inherited `.step-list` class,
+   so none of the legacy horizontal-stepper rules apply (the `repeat(7/8,…)`
+   grids, the `.step-list span{…border-radius:50%}` circle that used to crush
+   the text labels, and the `font-size:0` label-hiding). Everything below is
+   defined from scratch and needs no `!important`.
+
+   Desktop: a fixed-width left column holding a vertical progress list.
+   The layout column widths live on `#view-project .app-shell` further down.
+   ------------------------------------------------------------------------ */
+/* .stage-rail is the sidebar navigation wrapper. display:block is explicit so
+   it never picks up flex behaviour from the same-named element or utilities. */
+.stage-rail{display:block;margin:0}
+.stage-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.1rem}
+.stage-item{margin:0}
+
+/* Two-column row: number/tag marker | wrapping text. Used by both single
+   stages (an <a>) and grouped-stage parents (a non-interactive <div>). */
+.stage-row{display:grid;grid-template-columns:1.55rem minmax(0,1fr);align-items:center;gap:.55rem;padding:.42rem .5rem;border-radius:8px;color:var(--muted);text-decoration:none;cursor:pointer}
+a.stage-row:hover{background:var(--surface-soft);color:var(--text)}
+a.stage-row:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.stage-num{display:grid;place-items:center;width:1.55rem;height:1.55rem;border-radius:50%;background:var(--line);color:var(--text);font-size:.75rem;font-weight:700}
+.stage-label{font-size:.86rem;font-weight:600;line-height:1.25;overflow-wrap:break-word;text-align:left}
+
+/* Substages: indented, plain labels, shown only when the parent stage is open
+   (project-shell.js toggles .substages-open on the grouped .stage-item). */
+.substage-list{list-style:none;margin:.05rem 0 .3rem;padding:0 0 0 2.1rem;display:none;flex-direction:column;gap:.02rem}
+.stage-item.substages-open .substage-list{display:flex}
+.substage-item{margin:0}
+.substage-row{display:block;padding:.3rem .5rem;border-radius:6px;color:var(--muted);text-decoration:none;cursor:pointer}
+a.substage-row:hover{background:var(--surface-soft);color:var(--text)}
+a.substage-row:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.substage-label{font-size:.8rem;line-height:1.25;overflow-wrap:break-word}
+
+/* Four-state workflow model. project-shell.js puts exactly one of
+   is-active / is-complete / is-available / is-locked on each row (derived from
+   the shown panel + the inherited lock cascade). Each state is distinguished by
+   more than colour: active = accent fill + bold text + dark ringed marker;
+   complete = green marker + a check glyph after the label; available = neutral
+   grey marker, normal text; locked = reduced opacity + not-allowed cursor +
+   aria-disabled. Available deliberately does NOT use the primary-dark marker,
+   so an unlocked-but-unvisited stage can never read as active or completed. */
+
+/* Active — the stage whose panel is currently shown. */
+.stage-row.is-active,.substage-row.is-active{background:var(--accent);color:var(--text);font-weight:700}
+.stage-row.is-active .stage-num{background:var(--primary);color:#fff;box-shadow:0 0 0 2px var(--accent)}
+
+/* Complete — genuine artifact exists and the cursor has moved past. */
+.stage-row.is-complete .stage-num{background:var(--success);color:#fff}
+.stage-row.is-complete .stage-label::after,.substage-row.is-complete .substage-label::after{content:" \2713";color:var(--success);font-weight:700}
+
+/* Available — reachable now, neutral treatment (no dark/filled marker). */
+.stage-row.is-available .stage-num{background:var(--line);color:var(--text)}
+
+/* Locked — not reachable. */
+.stage-row.is-locked,.substage-row.is-locked{opacity:.5}
+a.stage-row[aria-disabled="true"],a.substage-row[aria-disabled="true"]{cursor:not-allowed}
+
+/* Sidebar column behaviour, scoped to Project mode so it overrides the
+   inherited `.sidebar` / `.privacy-card` rules (including their media queries)
+   without touching any other view. */
+#view-project .app-shell{grid-template-columns:220px minmax(0,1fr);gap:clamp(1rem,2vw,1.75rem);max-width:1600px;margin:0 auto;padding:1.25rem clamp(1rem,2.5vw,1.75rem)}
+#view-project .sidebar{position:sticky;top:3.4rem;align-self:start;max-height:calc(100vh - 3.6rem);overflow-y:auto;overflow-x:hidden;padding:.35rem .25rem}
+#view-project .workspace{min-width:0}
+#view-project .stage-rail{max-width:100%}
+
+/* Contextual stage guidance — quiet collapsible disclosure (What/Why/Look) */
+.stage-guidance{margin:.1rem 0 1.1rem;border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:.6rem;background:var(--surface-soft);font-size:.85rem;line-height:1.5}
+.stage-guidance>summary{list-style:none;cursor:pointer;padding:.55rem .9rem;font-weight:600;color:var(--muted);user-select:none}
+.stage-guidance>summary::-webkit-details-marker{display:none}
+.stage-guidance>summary::before{content:"\25B8\00a0";color:var(--primary)}
+.stage-guidance[open]>summary::before{content:"\25BE\00a0"}
+.stage-guidance[open]>summary{border-bottom:1px solid var(--line)}
+.stage-guidance p{margin:0;padding:.35rem .9rem 0}
+.stage-guidance p:last-child{padding-bottom:.8rem}
+
+/* Recommended starting point (preprocessing note — visual only) */
+.recommendation-note{background:var(--success-bg);border-color:#8bc7a2}
+
+/* Secondary/formal-term helper text */
+.term-note{color:var(--muted);font-weight:400;font-size:.9em}
+
+/* Model presentation grouping */
+.model-group{margin-top:1.1rem}
+.model-group-title{margin:0 0 .6rem;font-size:.95rem}
+.other-models-group{border:1px solid var(--line);border-radius:12px;padding:.4rem .95rem;background:var(--surface-soft)}
+.other-models-group>summary{cursor:pointer;font-weight:650;padding:.55rem 0}
+.other-models-group[open]>summary{margin-bottom:.5rem}
+.other-models-group .model-grid{padding-bottom:.6rem}
+.other-models-group summary .model-group-title{margin:0}
+.model-card-advanced{border-style:dashed}
+.advanced-badge{display:inline-flex;padding:.1rem .4rem;margin-left:.35rem;border-radius:999px;background:var(--warning-bg);border:1px solid var(--warning-line);font-size:.64rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;vertical-align:middle}
+
+/* Progressive disclosure — advanced model settings and governance */
+.advanced-settings>summary,.governance-details>summary{cursor:pointer;font-weight:700;display:flex;flex-direction:column;gap:.2rem;padding:.4rem 0}
+.advanced-settings[open]>summary,.governance-details[open]>summary{margin-bottom:.7rem}
+.advanced-settings-title,.governance-summary-title{font-size:1.02rem}
+.advanced-settings-hint,.governance-summary-hint{font-weight:400;font-size:.82rem;color:var(--muted)}
+.ann-scaling-note{margin-top:.6rem}
+.governance-details{margin-top:1.2rem;border:1px solid var(--line);border-radius:12px;padding:.4rem 1rem 1rem;background:var(--surface-soft)}
+
+/* Stage navigation — Back (left) / Continue (right). project-shell.js injects
+   the Back button; the Continue button already exists in the markup. */
+.stage-nav{margin-top:1.4rem;display:flex;justify-content:flex-end;gap:.75rem;flex-wrap:wrap}
+.stage-back{margin-right:auto}
+.stage-continue[aria-disabled="true"],.stage-back[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+
+/* Narrow layouts: below ~900px the fixed left column is dropped and the stage
+   navigation moves above the workspace at full width, keeping its hierarchy,
+   current-stage and lock states. The sidebar is the first child of .app-shell,
+   so collapsing the grid to one column places the nav above the content in
+   normal document order. The privacy/help/system cards flow beneath the nav. */
+@media (max-width: 900px){
+  /* Rail stacks above the workspace at full width; still a single semantic nav. */
+  #view-project .app-shell{grid-template-columns:1fr;padding:1rem clamp(1rem,3vw,1.75rem)}
+  #view-project .sidebar{position:static;max-height:none;overflow:visible;padding:.25rem 0 .75rem;border-bottom:1px solid var(--line);margin-bottom:.75rem}
+  #view-project .stage-rail{max-width:100%}
+  .app-project-status{border-left:none;padding-left:0;flex-basis:100%;order:3;white-space:normal}
+}
+@media (max-width: 560px){
+  .app-topbar .topbar-action,.local-processing>summary{padding:.3rem .5rem;font-size:.75rem}
+  .local-processing-body{width:min(16rem,80vw)}
+}

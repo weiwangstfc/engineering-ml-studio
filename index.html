@@ -6,8 +6,8 @@
   <meta name="description" content="Governed, private browser-only regression modelling, approval, prediction and monitoring.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
   <title>Local Regression Studio v1.0.11</title>
-  <link rel="stylesheet" href="./css/app.css">
-  <link rel="stylesheet" href="./css/explore.css">
+  <link rel="stylesheet" href="./css/app.css?v=1.0.12">
+  <link rel="stylesheet" href="./css/explore.css?v=1.0.12">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
@@ -367,15 +367,27 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
 
   <!-- ===================== PROJECT MODE (existing application, unchanged) ===================== -->
   <div id="view-project" class="view is-hidden">
-  <header class="app-header">
-    <div>
-      <p class="eyebrow">Governed browser-only machine learning · v1.0.11</p>
-      <h1>Local Regression Studio</h1>
-      <p class="subtitle">Prepare, compare, validate, approve, operate and monitor regression models locally with versioned governance records.</p>
+  <header class="app-topbar">
+    <div class="app-topbar-brand">
+      <h1>Engineering project workspace</h1>
+      <span class="app-mode-chip">Project</span>
+      <span id="projectStatusText" class="app-project-status" aria-live="polite">No dataset loaded</span>
     </div>
-    <div class="header-actions">
+    <div class="app-topbar-actions">
+      <button id="topbarHomeBtn" class="topbar-action" type="button">Home</button>
+      <button id="topbarSaveBtn" class="topbar-action" type="button">Save project</button>
+      <button id="topbarOpenBtn" class="topbar-action" type="button">Open project</button>
+      <button id="privacyInfoBtn" class="topbar-action" type="button">Privacy</button>
+      <a class="topbar-action" href="./docs/html/user-guide.html" target="_blank" rel="noopener">Help</a>
+      <details class="local-processing">
+        <summary><span class="local-dot" aria-hidden="true"></span>Local processing</summary>
+        <div class="local-processing-body">
+          <strong>Local by design</strong>
+          <p>CSV contents, models and results stay on this device unless you explicitly save or download a file.</p>
+        </div>
+      </details>
       <label class="language-control">
-        <span>Language</span>
+        <span class="language-control-label">Language</span>
         <select id="languageSelector" aria-label="Interface language">
           <option value="auto">Automatic (browser)</option>
           <option value="en">English</option>
@@ -391,45 +403,49 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
 
   <main class="app-shell">
     <aside class="sidebar" aria-label="Workflow steps">
-      <ol class="step-list">
-        <li><a href="#step-upload"><span>1</span>Load data</a></li>
-        <li class="training-only"><a href="#step-features"><span>2</span>Features</a></li>
-        <li class="training-only"><a href="#step-preprocess"><span>3</span>Preprocess</a></li>
-        <li class="training-only"><a href="#step-model"><span>4</span>Model</a></li>
-        <li class="training-only"><a href="#step-split"><span>5</span>Split & train</a></li>
-        <li class="training-only"><a href="#step-diagnostics"><span>6</span>Diagnostics</a></li>
-        <li><a href="#step-predict"><span>7</span>Predict</a></li>
-        <li class="governance-only"><a href="#step-monitor"><span>8</span>Monitor</a></li>
-      </ol>
-      <div class="privacy-card">
-        <strong>Local by design</strong>
-        <p>CSV contents, models and results stay on this device unless you explicitly save or download a file.</p>
-      </div>
-      <button id="privacyInfoBtn" class="button secondary sidebar-privacy-button" type="button">Privacy</button>
-      <div class="sidebar-system-card" aria-label="System utilities">
-        <strong>System</strong>
-        <button id="systemIntegrityBtn" class="text-button system-link" type="button">Runtime and integrity</button>
-        <button id="systemRecoveryBtn" class="text-button system-link" type="button">Recovery</button>
-      </div>
-      <div class="sidebar-help-card" aria-label="Help documentation">
-        <strong>Help</strong>
-        <a class="text-button system-link" href="./docs/html/user-guide.html" target="_blank" rel="noopener">User guide</a>
-        <a class="text-button system-link" href="./docs/html/step-4-model-options.html" target="_blank" rel="noopener">Model options</a>
-        <a class="text-button system-link" href="./docs/html/validation-and-applicability.html" target="_blank" rel="noopener">Validation and applicability</a>
-        <a class="text-button system-link" href="./docs/html/approval-and-operation.html" target="_blank" rel="noopener">Approval and operation</a>
-        <a class="text-button system-link" href="./docs/html/security-and-privacy.html" target="_blank" rel="noopener">Security and privacy</a>
-      </div>
-      <div class="sidebar-contact-card">
-        <strong>Contact</strong>
-        <a href="https://www.optibayeslab.com/contact" target="_blank" rel="noopener"> Report issue / Feedback </a>
-      </div>
+      <nav class="stage-rail" aria-label="Project workflow — six stages">
+      <ul class="stage-list">
+        <li class="stage-item" data-stage="1" data-panels="step-upload">
+          <a class="stage-row" href="#step-upload"><span class="stage-num" aria-hidden="true">1</span><span class="stage-label">Load data</span></a>
+        </li>
+        <li class="stage-item training-only" data-stage="2" data-panels="step-features">
+          <a class="stage-row" href="#step-features"><span class="stage-num" aria-hidden="true">2</span><span class="stage-label">Inputs and target</span></a>
+        </li>
+        <li class="stage-item training-only" data-stage="3" data-panels="step-preprocess">
+          <a class="stage-row" href="#step-preprocess"><span class="stage-num" aria-hidden="true">3</span><span class="stage-label">Prepare data</span></a>
+        </li>
+        <li class="stage-item stage-grouped training-only" data-stage="4" data-panels="step-model step-split">
+          <a class="stage-row stage-parent" href="#step-model"><span class="stage-num" aria-hidden="true">4</span><span class="stage-label">Choose and train</span></a>
+          <ul class="substage-list">
+            <li class="substage-item" data-panels="step-model"><a class="substage-row" href="#step-model"><span class="substage-label">Choose models</span></a></li>
+            <li class="substage-item" data-panels="step-split"><a class="substage-row" href="#step-split"><span class="substage-label">Configure validation and train</span></a></li>
+          </ul>
+        </li>
+        <li class="stage-item training-only" data-stage="5" data-panels="step-diagnostics">
+          <a class="stage-row" href="#step-diagnostics"><span class="stage-num" aria-hidden="true">5</span><span class="stage-label">Evaluate results</span></a>
+        </li>
+        <li class="stage-item stage-grouped" data-stage="6" data-panels="step-predict step-monitor">
+          <a class="stage-row stage-parent" href="#step-predict"><span class="stage-num" aria-hidden="true">6</span><span class="stage-label">Predict and monitor</span></a>
+          <ul class="substage-list">
+            <li class="substage-item" data-panels="step-predict"><a class="substage-row" href="#step-predict"><span class="substage-label">Predict and export</span></a></li>
+            <li class="substage-item governance-only" data-panels="step-monitor"><a class="substage-row" href="#step-monitor"><span class="substage-label">Monitor and revalidate</span></a></li>
+          </ul>
+        </li>
+      </ul>
+      </nav>
     </aside>
 
     <section class="workspace">
       <div id="alertRegion" class="alert-region" aria-live="polite"></div>
 
       <section id="step-upload" class="panel">
-        <div class="panel-heading"><div><span class="step-kicker">Step 1</span><h2>Start and load data</h2></div></div>
+        <div class="panel-heading"><div><span class="step-kicker">Stage 1 of 6</span><h2>Load data</h2></div></div>
+        <details class="stage-guidance">
+          <summary>Stage guidance</summary>
+          <p><strong>What you are doing:</strong> load the engineering dataset you want to model, from a CSV file or a bundled example.</p>
+          <p><strong>Why it matters:</strong> every later stage works from this data, which stays in your browser.</p>
+          <p><strong>Look for:</strong> the row and column summary after loading, to confirm the file was read correctly.</p>
+        </details>
         <div id="dropZone" class="drop-zone training-only" tabindex="0" role="button" aria-label="Upload CSV file">
           <input id="csvFile" type="file" accept=".csv,text/csv" hidden>
           <div class="drop-icon">CSV</div>
@@ -447,15 +463,22 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
         <p class="fine-print training-only">Offline mode reloads the app without attempting any CDN request. In either mode, CSV data is never sent to a CDN.</p>
         <div id="datasetSummary" class="summary-grid hidden"></div>
         <div id="previewWrap" class="table-wrap hidden"><table id="previewTable"></table></div>
+        <div class="stage-nav"><button class="button secondary stage-continue" type="button" data-target="step-features">Continue to inputs and target</button></div>
       </section>
 
       <section id="step-features" class="panel training-only locked" aria-disabled="true">
         <div class="panel-heading">
-          <div><span class="step-kicker">Step 2</span><h2>Select features and transform the target</h2></div>
-          <button id="autoFeaturesBtn" class="button secondary" type="button">Detect features automatically</button>
+          <div><span class="step-kicker">Stage 2 of 6</span><h2>Choose inputs and quantity to predict</h2></div>
+          <button id="autoFeaturesBtn" class="button secondary" type="button">Detect input variables automatically</button>
         </div>
+        <details class="stage-guidance">
+          <summary>Stage guidance</summary>
+          <p><strong>What you are doing:</strong> choose which columns describe the engineering conditions (input variables) and which quantity the model should predict.</p>
+          <p><strong>Why it matters:</strong> the model can only learn from the input variables you provide.</p>
+          <p><strong>Look for:</strong> avoid including identifiers, duplicated quantities, or information that would not be available when making a future prediction.</p>
+        </details>
         <div class="form-grid three">
-          <label>Target column<select id="targetColumn"><option value="">Choose target…</option></select></label>
+          <label>Quantity to predict <span class="term-note">(target)</span><select id="targetColumn"><option value="">Choose target…</option></select></label>
           <label>Target transformation
             <select id="targetTransform">
               <option value="none">None</option>
@@ -482,10 +505,18 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <div id="dataQualitySummary" class="quality-summary">Load a CSV to run data-quality checks.</div>
           <div class="table-wrap quality-table-wrap"><table id="dataQualityTable"></table></div>
         </section>
+        <div class="stage-nav"><button class="button secondary stage-continue" type="button" data-target="step-preprocess">Continue to data preparation</button></div>
       </section>
 
       <section id="step-preprocess" class="panel training-only locked" aria-disabled="true">
-        <div class="panel-heading"><div><span class="step-kicker">Step 3</span><h2>Configure preprocessing</h2></div></div>
+        <div class="panel-heading"><div><span class="step-kicker">Stage 3 of 6</span><h2>Prepare data</h2></div></div>
+        <details class="stage-guidance">
+          <summary>Stage guidance</summary>
+          <p><strong>What you are doing:</strong> decide how missing values, scaling and categories are handled before training.</p>
+          <p><strong>Why it matters:</strong> consistent preparation, fitted on the training data only, keeps the evaluation honest.</p>
+          <p><strong>Look for:</strong> the recommended starting point below is a reasonable default for many datasets — adjust it only if you have a specific reason.</p>
+        </details>
+        <div class="recommendation-note info-box compact-box"><strong>Recommended starting point:</strong> replace missing numeric values with the mean, standardise numeric inputs (fitted on training data only), and treat missing categories as their own “Missing” level. These defaults are already selected. They are a sensible starting point, not always the best choice for every dataset.</div>
         <div class="form-grid three">
           <label>Numeric missing values
             <select id="numericMissing"><option value="mean">Replace with mean</option><option value="median">Replace with median</option><option value="zero">Replace with zero</option><option value="drop">Drop affected rows</option></select>
@@ -503,38 +534,62 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <label class="toggle-card"><input id="dropFirstCategory" type="checkbox" checked><span><strong>Remove one reference category from each categorical feature</strong><small>Recommended for linear and ridge regression to avoid redundant one-hot columns. Usually unnecessary for tree models.</small></span></label>
         </div>
         <div id="preprocessEstimate" class="info-box">Select a target and at least one feature to estimate the processed feature count.</div>
+        <div class="stage-nav"><button class="button secondary stage-continue" type="button" data-target="step-model">Continue to model selection</button></div>
       </section>
 
       <section id="step-model" class="panel training-only locked" aria-disabled="true">
-        <div class="panel-heading"><div><span class="step-kicker">Step 4</span><h2>Select a model and tune hyperparameters</h2><p class="fine-print"><strong>Regression only:</strong> these models predict a continuous numeric target. Classification targets are not supported in this release.</p></div></div>
-        <div class="model-grid">
-          <label class="model-card"><input type="radio" name="modelType" value="linear" checked><span><strong>Linear regression</strong><small>Fast, interpretable baseline with analytical prediction intervals.</small></span></label>
-          <label class="model-card"><input type="radio" name="modelType" value="ridge"><span><strong>Ridge regression</strong><small>L2 coefficient shrinkage with bootstrap uncertainty.</small></span></label>
-          <label class="model-card"><input type="radio" name="modelType" value="elasticnet"><span><strong>Elastic net</strong><small>Combined L1 and L2 shrinkage for sparse, correlated linear models.</small></span></label>
-          <label class="model-card"><input type="radio" name="modelType" value="robust"><span><strong>Huber robust regression</strong><small>Downweights large residuals to reduce outlier influence.</small></span></label>
-          <label class="model-card"><input type="radio" name="modelType" value="tree"><span><strong>Decision tree</strong><small>Nonlinear model with approximate leaf-based intervals.</small></span></label>
-          <label class="model-card"><input type="radio" name="modelType" value="forest"><span><strong>Random forest</strong><small>Tree ensemble with approximate between-tree intervals.</small></span></label>
-          <label class="model-card"><input type="radio" name="modelType" value="gboost"><span><strong>Gradient-boosted trees</strong><small>Sequential shallow trees for strong nonlinear tabular prediction.</small></span></label>
-          <label class="model-card"><input type="radio" name="modelType" value="knn"><span><strong>k-nearest neighbours</strong><small>Local prediction from similar processed training rows.</small></span></label>
-          <label class="model-card"><input type="radio" name="modelType" value="quantile"><span><strong>Linear quantile regression</strong><small>Predicts a conditional quantile and fitted lower/upper quantile bounds.</small></span></label>
-          <label class="model-card"><input type="radio" name="modelType" value="gp"><span><strong>Gaussian process</strong><small>Exact or representative-subset GP with native predictive uncertainty.</small></span></label>
-          <label class="model-card"><input type="radio" name="modelType" value="ann"><span><strong>Artificial neural network</strong><small>Feed-forward dense network with early stopping and approximate uncertainty.</small></span></label>
+        <div class="panel-heading"><div><span class="step-kicker">Stage 4 of 6 · Part A</span><h2>Choose models</h2><p class="fine-print"><strong>Regression only:</strong> these models predict a continuous numeric quantity. Classification targets are not supported in this release.</p></div></div>
+        <details class="stage-guidance">
+          <summary>Stage guidance</summary>
+          <p><strong>What you are doing:</strong> select a modelling approach. Start with a recommended model, then open advanced settings only when you need them.</p>
+          <p><strong>Why it matters:</strong> a more complex model is not automatically more accurate or more suitable for engineering use.</p>
+          <p><strong>Look for:</strong> begin simple, then compare against a flexible model to see whether the extra complexity is justified.</p>
+        </details>
+        <div class="model-group">
+          <h3 class="model-group-title">Recommended starting models</h3>
+          <div class="model-grid">
+            <label class="model-card"><input type="radio" name="modelType" value="linear" checked><span><strong>Linear regression</strong><small>Fast, interpretable baseline with analytical prediction intervals.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="forest"><span><strong>Random forest</strong><small>Tree ensemble with approximate between-tree intervals.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="gboost"><span><strong>Gradient-boosted trees</strong><small>Sequential shallow trees for strong nonlinear tabular prediction.</small></span></label>
+          </div>
         </div>
-        <div class="subpanel">
+        <details class="model-group other-models-group">
+          <summary><span class="model-group-title">Other modelling approaches</span></summary>
+          <div class="model-grid">
+            <label class="model-card"><input type="radio" name="modelType" value="ridge"><span><strong>Ridge regression</strong><small>L2 coefficient shrinkage with bootstrap uncertainty.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="elasticnet"><span><strong>Elastic net</strong><small>Combined L1 and L2 shrinkage for sparse, correlated linear models.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="robust"><span><strong>Huber robust regression</strong><small>Downweights large residuals to reduce outlier influence.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="tree"><span><strong>Decision tree</strong><small>Nonlinear model with approximate leaf-based intervals.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="knn"><span><strong>k-nearest neighbours</strong><small>Local prediction from similar processed training rows.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="quantile"><span><strong>Linear quantile regression</strong><small>Predicts a conditional quantile and fitted lower/upper quantile bounds.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="gp"><span><strong>Gaussian process</strong><small>Exact or representative-subset GP with native predictive uncertainty.</small></span></label>
+            <label class="model-card model-card-advanced"><input type="radio" name="modelType" value="ann"><span><strong>Artificial neural network <span class="advanced-badge">Advanced</span></strong><small>Flexible feed-forward network. Needs its inputs on a common scale (handled automatically) and more care to train well.</small></span></label>
+          </div>
+        </details>
+        <details class="subpanel advanced-settings">
+          <summary><span class="advanced-settings-title">Advanced model settings</span><span class="advanced-settings-hint">Tuning method and model-specific settings (including neural-network architecture and training settings)</span></summary>
           <div class="form-grid three">
-            <label>Tuning method
+            <label>Tuning method <span class="term-note">(model-setting search)</span>
               <select id="tuningMode"><option value="manual">Manual configuration</option><option value="grid">Grid search</option><option value="random">Ordinary random search</option><option value="lhs">Latin hypercube sampling</option></select>
             </label>
             <label id="searchTrialsLabel" class="hidden">Number of search samples<input id="searchTrials" type="number" min="2" max="64" value="12"></label>
           </div>
+          <p class="fine-print ann-scaling-note">Neural network: safe defaults are provided (single/small hidden layers, ReLU activation, Adam optimiser, early stopping on). Scaling of inputs is important and is applied automatically. All architecture, optimiser and regularisation controls remain available here.</p>
           <div id="modelParams"></div>
           <div id="searchSummary" class="info-box compact-box">Manual configuration selected.</div>
           <p class="fine-print">Grid values are generated from minimum, maximum and number of points. Tuning compares candidates on the validation set only; the test set remains isolated.</p>
-        </div>
+        </details>
+        <div class="stage-nav"><button class="button primary stage-continue" type="button" data-target="step-split">Continue to validation and training</button></div>
       </section>
 
       <section id="step-split" class="panel training-only locked" aria-disabled="true">
-        <div class="panel-heading"><div><span class="step-kicker">Step 5</span><h2>Split data and train the model</h2></div></div>
+        <div class="panel-heading"><div><span class="step-kicker">Stage 4 of 6 · Part B</span><h2>Configure validation and train</h2><p class="fine-print term-note">Formally: split the data and fit the model. Training data fits the model, validation data selects model settings, and the test data is kept aside for the final independent check.</p></div></div>
+        <details class="stage-guidance">
+          <summary>Stage guidance</summary>
+          <p><strong>What you are doing:</strong> choose how the data is divided for honest evaluation, then train the model you selected in Part A.</p>
+          <p><strong>Why it matters:</strong> the split decides what "accuracy" means. A split that leaks information between train and test overstates how well the model will really perform.</p>
+          <p><strong>Look for:</strong> a split strategy that matches how your data is grouped or ordered, then press <em>Train and evaluate</em>.</p>
+        </details>
         <div class="form-grid three">
           <label>Split strategy
             <select id="splitStrategy"><option value="random">Naive random split</option><option value="source">Metadata/source-grouped split</option><option value="regime">Regime-aware split</option><option value="time">Time-based split for transient data</option></select>
@@ -615,7 +670,13 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
       </section>
 
       <section id="step-diagnostics" class="panel training-only locked" aria-disabled="true">
-        <div class="panel-heading"><div><span class="step-kicker">Step 6</span><h2>Review, validate, approve, and export</h2></div></div>
+        <div class="panel-heading"><div><span class="step-kicker">Stage 5 of 6</span><h2>Evaluate results</h2><p class="fine-print term-note">Formally: model diagnostics. Read the metrics and diagnostic plots to judge whether the model is good enough and where it can be trusted.</p></div></div>
+        <details class="stage-guidance">
+          <summary>Stage guidance</summary>
+          <p><strong>What you are doing:</strong> inspect how well the trained model predicts on data it did not learn from.</p>
+          <p><strong>Why it matters:</strong> headline accuracy can hide problems — bias in part of the range, poor coverage of the prediction intervals, or weak performance for a particular group.</p>
+          <p><strong>Look for:</strong> points scattered close to the diagonal in <em>Actual vs predicted</em>, residuals with no obvious pattern, and interval coverage close to the level you requested.</p>
+        </details>
         <div id="experimentSummary" class="experiment-summary hidden" aria-live="polite"></div>
         <section id="comparisonWorkspace" class="subpanel comparison-workspace hidden" aria-live="polite">
           <div class="panel-heading compact-heading">
@@ -662,6 +723,8 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <article class="chart-card"><div class="chart-title"><h3>Training and optimisation history</h3><button data-plot="trainingHistory" class="text-button export-plot" type="button">PNG</button></div><div id="plotTrainingHistory" class="plot"></div></article>
           <article class="chart-card"><div class="chart-title"><h3>Feature importance</h3><button data-plot="importance" class="text-button export-plot" type="button">PNG</button></div><div id="plotImportance" class="plot"></div></article>
         </div>
+        <details class="governance-details" open>
+          <summary><span class="governance-summary-title">Advanced validation and governance</span><span class="governance-summary-hint">Acceptance criteria, approval decisions, operational schema and downloadable reports. Optional for exploratory work; recommended before any operational use.</span></summary>
         <section id="validationWorkspace" class="subpanel validation-workspace" aria-live="polite">
           <div class="panel-heading compact-heading">
             <div><h3>Validation and acceptance</h3><p class="fine-print">Acceptance criteria apply to the currently active experiment unless you explicitly apply them to all comparable experiments. Blank numeric fields are not evaluated. Acceptance is a user decision, not an automatic certification.</p></div>
@@ -770,9 +833,17 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
             <p class="fine-print">The approved prediction package is enabled only when the selected approval candidate has an approved or conditionally approved status.</p>
           </div>
         </section>
+        </details>
+        <div class="stage-nav"><button class="button primary stage-continue" type="button" data-target="step-predict">Continue to prediction and export</button></div>
       </section>
       <section id="step-predict" class="panel locked" aria-disabled="true">
-        <div class="panel-heading"><div><span class="step-kicker">Step 7</span><h2>Predict unknown data</h2></div><span id="operationModeBadge" class="status-pill">Full workspace</span></div>
+        <div class="panel-heading"><div><span class="step-kicker">Stage 6 of 6 · Part A</span><h2>Predict and export</h2><p class="fine-print term-note">Formally: predict unknown data. Use the accepted model to predict new cases and export the results.</p></div><span id="operationModeBadge" class="status-pill">Full workspace</span></div>
+        <details class="stage-guidance">
+          <summary>Stage guidance</summary>
+          <p><strong>What you are doing:</strong> apply the trained model to new input rows that have no measured answer yet, and download the predictions.</p>
+          <p><strong>Why it matters:</strong> predictions are only trustworthy for inputs similar to the training data. Rows outside the valid input range are flagged rather than silently trusted.</p>
+          <p><strong>Look for:</strong> the applicability summary — check how many prediction rows fall inside the valid input range before relying on the numbers.</p>
+        </details>
         <div id="approvedPackageSummary" class="approved-package-summary">No approved prediction package is loaded. Full-workspace users may still predict with the active fitted model.</div>
         <div class="action-row wrap">
           <label class="file-button button primary">Upload prediction CSV<input id="predictionFile" type="file" accept=".csv,text/csv" hidden></label>
@@ -791,10 +862,17 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
         <div id="predictionSummary" class="info-box">Train or load a fitted model, then upload a compatible CSV. A measured target column is optional.</div>
         <div id="predictionApplicabilitySummary" class="applicability-summary hidden" aria-live="polite"></div>
         <article class="chart-card prediction-chart-card"><div class="chart-title"><h3>Predictions against selected input feature</h3><button data-plot="unknownPrediction" class="text-button export-plot" type="button">PNG</button></div><div id="plotUnknownPrediction" class="plot"></div></article>
+        <div class="stage-nav governance-only"><button class="button secondary stage-continue" type="button" data-target="step-monitor">Continue to monitoring and revalidation</button></div>
       </section>
 
       <section id="step-monitor" class="panel governance-only">
-        <div class="panel-heading"><div><span class="step-kicker">Step 8</span><h2>Monitor operational performance and revalidation</h2><p class="fine-print">Import a CSV containing previous predictions and later measured outcomes. Monitoring does not retrain or alter the model.</p></div></div>
+        <div class="panel-heading"><div><span class="step-kicker">Stage 6 of 6 · Part B</span><h2>Monitor and revalidate</h2><p class="fine-print">Import a CSV containing previous predictions and later measured outcomes. Monitoring does not retrain or alter the model.</p></div></div>
+        <details class="stage-guidance">
+          <summary>Stage guidance</summary>
+          <p><strong>What you are doing:</strong> compare what the model predicted in service against what was later measured, to see whether it still performs well.</p>
+          <p><strong>Why it matters:</strong> real-world data drifts over time. A model that was accurate at approval can degrade, which is a condition requiring review.</p>
+          <p><strong>Look for:</strong> a rising error trend, poor interval coverage, or specific groups drifting — any of these is a signal to revalidate the model.</p>
+        </details>
         <div class="action-row wrap">
           <label class="file-button button primary">Upload monitoring CSV<input id="monitoringFile" type="file" accept=".csv,text/csv" hidden></label>
           <button id="downloadMonitoringBtn" class="button secondary" type="button" disabled>Download monitoring record</button>
@@ -834,6 +912,27 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
       </section>
     </section>
   </main>
+  <footer class="app-footer">
+    <div class="app-footer-group" aria-label="System utilities">
+      <span class="app-footer-title">System</span>
+      <button id="systemIntegrityBtn" class="text-button" type="button">Runtime and integrity</button>
+      <button id="systemRecoveryBtn" class="text-button" type="button">Recovery</button>
+    </div>
+    <div class="app-footer-group" aria-label="Help documentation">
+      <span class="app-footer-title">Help</span>
+      <a class="text-button" href="./docs/html/user-guide.html" target="_blank" rel="noopener">User guide</a>
+      <a class="text-button" href="./docs/html/step-4-model-options.html" target="_blank" rel="noopener">Model options</a>
+      <a class="text-button" href="./docs/html/validation-and-applicability.html" target="_blank" rel="noopener">Validation and applicability</a>
+      <a class="text-button" href="./docs/html/approval-and-operation.html" target="_blank" rel="noopener">Approval and operation</a>
+      <a class="text-button" href="./docs/html/security-and-privacy.html" target="_blank" rel="noopener">Security and privacy</a>
+    </div>
+    <div class="app-footer-group">
+      <span class="app-footer-title">Contact</span>
+      <a class="text-button" href="https://www.optibayeslab.com/contact" target="_blank" rel="noopener">Report issue / Feedback</a>
+    </div>
+    <p class="app-footer-scope fine-print">Your data stays in the browser · Suitable for learning, prototyping and small engineering studies · Not a safety-critical design or certification tool.</p>
+    <p class="app-footer-credit fine-print">Engineering ML Studio · v1.0.11 · Built on the Local Regression Studio engine.</p>
+  </footer>
   </div><!-- /#view-project -->
 
   </div><!-- /#modeMain -->
