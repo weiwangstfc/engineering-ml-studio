@@ -52,6 +52,16 @@ async function enterProjectMode(page) {
   await expect(page.locator('#view-project')).toBeVisible();
 }
 
+// Phase 3 (increment 2): the Project workspace shows ONE stage at a time, so a
+// control in a stage that is not currently shown is display:none. Reveal a
+// stage through the shell's own navigation API before interacting with its
+// controls. This drives the real showStage() code path and adds no behaviour;
+// it only mirrors what a user does by clicking the workflow navigator.
+async function goToStage(page, panelId) {
+  await page.evaluate((id) => window.EMSProjectShell.goToPanel(id), panelId);
+  await expect(page.locator('#' + panelId)).toBeVisible();
+}
+
 // Drive the app from a blank page to a trained linear model on the house dataset.
 // Returns the collectors so individual tests can make focused assertions.
 async function loadDatasetAndTrain(page) {
@@ -68,7 +78,8 @@ async function loadDatasetAndTrain(page) {
   await expect(page.locator('#targetColumn option', { hasText: 'price' })).toHaveCount(1);
   await expect(page.locator('#step-features')).not.toHaveClass(/locked/);
 
-  // (4) Progress to feature & target selection.
+  // (4) Progress to feature & target selection (reveal the now-unlocked stage).
+  await goToStage(page, 'step-features');
   await page.selectOption('#targetColumn', 'price');
   await page.click('#autoFeaturesBtn');
   await expect(page.locator('#featureList input[type="checkbox"]:checked').first()).toBeVisible();
@@ -78,6 +89,7 @@ async function loadDatasetAndTrain(page) {
   await expect(page.locator('#step-split')).not.toHaveClass(/locked/);
 
   // (5) Train. 'linear' is the default model, so no model change is needed.
+  await goToStage(page, 'step-split');
   await page.click('#trainBtn');
 
   // (6) Training completion is observable as populated metric rows.
@@ -101,8 +113,10 @@ test.describe('Engineering ML Studio — baseline browser application', () => {
     await expect(page.locator('main.app-shell')).toBeVisible();
     // Scope to the Project view: the landing page also has an <h1>.
     await expect(page.locator('#view-project h1')).toBeVisible();
-    // Baseline Project title is inherited and MUST NOT change in this stage.
-    await expect(page.locator('#view-project h1')).toContainText('Local Regression Studio');
+    // Phase 3 renames the Project heading to a compact workspace title (the full
+    // product name is shown once, in the global brand); the legacy engine is still
+    // credited via the "Built on the Local Regression Studio engine." footer note.
+    await expect(page.locator('#view-project h1')).toContainText('Engineering project workspace');
   });
 
   test('3. a bundled example dataset can be loaded', async ({ page }) => {
@@ -119,6 +133,7 @@ test.describe('Engineering ML Studio — baseline browser application', () => {
     await page.waitForFunction(() => !!(window.LocalRegressionApp && window.LocalRegressionApp.version));
     await enterProjectMode(page);
     await page.setInputFiles('#csvFile', HOUSE_CSV);
+    await goToStage(page, 'step-features');
     await page.selectOption('#targetColumn', 'price');
     await page.click('#autoFeaturesBtn');
     await expect(page.locator('#featureList input[type="checkbox"]:checked').first()).toBeVisible();
@@ -147,6 +162,7 @@ test.describe('Engineering ML Studio — baseline browser application', () => {
     await page.setInputFiles('#csvFile', HOUSE_CSV);
     await expect(page.locator('#step-features')).not.toHaveClass(/locked/);
 
+    await goToStage(page, 'step-features');
     await page.selectOption('#targetColumn', 'price');
     await expect(page.locator('#step-preprocess')).not.toHaveClass(/locked/);
 
@@ -155,6 +171,7 @@ test.describe('Engineering ML Studio — baseline browser application', () => {
     await expect(page.locator('#step-split')).not.toHaveClass(/locked/);
 
     // The diagnostics stage unlocks only after training.
+    await goToStage(page, 'step-split');
     await page.click('#trainBtn');
     await expect(page.locator('#step-diagnostics')).not.toHaveClass(/locked/);
     await expect(page.locator('#step-predict')).not.toHaveClass(/locked/);

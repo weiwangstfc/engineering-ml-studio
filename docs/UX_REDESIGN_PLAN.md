@@ -30,8 +30,18 @@
 > in **Project mode** remains a later increment (see [`../ROADMAP.md`](../ROADMAP.md) Phase 3 and
 > [`NEURAL_NETWORK_DEMO.md`](NEURAL_NETWORK_DEMO.md)).
 >
-> **Proposal note (later increments):** the sections below are not yet implemented beyond the first
-> increment described above.
+> **Phase 3 update (increment 1).** The tiered-exposure and simplified-workflow proposals below are now
+> prototyped in **Project mode**: the inherited eight-panel workflow is presented as **six user-facing
+> stages** with engineering language, per-stage guidance, model grouping (Recommended vs Other), and
+> progressive disclosure for advanced modelling and governance controls (including the neural network's
+> full configuration). Crucially this is a **thin presentation and navigation layer** — no engine,
+> pipeline, default, governance or export behaviour was changed. See
+> [`PHASE3_PROJECT_MODE_UX_PLAN.md`](PHASE3_PROJECT_MODE_UX_PLAN.md) and
+> [`PROJECT_MODE_STAGE_MAPPING.md`](PROJECT_MODE_STAGE_MAPPING.md).
+>
+> **Proposal note (later increments):** the sections below that go beyond presentation (configurable
+> Project mode, project templates, additional datasets, deeper notebook integration, a dedicated ANN
+> seed) are not yet implemented.
 >
 > **Source basis note:** No screenshots are stored in the repository. This plan is therefore based
 > on the **confirmed application structure** (`index.html`, `css/app.css`, and the module map in

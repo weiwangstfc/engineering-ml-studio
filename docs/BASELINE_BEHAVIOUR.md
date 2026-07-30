@@ -32,15 +32,47 @@ The automated tests that back the **[Confirmed]** items live in `tests/smoke.spe
 > below are **unchanged**. New Explore/NN behaviour is covered in
 > [`EXPLORE_MODE.md`](EXPLORE_MODE.md) and [`NEURAL_NETWORK_DEMO.md`](NEURAL_NETWORK_DEMO.md), and
 > tested in `tests/explore.spec.js` and `tests/unit.spec.js`.
+>
+> **Phase 3 note (increment 1).** Project mode is now **presented** as six user-facing stages over the
+> same eight internal panels, with engineering language, per-stage guidance and progressive disclosure
+> (`js/project-shell.js`, `tests/project.spec.js`). The six-stage sidebar is a responsive, accessible
+> navigation (self-contained CSS, not the legacy `.step-list` stepper; two-column desktop layout that
+> collapses to a full-width nav above the content at ≤ 900 px; `aria-current`/`aria-disabled` state).
+> This is a **presentation and navigation layer only** —
+> every workflow behaviour documented below (panel IDs, unlock cascade, training pipeline, model IDs and
+> default, artifact/approval/export contract) is **unchanged**. The one baseline behaviour that changed
+> by design is the Project heading text (see below). See
+> [`PHASE3_PROJECT_MODE_UX_PLAN.md`](PHASE3_PROJECT_MODE_UX_PLAN.md) and
+> [`PROJECT_MODE_STAGE_MAPPING.md`](PROJECT_MODE_STAGE_MAPPING.md).
+>
+> **Phase 3 note (increment 2).** Project mode is now re-presented as a compact engineering
+> **application shell**: a sticky top bar (product name + *Project* chip + utility actions), a compact
+> left workflow navigator, a **single-stage workspace** (exactly one panel is shown at a time;
+> `#view-project .panel:not(.is-active-panel)` is `display:none`), collapsible stage guidance, and
+> privacy / system / help relocated out of the workflow rail (top bar and footer). `js/project-shell.js`
+> was rewritten as the single-stage controller and drives the same unlock cascade **read-only** —
+> **`js/app.js` is unedited** and every workflow behaviour below is unchanged. Because a control in a
+> stage that is not currently shown is `display:none`, the smoke and project suites reveal a stage via
+> `window.EMSProjectShell.goToPanel(id)` before interacting with its controls; **all original
+> assertions are preserved**. The Project heading is now the top-bar `h1` **"Engineering project
+> workspace"** with a separate **"Project"** mode chip (see below). The rail renders each stage in one of four
+> presentation states (**Active / Completed / Available / Locked**) read from the same lock cascade; a
+> follow-up correction ensured a fresh project shows only Stage 1 as active and never renders an empty
+> Stage 6 as active/completed. This is a **presentation-only** change — no unlock rule, panel or
+> workflow behaviour below is affected. See
+> [`PROJECT_MODE_STAGE_MAPPING.md`](PROJECT_MODE_STAGE_MAPPING.md).
 
 ## Application shell and startup
 
 - **[Confirmed]** Loading `/?localOnly=1` over HTTP produces no fatal JavaScript errors; the app
   finishes bootstrapping (signalled by `window.LocalRegressionApp` being defined).
 - **[Confirmed]** After entering **Project mode**, the principal container (`main.app-shell`) and the
-  Project page heading (`#view-project h1`) are visible. The Project heading text is
-  **"Local Regression Studio"** — this is inherited and is intentionally unchanged at this stage.
-  (The new landing page carries its own heading, **"Engineering ML Studio"**.)
+  Project page heading (`#view-project h1`) are visible. As of **Phase 3 (increment 2)** the heading is
+  the application top-bar `h1` **"Engineering project workspace"** with a separate **"Project"** mode chip.
+  (The compact title replaces increment 2's "Engineering ML Studio" so the full product name is shown
+  once, in the global brand; increment 1 used "Engineering ML Studio — Project mode"; the inherited text
+  was "Local Regression Studio".) The inherited engine is still credited via the "Built on the Local Regression Studio
+  engine." note, now in the application footer (`.app-footer-credit`). The smoke test assertion matches.
 - **[Confirmed]** With `?localOnly=1`, only bundled libraries under `vendor/` are used; no external
   (non-local) network requests are made during the load-and-train workflow.
 - **[Inferred]** Without `?localOnly=1` the app runs in "hybrid mode" and may load a pinned CDN
@@ -48,8 +80,10 @@ The automated tests that back the **[Confirmed]** items live in `tests/smoke.spe
 
 ## Eight-stage workflow
 
-The interface is a single long page exposing eight sequential stages. Stages downstream of data
-loading start **locked** and unlock as prerequisites are met.
+The inherited interface is a single long page exposing eight sequential stages. (As of **Phase 3
+increment 2** the Project-mode workspace **presents** these one stage at a time — a single panel is
+shown while the rest are hidden — but the panels, their order and their unlock logic are unchanged.)
+Stages downstream of data loading start **locked** and unlock as prerequisites are met.
 
 1. **[Confirmed]** **Load data.** A CSV chosen via the file input (`#csvFile`) is parsed in the
    browser. On success the dataset summary (`#datasetSummary`) reports rows/columns and the target

@@ -63,7 +63,17 @@ Full instructions, browser requirements, and how to run the automated tests are 
 
 ## Status
 
-**Phase 2 prototype (in progress): the first "Learn the Code" pathway.** Building on the Explore
+**Phase 3 prototype (in progress): a friendlier Project mode.** This stage re-presents the inherited
+Project workflow as **six clear stages** — *1. Load data · 2. Choose inputs and quantity to predict ·
+3. Prepare data · 4. Choose and train models · 5. Evaluate results · 6. Predict, export and monitor* —
+with engineering language, per-stage guidance, and advanced modelling and governance controls tucked
+behind progressive disclosure. This is a **thin presentation and navigation layer only**: the eight
+inherited panels, the training pipeline, the eleven models (default Linear Regression), and the
+artifact/approval/export contract are all **unchanged**. The neural network remains an **advanced,
+non-default** option. See [`docs/PHASE3_PROJECT_MODE_UX_PLAN.md`](docs/PHASE3_PROJECT_MODE_UX_PLAN.md)
+and [`docs/PROJECT_MODE_STAGE_MAPPING.md`](docs/PROJECT_MODE_STAGE_MAPPING.md).
+
+**Phase 2 prototype: the first "Learn the Code" pathway.** Building on the Explore
 mode, this stage adds a guided **Jupyter notebook** that reproduces the *same* pressure-drop
 activity in Python — the same dataset, the same five inputs and target, the same fixed random seed
 (42) and the same three models — using `pandas`, `scikit-learn` and `matplotlib`. A new in-app
@@ -116,8 +126,10 @@ and [`docs/BASELINE_TEST_REPORT.md`](docs/BASELINE_TEST_REPORT.md).
 - **Explore** — a guided, no-code, **problem-led** introduction to regression built around an
   engineering example (predicting pressure drop in a pipe). New in Phase 1. See
   [`docs/EXPLORE_MODE.md`](docs/EXPLORE_MODE.md).
-- **Project** — the full inherited workflow (upload → features → preprocess → model → split →
-  diagnostics → predict → monitor, plus governance), unchanged.
+- **Project** — the full modelling workflow on your own data, now presented as **six guided stages**
+  (Phase 3). The eight inherited internal panels (upload → features → preprocess → model → split →
+  diagnostics → predict → monitor, plus governance) and all calculations are unchanged behind the new
+  presentation. See [`docs/PROJECT_MODE_STAGE_MAPPING.md`](docs/PROJECT_MODE_STAGE_MAPPING.md).
 - **Learn with Python** — a guided Jupyter notebook that reproduces the Explore pressure-drop
   workflow in Python (`pandas` + `scikit-learn`). New in Phase 2. See
   [`notebooks/README.md`](notebooks/README.md) and the in-app **Learn** page.
@@ -140,6 +152,8 @@ Always independently verify any output before relying on it.
 - [`docs/NEURAL_NETWORK_DEMO.md`](docs/NEURAL_NETWORK_DEMO.md) — the neural network as an advanced option (browser + notebook)
 - [`docs/PHASE1_IMPLEMENTATION_PLAN.md`](docs/PHASE1_IMPLEMENTATION_PLAN.md) — Phase 1 plan
 - [`docs/PHASE2_LEARN_THE_CODE_PLAN.md`](docs/PHASE2_LEARN_THE_CODE_PLAN.md) — Phase 2 "Learn the Code" plan
+- [`docs/PHASE3_PROJECT_MODE_UX_PLAN.md`](docs/PHASE3_PROJECT_MODE_UX_PLAN.md) — Phase 3 Project-mode UX plan
+- [`docs/PROJECT_MODE_STAGE_MAPPING.md`](docs/PROJECT_MODE_STAGE_MAPPING.md) — six-stage ↔ eight-panel mapping
 - [`notebooks/README.md`](notebooks/README.md) — the Phase 2 teaching notebook
 - [`docs/BASELINE_BEHAVIOUR.md`](docs/BASELINE_BEHAVIOUR.md) — current behaviour the tests protect
 - [`docs/BASELINE_TEST_REPORT.md`](docs/BASELINE_TEST_REPORT.md) — baseline test run and tooling

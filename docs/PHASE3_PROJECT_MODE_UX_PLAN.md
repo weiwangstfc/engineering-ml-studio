@@ -1,10 +1,96 @@
 # Phase 3 plan — Project-mode UX improvements
 
-**Status:** planning only. This document proposes changes; **no Project-mode
-JavaScript, HTML or CSS is modified in this phase.** The goal is to make the
-inherited, technically complete Project mode approachable for mechanical,
-thermal and computational engineers **without removing any advanced modelling,
-validation or governance capability**.
+> **Status update — increment 1 implemented (prototype).** The "recommended
+> first implementation increment" in §5 is now built on
+> `feature/project-mode-six-stage-shell`: Project mode presents **six
+> user-facing stages** over the unchanged eight internal panels, with
+> engineering language, per-stage guidance, model grouping (Recommended vs
+> Other), and progressive disclosure for advanced modelling and governance
+> controls. It is a **thin presentation and navigation layer only** — no
+> calculation, adapter, default, pipeline order, governance rule or export
+> format was changed. New/changed files: `js/project-shell.js`, `css/app.css`,
+> `index.html`, `js/bootstrap.js`, `tests/project.spec.js`,
+> `tests/smoke.spec.js`. The concrete stage↔panel mapping and the preserved
+> contracts are recorded in
+> [`PROJECT_MODE_STAGE_MAPPING.md`](PROJECT_MODE_STAGE_MAPPING.md). Deferred, as
+> planned: a dedicated ANN random seed, IA re-grouping beyond labels/disclosure,
+> and any change to model dispatch or the artifact contract. The audit and
+> proposals below are retained as the plan of record.
+>
+> **Layout correction (follow-up to increment 1).** A responsive defect in the
+> six-stage sidebar was fixed: the navigation list no longer inherits the legacy
+> `.step-list` horizontal-stepper CSS (which had forced each text label into a
+> 28 px circle, hidden labels at narrow widths, and hidden the privacy card
+> below 1100 px). The navigation is now a self-contained, single semantic
+> structure — `<nav class="stage-rail">` → an unordered `<ul class="stage-list">`
+> with two-column stage rows and indented `4A/4B`, `6A/6B` substages (no stray
+> `1.`/`2.` numbering). Desktop uses a `minmax(260px, 290px)` left column;
+> at ≤ 900 px the grid collapses and the nav sits full-width above the content
+> with the privacy/help cards beneath. Accessibility was added (`aria-current`
+> scroll-spy, `aria-disabled` on locked stages, substage `aria-label`s, visible
+> focus). Verified overflow-free at 1440/1024/768/600/390/~350 px and covered by
+> new responsive/accessibility tests in `tests/project.spec.js`. Still
+> presentation and navigation only. Details in
+> [`PROJECT_MODE_STAGE_MAPPING.md`](PROJECT_MODE_STAGE_MAPPING.md).
+>
+> **Status update — increment 2 implemented (prototype): professional
+> application shell.** Because the earlier render still read as an unstyled
+> report outline, Project mode was re-presented as a compact engineering
+> **application**. The root cause of "edits don't show" was a **stale cached
+> stylesheet** — the stylesheet links now carry a `?v=` cache-busting query.
+> The shell adds a sticky **application top bar** (product name + *Project* chip +
+> live status + utility actions Home/Save/Open/Privacy/Help + language + runtime
+> pill + *Local processing* disclosure), a **compact left workflow navigator**
+> (~220 px), a **dominant single-stage workspace** (`showStage` reveals exactly
+> one panel; `#view-project .panel:not(.is-active-panel){display:none}`), an
+> **application footer** (System / Help / Contact / scope boundaries / legacy
+> credit), and **collapsible stage guidance** (`<details class="stage-guidance">`).
+> Substages now use **plain labels** (the `4A/4B/6A/6B` tags were removed) and
+> show only while their parent stage is current; **privacy / system / help were
+> relocated out of the workflow rail**. `js/project-shell.js` was rewritten as
+> the single-stage controller; **`js/app.js` is unedited** (its own
+> `scrollIntoView` transitions are mirrored by wrapping each panel's
+> `scrollIntoView`). Still presentation, layout and navigation only — no
+> calculation, adapter, default, pipeline order, governance rule, export or
+> saved-project format changed. New/changed: `js/project-shell.js`, `css/app.css`,
+> `index.html`, `tests/project.spec.js`, `tests/smoke.spec.js`,
+> `docs/PROJECT_MODE_STAGE_MAPPING.md`. Full suite (project + smoke + explore +
+> unit) green. Details in
+> [`PROJECT_MODE_STAGE_MAPPING.md`](PROJECT_MODE_STAGE_MAPPING.md).
+>
+> **Correction — workflow navigation state model.** A follow-up manual review
+> found that on a fresh project both Stage 1 **and** Stage 6 looked active/
+> completed: the old two-state `syncSidebar` marked Stage 6 "available" because
+> `step-monitor` is always present (no `.locked` class — it is gated by the
+> `governance-only` mode), and the old `.is-available` marker reused the
+> primary-dark active fill. The rail was reworked to a **four-state model**
+> (**Active / Completed / Available / Locked**, classes on the row:
+> `.stage-row.is-active|is-complete|is-available|is-locked`) derived only from the
+> shown panel plus the inherited lock cascade. Completion is tied to genuine lock
+> milestones (never *unlocked* / *visible* / *last* / *visited*); stage
+> availability is derived from a stage's **entry panel** (`step-predict` for Stage
+> 6), so a fresh Stage 6 is correctly **Locked**. States use more than colour
+> (ring+bold, a `✓` glyph, reduced opacity) and a `checkConsistency()` guard keeps
+> the top-bar status, active stage and completed set in agreement. `js/app.js`
+> stays unedited and the saved-project schema is unchanged. Tests: a dedicated
+> **workflow navigation state** block in `tests/project.spec.js` asserts the states
+> from computed styles (fresh state, transitions, restoration, consistency);
+> stylesheet cache-buster bumped to `?v=1.0.12`. Full Playwright suite **117
+> passed**. A small **global-header refinement** followed: the application top-bar
+> `h1` is now the compact **"Engineering project workspace"** (was "Engineering ML
+> Studio"), so the full product name is shown once (in the global brand) instead of
+> twice; the global `.top-nav`, router and accessibility are untouched. The
+> remaining **two-header duplication** (global `.top-nav` + application top bar both
+> showing *Home*) stays a **deferred** later refinement (full nav consolidation is
+> not trivially isolated — the global nav is shared by all views). See
+> [`PROJECT_MODE_STAGE_MAPPING.md`](PROJECT_MODE_STAGE_MAPPING.md) §"Workflow
+> navigation state model".
+
+**Original status:** planning only. This document proposes changes; **no
+Project-mode JavaScript, HTML or CSS is modified in this phase.** The goal is to
+make the inherited, technically complete Project mode approachable for
+mechanical, thermal and computational engineers **without removing any advanced
+modelling, validation or governance capability**.
 
 Scope guardrails for Phase 3 implementation (when it happens):
 

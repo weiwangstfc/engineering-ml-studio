@@ -1,12 +1,114 @@
 # Project Status — Engineering ML Studio
 
-Concise, factual snapshot during **Phase 2** (first "Learn the Code" prototype increment), building
-on the delivered Phase 1 Explore mode. For detail see
+Concise, factual snapshot during **Phase 3, increment 2** (Project-mode professional application
+shell), building on increment 1's six-stage presentation shell and the delivered Phase 1 Explore mode
+and Phase 2 "Learn the Code" pathway. For detail see
 [`ARCHITECTURE_AUDIT.md`](ARCHITECTURE_AUDIT.md), [`ROADMAP.md`](../ROADMAP.md),
 [`EXPLORE_MODE.md`](EXPLORE_MODE.md), [`PHASE2_LEARN_THE_CODE_PLAN.md`](PHASE2_LEARN_THE_CODE_PLAN.md),
-and [`UX_REDESIGN_PLAN.md`](UX_REDESIGN_PLAN.md).
+[`PHASE3_PROJECT_MODE_UX_PLAN.md`](PHASE3_PROJECT_MODE_UX_PLAN.md),
+[`PROJECT_MODE_STAGE_MAPPING.md`](PROJECT_MODE_STAGE_MAPPING.md), and
+[`UX_REDESIGN_PLAN.md`](UX_REDESIGN_PLAN.md).
 
-## Phase 2 prototype (this stage)
+## Phase 3 prototype — Project-mode professional application shell (this stage)
+
+Increment 2 re-presents Project mode as a compact engineering **application**, correcting the earlier
+render that still read as an unstyled report outline. It builds on increment 1's six-stage mapping and
+remains **presentation, layout and navigation only**.
+
+- **Application shell.** Project mode now has a sticky **application top bar** (product name, a
+  *Project* mode chip, a live project-status readout, and utility actions — Home, Save project, Open
+  project, Privacy, Help — plus the language selector, runtime pill and a *Local processing*
+  disclosure), a **compact left workflow navigator** (~220 px), a **dominant workspace**, and an
+  **application footer** (System, Help documentation, Contact, the governance scope boundaries and the
+  legacy-engine credit).
+- **One stage at a time.** The workspace shows exactly one panel; `#view-project .panel:not(.is-active-panel)`
+  is `display:none` and `js/project-shell.js` (`showStage`) reveals a single panel, so the workspace
+  reads as an application screen rather than one long document. Charts drawn while a panel is hidden are
+  resized on reveal (`Plotly.Plots.resize`).
+- **Six user-facing stages over the unchanged eight internal panels.** The rail presents
+  **1. Load data · 2. Inputs and target · 3. Prepare data · 4. Choose and train · 5. Evaluate results ·
+  6. Predict and monitor**. Stage 4 groups *Choose models* (`step-model`) and *Configure validation and
+  train* (`step-split`); stage 6 groups *Predict and export* (`step-predict`) and *Monitor and
+  revalidate* (`step-monitor`). Substages use **plain labels** (the `4A/4B/6A/6B` tags are removed) and
+  are shown **only while their parent stage is current**. The eight DOM panels, their IDs and order are
+  unchanged — see [`PROJECT_MODE_STAGE_MAPPING.md`](PROJECT_MODE_STAGE_MAPPING.md).
+- **Privacy / local-processing relocated out of the workflow rail.** The rail now holds only the six
+  stages; privacy and the *Local processing* note live in the top bar, and System / Help / Contact /
+  scope / attribution live in the footer.
+- **Thin presentation and navigation layer only.** No calculation, model adapter, default, split
+  behaviour, preprocessing behaviour, governance rule, export format, saved-project format, monitor
+  state or training operation order was changed. `js/app.js` is **unedited**. The training pipeline
+  (`trainAndEvaluate`), the layered model dispatch load order, the eleven model IDs (default `linear`),
+  and the artifact/approval/export contract are all as inherited. All gating is **read** from the
+  classes app.js already sets; the shell never unlocks a panel.
+- **Engineering language, guidance and progressive disclosure.** User-facing labels use engineering
+  terms (input variable, quantity to predict, model, model setting, valid input range) with the formal
+  ML term kept in secondary help. Each stage's *What / Why / Look for* guidance is now a collapsed
+  `<details class="stage-guidance">` disclosure below the stage title, so it no longer dominates the
+  workspace. Models are grouped into **Recommended starting models** (Linear, Random Forest, Gradient
+  Boosting) and a collapsed **Other modelling approaches** disclosure (the neural network marked
+  *Advanced*). Tuning and model-specific settings sit under a collapsed **Advanced model settings**
+  disclosure; validation, approval, operational release and reporting sit under an **Advanced
+  validation and governance** disclosure. A *Recommended starting point* note is shown in Prepare data
+  **without changing any preprocessing default**.
+- **Back / Continue and rail navigation.** Rail clicks switch the shown panel via `goToPanel`, which
+  refuses locked or mode-hidden targets — no unsafe stage jumping and no new application state.
+  Additive *Continue to …* buttons (`.stage-continue`) and an injected *Back* button on every stage
+  after the first walk the fixed panel order, skipping locked/mode-hidden panels. app.js's own
+  `scrollIntoView` transitions are mirrored by wrapping each panel's `scrollIntoView` — no app.js edit.
+  The panel-lock logic (`unlockPanel`/`unlockWorkflow`) remains the single source of truth for
+  availability.
+- **Responsive, accessible navigator.** The rail is a single semantic structure
+  (`<nav class="stage-rail">` → `<ul class="stage-list">`) styled from scratch — not the inherited
+  `.step-list`. On desktop it is a compact 220 px left column with two-column stage rows whose labels
+  wrap sensibly; at ≤ 900 px the grid collapses and the navigator stacks above the workspace. Lists are
+  unordered (no stray `1.`/`2.` markers) and rows are not underlined links; the **shown** stage carries
+  `aria-current="step"` (current = shown; no scroll-spy), locked stages expose `aria-disabled`, and
+  rows stay keyboard-focusable with a visible focus ring. Verified free of horizontal overflow at
+  1440 / 1280 / 1024 / 768 / 390 px.
+- **Four-state workflow navigation model.** Each rail row renders in exactly one of **Active /
+  Completed / Available / Locked**, on the row itself (`.stage-row.is-active` / `.is-complete` /
+  `.is-available` / `.is-locked`), derived only from the shown panel and the inherited lock cascade.
+  Completion is tied to real lock milestones (dataset loaded, features chosen, model trained), never to
+  *unlocked* / *visible* / *last-stage* / *visited*; a stage is *complete* only when its artifact exists
+  **and** the cursor is strictly later, and Stage 6 is terminal (never auto-completed). This corrected a
+  defect where a fresh project showed **Stage 6 with a dark active-looking marker**: the old two-state
+  rule counted Stage 6 as "available" because `step-monitor` is always present (no `.locked` class; it
+  is gated by the `governance-only` mode), and the old `.is-available` marker reused the primary-dark
+  fill. Availability is now derived from a stage's **entry panel** (`step-predict` for Stage 6), which
+  stays locked until a model is fitted. States are distinguished by more than colour (ring + bold for
+  active, a `✓` glyph for complete, reduced opacity + `not-allowed` for locked). A `checkConsistency()`
+  guard (on `window.EMSProjectShell`, run each `syncAll`) asserts the top-bar status agrees with the
+  rail — exactly one `aria-current`, no completed stages without a dataset, Stage 6 never active/complete
+  without one. See [`PROJECT_MODE_STAGE_MAPPING.md`](PROJECT_MODE_STAGE_MAPPING.md).
+- **Cache-busting.** Both stylesheet links carry `?v=1.0.12` so stylesheet edits are never masked by a
+  stale browser cache (the root cause of the earlier "edits don't show" render).
+- **Global-header refinement (presentation-only, done).** The application top bar previously repeated the
+  full product name (`h1` "Engineering ML Studio"), which also appears in the global brand — so the name
+  showed twice in Project mode. The `h1` is now the compact, Project-specific title **"Engineering project
+  workspace"** (the mode chip still reads *Project*), so the full product name is shown once, in the
+  global brand. This is a text-only change to the Project top bar; the global `.top-nav`, the router and
+  accessibility are untouched.
+- **Known deferrals (recorded, not implemented).** No dedicated neural-network random seed is added
+  (the ANN still shares the global split seed). Non-English translations fall back to English for the
+  renamed labels until the `js/i18n.js` dictionary is extended. **Full navigation consolidation:** the
+  global `.top-nav` (Home · Explore · Project · Learn · About, rendered above every view) and the
+  Project application top bar both still present a *Home* affordance, so Project mode shows two navigation
+  headers at once. Removing that second header is not trivially isolated (the global nav is shared by all
+  views), so it remains **deferred**; a later refinement should hide or visually integrate the global
+  `.top-nav` within Project mode so the application top bar is the single header — without disturbing the
+  other views.
+- **New/changed files (increment 2):** `js/project-shell.js` (rewritten as the single-stage
+  controller), `css/app.css` (application-shell styles: top bar, footer, compact rail, single-stage,
+  guidance disclosure), `index.html` (top bar, cleaned rail, footer, guidance `<details>`,
+  cache-busting), `tests/project.spec.js` (application-shell, single-stage, navigation,
+  responsive/accessibility tests, a dedicated **workflow navigation state** block asserting the four
+  states from computed styles, plus regression guards), `tests/smoke.spec.js` (single-stage
+  `goToStage` navigation helper), `docs/PROJECT_MODE_STAGE_MAPPING.md` and the Phase 3 documentation.
+  `js/app.js` is unchanged. The full Playwright suite (project + smoke + explore + unit) is green —
+  **117 passed** — and the stdlib Python notebook/dataset unit tests pass.
+
+## Phase 2 prototype (delivered)
 
 - **First "Learn the Code" pathway.** A single, high-quality guided Jupyter notebook,
   `notebooks/pipe_pressure_drop.ipynb`, reproduces the Explore pressure-drop activity in Python: the
