@@ -139,6 +139,18 @@ selected for the workflow to publish.
 The site is served from the `/engineering-ml-studio/` sub-path, so every asset reference must
 stay relative (`./css/app.css`, `./js/lrs-worker.js`); a root-absolute `/css/...` would 404.
 
+### Security headers on a static host
+
+GitHub Pages serves files only — it cannot set custom response headers. That matters for one
+directive in particular: **`frame-ancestors` works only as an HTTP header and is ignored in a
+`<meta>` CSP**, so it is deliberately not listed in `index.html`. Clickjacking is instead handled
+by `js/frame-guard.js`, which runs first in `<head>` and refuses to render the application inside a
+frame. It is covered by tests 10 and 11 in `tests/smoke.spec.js`.
+
+If the site ever moves to a host that can set headers (or sits behind a CDN or reverse proxy that
+can), add `Content-Security-Policy: frame-ancestors 'none'` and `X-Frame-Options: DENY` there and
+keep the script as a second layer.
+
 Deploying elsewhere only requires serving the repository's static files from any web server or
 static host.
 
