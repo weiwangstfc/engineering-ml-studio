@@ -156,7 +156,7 @@ end to end and teaches the codebase.*
 | ID | Task | Est. |
 |---|---|---|
 | **A1** | **Heat-transfer dataset: convective cooling / fin heat dissipation.** Generator script driven by a documented correlation, fixed seed, SI units in every column name (`h_w_m2k`, `area_m2`, `delta_t_k`, …). Committed CSV ~500 rows. Python tests mirroring `test_pipe_dataset.py`: determinism for a fixed seed, expected columns and units, physically sensible ranges, no non-finite or negative values, and reproducibility of the committed CSV from documented defaults. | 3–4 d |
-| **A2** | **Mechanics dataset: cantilever beam deflection** (or fatigue life — Wei Wang to choose). Same pattern. Should exhibit a different modelling character from A1 so the two teach different lessons. | 3–4 d |
+| **A2** | **Mechanics dataset: tensile testing of structural steel** (decided by Wei Wang, 2026-09-24). Predict **yield strength** (MPa, and optionally ultimate tensile strength) from composition and microstructure — carbon, manganese and silicon content (wt%), grain size (µm), tempering temperature (°C), test temperature (°C). Build the generator on **Hall–Petch**, `σ_y = σ_0 + k · d^(−1/2)`, plus approximately linear solid-solution strengthening terms. Document the governing equations, coefficient sources, assumptions and simplifications in the module docstring exactly as `generate_pipe_pressure_drop.py` does — that header is the template, not just an example.<br><br>**Why this is a strong teaching choice, and what the copy should exploit:** (i) the `d^(−1/2)` term is genuinely nonlinear against otherwise near-linear composition effects, so a linear model does *acceptably* and a flexible model does *better* — the clearest "why would I use anything beyond a straight line?" lesson in the library; (ii) real tensile testing carries honest specimen-to-specimen scatter, so it can teach irreducible error and noise floors, which the smooth pipe-flow physics of A1 cannot.<br><br>**The synthetic disclaimer matters more here than anywhere else in the set.** Predicted yield strength must never look usable for structural design. State it in the generator docstring, `examples/README.md`, the dataset catalogue (A6) and the Explore narrative (A4) — and keep it consistent with the existing "no safety-critical qualification" scope limit in `PRODUCT_VISION.md`. | 3–4 d |
 | **A3** | **Second fluids dataset** distinct from pressure drop — e.g. orifice/venturi flow or drag on a bluff body. Same pattern. | 3 d |
 | **A4** | **Wire A1–A3 into Explore.** Add `EXAMPLES` entries with the full narrative: problem statement, why an engineer cares, input/output descriptions with units, the expected physical trend, and the synthetic-data disclaimer. Match the depth of the existing `pipe` entry — the narrative *is* the teaching. | 2 d per dataset |
 | **A5** | **Keep the `nonlinear` Explore example, and frame it as a deliberate lesson** (decided by Wei Wang, 2026-09-24 — it stays). It is the only non-engineering example, so its narrative copy should earn its place: present it as "what a hard, noisy problem looks like", the contrast case against the clean physics of A1–A3. Copy only — no data or behaviour change. Do this as part of the A4 copy pass. | 0.5 d |
@@ -310,21 +310,21 @@ A single engineer, roughly one quarter. Adjust once A1 reveals the real pace.
 
 ### Still open
 
-1. **A2** — beam deflection, fatigue life, or something else? Which mechanics problem will the
-   course actually teach?
-2. **A1/A3** — synthetic only, or is there real, clearance-checked experimental data available? Real
+1. **A1/A3** — synthetic only, or is there real, clearance-checked experimental data available? Real
    data would be a significant differentiator and a significant IP conversation.
-3. **D3a input — confirm the target dataset size.** A proposal is now on the table (**10,000 rows ×
+2. **D3a input — confirm the target dataset size.** A proposal is now on the table (**10,000 rows ×
    30 columns**, ceiling 50,000 × 100) with the reasoning under Workstream D. It is inferred from
    the code's own limits and the bundled datasets, not from knowing who attends the courses — so it
    needs a yes, or a replacement, **before week 5**. If real course data will be much larger than
    this, say so early: it changes D3 from a responsiveness task into a scale task, which is a
    different and considerably larger piece of work.
-4. **Sequencing** — 15 weeks, or defer B3/D4 to land at 13? See the note under §7.
-5. **F1** — version scheme, and whether to cut a `v1.0.0` of Engineering ML Studio proper.
+3. **Sequencing** — accept ~14 weeks, or defer B3 and D4 to land at 13? See the note under §7.
+4. **F1** — version scheme, and whether to cut a `v1.0.0` of Engineering ML Studio proper.
 
 ### Decided
 
+- **2026-09-24 — A2: tensile testing of structural steel** is the mechanics dataset. Hall–Petch plus
+  solid-solution strengthening; yield strength as the target.
 - **2026-09-24 — D3 approved.** Training moves off the main thread: spike (D3a) then implementation
   (D3b), against a bit-identical-results gate. Recorded as the one agreed exception to guardrail 1.
 - **2026-09-24 — A5: keep the `nonlinear` example.** It stays; its narrative copy is reframed as the
