@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Governed, private browser-only regression modelling, approval, prediction and monitoring.">
+  <meta name="description" content="Engineering ML Studio — learn and apply machine-learning regression to engineering data (mechanics, heat transfer, fluids) entirely in your browser. No install, no upload, no account.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
-  <title>Local Regression Studio v1.0.11</title>
-  <link rel="stylesheet" href="./css/app.css?v=1.0.12">
-  <link rel="stylesheet" href="./css/explore.css?v=1.0.12">
+  <title>Engineering ML Studio — browser-only machine learning for engineers</title>
+  <link rel="stylesheet" href="./css/app.css?v=1.0.13">
+  <link rel="stylesheet" href="./css/explore.css?v=1.0.13">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
@@ -264,7 +264,8 @@
         <div class="explore-nav">
           <button class="button secondary" id="exploreBackTo3" type="button">Back</button>
           <button class="button secondary" id="exploreRestart" type="button">Start over</button>
-          <button class="button secondary" data-mode="project" type="button">Continue in Project mode</button>
+          <button class="button secondary" id="exploreToProjectBtn" type="button"
+            title="Opens Project mode with this dataset, target, inputs and model already chosen. Nothing is trained until you say so.">Continue in Project mode</button>
         </div>
       </section>
     </div>
