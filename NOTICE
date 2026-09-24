@@ -1,0 +1,47 @@
+Engineering ML Studio
+Copyright 2026 UK Research and Innovation (UKRI)
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+This file is the NOTICE file referred to in section 4(d) of that licence: its
+contents must be reproduced in any distribution of this work or of derivative
+works.
+
+--------------------------------------------------------------------------------
+Original work
+--------------------------------------------------------------------------------
+
+Engineering ML Studio was initially derived from Local Regression Studio,
+developed by Yu Duan and maintained by OPTIBAYES LAB LTD (registered in England
+and Wales, company number 16391767).
+
+    Copyright (c) 2026 Yu Duan
+
+The original work is distributed under permissive MIT-style terms, which permit
+sublicensing. The original copyright and permission notice is reproduced
+unchanged in LICENSES.txt and must be retained in all copies and derivative
+works, including this one. Yu Duan and any previous contributors retain full
+credit for, and copyright in, the original work; the Apache-2.0 licence applied
+to this project does not alter it.
+
+--------------------------------------------------------------------------------
+New contributions
+--------------------------------------------------------------------------------
+
+Copyright in contributions developed for Engineering ML Studio under this STFC
+project is held by UK Research and Innovation (UKRI) and is licensed under the
+Apache License, Version 2.0. The project is led and maintained by Wei Wang at
+the Science and Technology Facilities Council (STFC).
+
+--------------------------------------------------------------------------------
+Third-party components
+--------------------------------------------------------------------------------
+
+Third-party components retain their own licences:
+
+  Plotly.js v3.3.1 — MIT — bundled at vendor/plotly-3.3.1.min.js
+  Papa Parse v5.5.4 — MIT — loaded from a pinned CDN URL in hybrid mode only
+  CSV Lite — included as part of the original Local Regression Studio work
+
+See THIRD_PARTY_NOTICES.md, LICENSES.txt and SBOM.cdx.json.
+
+Full provenance and attribution detail: NOTICE.md

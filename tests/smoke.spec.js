@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 UK Research and Innovation (UKRI)
 // Baseline smoke tests for Engineering ML Studio.
 //
 // These tests exercise the *current* (inherited) browser application end to end.

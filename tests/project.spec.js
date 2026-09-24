@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 UK Research and Innovation (UKRI)
 // Phase 3 (increment 2) — Project-mode professional application shell.
 //
 // These tests exercise the PRESENTATION + NAVIGATION layer that presents the

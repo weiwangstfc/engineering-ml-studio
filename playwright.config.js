@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 UK Research and Innovation (UKRI)
 // Playwright configuration for Engineering ML Studio baseline tests.
 // The application is a static site; we serve it with Python's built-in HTTP
 // server (already required for local development) and drive it in Chromium.

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 UK Research and Innovation (UKRI)
 """Generate a synthetic, physically-informed pipe pressure-drop dataset.
 
 This produces the bundled Explore-mode demonstration dataset

@@ -2,6 +2,7 @@
   "name": "engineering-ml-studio",
   "version": "0.0.0",
   "private": true,
+  "license": "Apache-2.0",
   "description": "Development and test tooling for Engineering ML Studio. The browser application itself has NO runtime npm dependencies; everything here is for local development and automated testing only.",
   "scripts": {
     "serve": "python3 -m http.server 8000",

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 UK Research and Innovation (UKRI)
 /*
  * project-shell.js — Phase 3 (increment 2)
  *

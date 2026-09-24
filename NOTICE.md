@@ -53,7 +53,9 @@ Yu Duan and previous contributors **retain copyright** in the original Local Reg
 That original code remains subject to [`LICENSES.txt`](LICENSES.txt).
 
 Copyright in **new contributions** developed for Engineering ML Studio under this STFC project is
-held by **UK Research and Innovation (UKRI)**, unless otherwise stated. This does **not** alter the
+held by **UK Research and Innovation (UKRI)** and licensed under the **Apache License, Version
+2.0** (see [`LICENSE`](LICENSE)); the short-form attribution that Apache-2.0 section 4(d) requires
+in redistributions is in [`NOTICE`](NOTICE). This does **not** alter the
 copyright or attribution of the original Local Regression Studio code and earlier contributions, and
 it does **not** imply that UKRI owns the original work or that any copyright has been transferred.
 

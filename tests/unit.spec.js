@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 UK Research and Innovation (UKRI)
 // Focused unit tests for the inherited ML core.
 //
 // The runtime modules bind to `window` (e.g. `window.MLCore`) and are loaded by

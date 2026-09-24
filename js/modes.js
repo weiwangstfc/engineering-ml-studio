@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 UK Research and Innovation (UKRI)
 // Engineering ML Studio — mode/router layer (Phase 1 prototype).
 //
 // A tiny view switcher over the existing single-page application. It shows exactly

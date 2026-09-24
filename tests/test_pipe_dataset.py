@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 UK Research and Innovation (UKRI)
 """Tests for the synthetic pipe pressure-drop dataset generator.
 
 These use only the Python standard library plus numpy (already required by the

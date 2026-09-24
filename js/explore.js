@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 UK Research and Innovation (UKRI)
 // Engineering ML Studio — Explore mode controller (Phase 1 prototype).
 //
 // A guided, beginner-friendly, four-stage regression workflow built around a
