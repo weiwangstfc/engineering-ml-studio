@@ -177,6 +177,7 @@ Always independently verify any output before relying on it.
 - [`NOTICE.md`](NOTICE.md) — attribution and origin
 - [`GOVERNANCE.md`](GOVERNANCE.md) — how the project is run
 - [`ROADMAP.md`](ROADMAP.md) — planned phases
+- [`docs/WORKPLAN.md`](docs/WORKPLAN.md) — **current status, gaps and the prioritised task list** (start here if you are joining the project)
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to contribute
 - [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — local run and test instructions
 - [`docs/EXPLORE_MODE.md`](docs/EXPLORE_MODE.md) — the Phase 1 Explore-mode prototype
