@@ -4,3 +4,7 @@ test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
+
+# Python bytecode from running the dataset/notebook tests.
+__pycache__/
+*.pyc
