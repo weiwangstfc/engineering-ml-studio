@@ -68,6 +68,9 @@ Confirm with Wei Wang before going near them.
 1. **Do not change the ML algorithms, the frozen model IDs, the training pipeline order, the
    saved-project schema, the export schema, or the governance data structures.** Saved projects and
    approved packages in the wild must keep working.
+   *One agreed exception:* **D3** moves training onto the existing web worker. That changes *where*
+   the pipeline runs, never *what* it computes, and it ships only against a bit-identical-results
+   gate. Approved by Wei Wang on 2026-09-24 — see D3a/D3b. Nothing else in this rule is negotiable.
 2. **No new browser runtime dependency.** The shipped app has zero runtime npm packages. Plotly and
    Papa Parse are already bundled/pinned; adding a third library needs a decision, not a commit.
 3. **No build step.** The repository root *is* the deployed site. Plain HTML/CSS/JS, loaded directly.
@@ -155,7 +158,7 @@ end to end and teaches the codebase.*
 | **A2** | **Mechanics dataset: cantilever beam deflection** (or fatigue life — Wei Wang to choose). Same pattern. Should exhibit a different modelling character from A1 so the two teach different lessons. | 3–4 d |
 | **A3** | **Second fluids dataset** distinct from pressure drop — e.g. orifice/venturi flow or drag on a bluff body. Same pattern. | 3 d |
 | **A4** | **Wire A1–A3 into Explore.** Add `EXAMPLES` entries with the full narrative: problem statement, why an engineer cares, input/output descriptions with units, the expected physical trend, and the synthetic-data disclaimer. Match the depth of the existing `pipe` entry — the narrative *is* the teaching. | 2 d per dataset |
-| **A5** | **Retire or reframe the `nonlinear` Explore example.** It is a generic signal, not an engineering problem, and it dilutes the platform's pitch. Either remove it or re-cast it as an explicit "what does a hard, noisy problem look like?" lesson. Decision needed from Wei Wang. | 0.5 d |
+| **A5** | **Keep the `nonlinear` Explore example, and frame it as a deliberate lesson** (decided by Wei Wang, 2026-09-24 — it stays). It is the only non-engineering example, so its narrative copy should earn its place: present it as "what a hard, noisy problem looks like", the contrast case against the clean physics of A1–A3. Copy only — no data or behaviour change. Do this as part of the A4 copy pass. | 0.5 d |
 | **A6** | **Dataset catalogue.** A short page (Learn mode or `examples/README.md` expanded) listing every dataset: the physics it comes from, the governing equation, ranges, seed, and an explicit "synthetic, for training only — not for design" statement. Provenance must be documented before any dataset is used in a paid course. | 1 d |
 
 > **Constraint on all datasets:** synthetic and generated from a documented equation with a fixed
@@ -194,9 +197,29 @@ than any bundled example.*
 |---|---|---|
 | **D1** | **Accessibility audit and fixes**, targeting WCAG 2.2 AA. Keyboard-only path through Explore and all six Project stages, focus order and visible focus, form labelling, colour contrast, screen-reader pass on the stage navigation. 47 `aria-` attributes exist but nothing has been audited. Add automated checks where practical. | 5–7 d |
 | **D2** | **Responsive pass over Project mode.** The recent fixes (single header, unclipped status readout) were spot repairs. Do the whole six-stage flow at 390 px properly — tables, plots, the advanced disclosures. | 4 d |
-| **D3** | **Spike: move training off the main thread.** Worker plumbing exists (`js/worker-client.js`, `js/lrs-worker.js`) but training runs on the main thread, so a large CSV freezes the tab. **Time-boxed investigation first**, then a proposal. Any implementation must prove bit-identical results on a fixed seed before it is considered. High value, non-trivial risk — do not start without agreement. | 3 d spike |
+| **D3a** | **Spike: move training off the main thread** — *approved 2026-09-24, implementation to follow*. **Time-box strictly to 3 days; produce a written proposal, not code.** Read the four findings below first — they are already established, so do not re-derive them. Settle the three genuinely open questions: (i) **cooperative cancellation** — the worker only checks `cancelled.has(requestId)` between awaits, so a synchronous training loop cannot be interrupted; decide whether loops yield periodically, and how invasive that is in inherited code; (ii) **progress reporting** — `worker-client.js` already handles `PROGRESS` messages but nothing ever sends one, so decide where a progress hook can go in each trainer without restructuring it; (iii) **payload cost** — what crosses the boundary per train, whether it is structured-cloneable, and whether copying a large matrix undoes the benefit. **Deliverable: `docs/WORKER_TRAINING_PROPOSAL.md` with a go/no-go per model and a firm estimate for D3b.** | 3 d |
+| **D3b** | **Implement worker-based training**, per the D3a proposal. Non-negotiable gate: a test that trains every model on a fixed seed both ways and asserts **bit-identical** metrics and predictions — write that test *first*, against the current main-thread path, so it is proven meaningful before anything moves. Migrate model by model, each behind its own commit, so any regression bisects cleanly. **Watch the timeout:** `WorkerClient.request()` defaults to 15 s and rejects with "Worker operation timed out"; training must pass a much larger value or opt out, or large jobs will fail spuriously. Keep the existing graceful degradation — if the worker is unavailable, `failureReason` is set and training must still work on the main thread. No algorithm, model ID or schema changes. | 5–8 d, **confirm from D3a** |
 | **D4** | **Cross-browser testing.** `playwright.config.js` runs chromium only. Add Firefox and WebKit, fix what falls out. Engineers at large firms are often on locked-down browsers. | 2–3 d |
-| **D5** | **Empty and error states.** Every mode should say something useful when it has nothing to show, and every failure should say what to do next. | 2 d |
+| **D5** | **Empty and error states.** Every mode should say something useful when it has nothing to show, and every failure should say what to do next. Overlaps D3b, which introduces a training progress state — sequence them together. | 2 d |
+
+**D3 groundwork already established** (verified 2026-09-24 — this is why the estimate is 5–8 d, not the
+two-to-three weeks a "move training to a worker" task usually implies):
+
+1. **The message plumbing is done.** `js/worker-client.js` is a complete generic client — request/
+   response correlation, `PROGRESS` callbacks, `CANCEL`, timeouts, and graceful degradation when
+   `Worker` is unavailable. None of it needs designing.
+2. **The worker is nearly empty.** `js/lrs-worker.js` is 33 lines and imports only
+   `platform-core.js`, handling `PING`, `FINGERPRINT_TEXT` and `MODEL_CAPABILITIES`. The change is
+   additive: `importScripts` the three core modules and add a `TRAIN` message type.
+3. **The `window` shim already exists.** `self.window = self` at the top of the worker is what lets
+   modules that bind to `window` load there. `ml-core.js`, `advanced-core.js` and
+   `modelling-core.js` should therefore load **unmodified** — confirm in the spike.
+4. **Determinism is in far better shape than assumed.** Every trainer already seeds through
+   `ML.mulberry32(seed)`. The only `Math.random` in `js/` is `platform-core.js:63`, generating an
+   ID, not training. The bit-identical gate should be achievable rather than aspirational.
+
+Related: the worker reports `workerVersion: '1.0.11'` and `LRSWorkerClient.version` is the same
+inherited string — fold both into **F1**.
 
 ### Workstream E — Course enablement (P2)
 
@@ -227,12 +250,21 @@ A single engineer, roughly one quarter. Adjust once A1 reveals the real pace.
 | Weeks | Focus | Why this order |
 |---|---|---|
 | 1 | Onboarding, then **A1** | A1 is self-contained, ships something visible, and forces a tour of generator → tests → Explore → docs. |
-| 2–4 | **A2, A3, A4, A6**, decide **A5** | Closes the headline gap: three engineering domains instead of one. Everything after this teaches better. |
-| 5–6 | **B1, B2** | Depth on the datasets now available. |
-| 7 | **E1, E2, E4** | Cheap, and makes the platform usable in a classroom. Do before the first course. |
-| 8–10 | **C1, C2** | The hard, high-value work on aim 2. C1 first — templates are worth little if real data won't load. |
-| 11 | **D1, D2** | Accessibility and mobile, before wider promotion. |
-| 12 | **F1, B3**, **D3** spike | Versioning before any release; the worker spike informs the next quarter. |
+| 2–4 | **A2, A3, A4, A5, A6** | Closes the headline gap: three engineering domains instead of one. Everything after this teaches better. |
+| 5 | **D3a** spike (3 d), then start **B1** | The spike is cheap and now on the critical path — its proposal has to exist early enough to schedule D3b and to answer the classroom dataset-size question. It blocks nothing, so it sits in a gap rather than displacing P1 work. |
+| 6–7 | **B1, B2** | Depth on the datasets now available. |
+| 8 | **E1, E2, E4** | Cheap, and makes the platform usable in a classroom. Do before the first course. |
+| 9–11 | **C1, C2** | The hard, high-value work on aim 2. C1 first — templates are worth little if real data won't load. |
+| 12 | **D1, D2** | Accessibility and mobile, before wider promotion. |
+| 13–14 | **D3b** with **D5**, then **F1** | The identical-results test is written first. D5's progress/error states land with the worker change rather than after it. Versioning last, so the release records the worker migration. |
+| 14 | **B3** | Second notebook. First thing to drop if the quarter has to end at 13. |
+
+> **This is ~14 weeks, not 12.** Approving D3 added the spike plus implementation. It is less than it
+> first looked — reading the worker showed the plumbing is already built and the RNG already seeded
+> (see the D3 groundwork note under Workstream D), so D3b is estimated at 5–8 days rather than the
+> 8–12 assumed before. If 12 weeks is fixed, **defer B3 and D4**: that lands it at 13 and costs only
+> the second notebook and cross-browser coverage, neither of which blocks a first course. Confirm the
+> real D3b number from the D3a proposal in week 5 rather than trusting this estimate.
 
 **If only three things get done: A1–A4** (engineering breadth), **C1** (real data actually loads),
 **B1** (learners understand what they see). Those three move both stated aims furthest.
@@ -241,13 +273,26 @@ A single engineer, roughly one quarter. Adjust once A1 reveals the real pace.
 
 ## 8. Decisions needed from Wei Wang
 
+### Still open
+
 1. **A2** — beam deflection, fatigue life, or something else? Which mechanics problem will the
    course actually teach?
-2. **A5** — keep, reframe, or remove the generic `nonlinear` Explore example?
-3. **A1/A3** — synthetic only, or is there real, clearance-checked experimental data available? Real
+2. **A1/A3** — synthetic only, or is there real, clearance-checked experimental data available? Real
    data would be a significant differentiator and a significant IP conversation.
-4. **D3** — is the main-thread training limit worth the risk of touching execution, given the
-   guardrail on the pipeline? What CSV size must the platform handle in a classroom?
+3. **D3a input** — **what dataset size must the platform handle in a classroom?** Rows × columns.
+   The spike needs a target to design against, and "as big as possible" is not one. This is the
+   single question most worth answering before week 5.
+4. **Sequencing** — 15 weeks, or defer B3/D4 to land at 13? See the note under §7.
 5. **F1** — version scheme, and whether to cut a `v1.0.0` of Engineering ML Studio proper.
-6. Deferred by Wei Wang on 2026-09-24, tracked here so they are not lost: **trademark filing**
-   (UK IPO Class 41) and **STFC IP review** of the `LICENSE` / `NOTICE` / `LICENSES.txt` set.
+
+### Decided
+
+- **2026-09-24 — D3 approved.** Training moves off the main thread: spike (D3a) then implementation
+  (D3b), against a bit-identical-results gate. Recorded as the one agreed exception to guardrail 1.
+- **2026-09-24 — A5: keep the `nonlinear` example.** It stays; its narrative copy is reframed as the
+  deliberate "hard, noisy problem" contrast to the physics-based datasets.
+
+### Deferred
+
+- Deferred by Wei Wang on 2026-09-24, tracked here so they are not lost: **trademark filing**
+  (UK IPO Class 41) and **STFC IP review** of the `LICENSE` / `NOTICE` / `LICENSES.txt` set.
