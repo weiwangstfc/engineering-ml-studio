@@ -282,6 +282,9 @@
       var features = ex.features.filter(function (f) { return headers.indexOf(f) !== -1; });
       var dataset = {
         key: key, rows: rows, headers: headers,
+        // The raw CSV text is retained so "Continue in Project mode" can hand the very
+        // same file to Project mode without a second fetch (see continueInProject).
+        text: text, fileName: ex.file.split('/').pop(),
         profiles: global.MLCore.inferColumns(rows, headers),
         target: ex.target, features: features
       };
@@ -941,6 +944,115 @@
     selectExample(state.exampleKey);
   }
 
+  // --- Continue in Project mode ---------------------------------------------------
+  // Carry the Explore activity into Project mode so a learner who has just trained and
+  // interpreted a model does not land on an empty "Drop a CSV here".
+  //
+  // Everything below is driven through Project mode's OWN controls and change events —
+  // exactly as if the engineer had chosen the file, the target, the inputs and the model
+  // by hand. No Project state is written directly, no panel is unlocked from here, and
+  // nothing is trained automatically: the engineer still presses "Train and evaluate".
+
+  function waitFor(test, timeoutMs) {
+    return new Promise(function (resolve, reject) {
+      var deadline = Date.now() + (timeoutMs || 8000);
+      (function poll() {
+        var value;
+        try { value = test(); } catch (e) { value = null; }
+        if (value) return resolve(value);
+        if (Date.now() > deadline) return reject(new Error('Timed out preparing Project mode.'));
+        setTimeout(poll, 50);
+      })();
+    });
+  }
+
+  function fire(node, type) {
+    node.dispatchEvent(new Event(type, { bubbles: true }));
+  }
+
+  // Build a File from the already-fetched CSV text and feed it to Project mode's own
+  // hidden file input, so the inherited load path (validation, fingerprint, profiling,
+  // panel unlocking) runs unchanged.
+  function handOverDataset(dataset) {
+    var input = el('csvFile');
+    if (!input) throw new Error('Project mode is not available.');
+    var file = new File([dataset.text], dataset.fileName || 'explore-example.csv', { type: 'text/csv' });
+    var transfer = new DataTransfer();
+    transfer.items.add(file);
+    input.files = transfer.files;
+    fire(input, 'change');
+  }
+
+  function handOverTarget(target) {
+    var select = el('targetColumn');
+    if (!select) return;
+    select.value = target;
+    if (select.value !== target) return; // target column absent — leave the choice open
+    fire(select, 'change');
+  }
+
+  function handOverFeatures(features) {
+    var boxes = document.querySelectorAll('#featureList input[data-feature]');
+    Array.prototype.forEach.call(boxes, function (box) {
+      var wanted = features.indexOf(box.dataset.feature) !== -1;
+      if (box.checked !== wanted) { box.checked = wanted; fire(box, 'change'); }
+    });
+  }
+
+  function handOverModel(modelType) {
+    var radio = document.querySelector('input[name="modelType"][value="' + modelType + '"]');
+    if (!radio || radio.checked) return;
+    radio.checked = true;
+    fire(radio, 'change');
+  }
+
+  // A short, dismissible note so the carried-over choices are visible rather than magic.
+  function showHandoverNote(ex, modelLabel) {
+    var host = el('alertRegion');
+    if (!host) return;
+    var note = document.createElement('div');
+    note.className = 'alert success';
+    note.textContent = 'Carried over from Explore: ' + ex.short + ' — ' + ex.features.length +
+      ' inputs, predicting ' + ex.target + ', starting model ' + modelLabel +
+      '. Review every choice, then train when you are ready. Nothing has been trained yet.';
+    host.appendChild(note);
+  }
+
+  function continueInProject() {
+    var ex = exampleByKey(state.exampleKey);
+    var modelType = state.focusModel || 'linear';
+    return loadDataset(state.exampleKey).then(function (dataset) {
+      if (global.EMSModes) global.EMSModes.show('project');
+      handOverDataset(dataset);
+      // populateColumnControls() fills the target select once the CSV has parsed.
+      return waitFor(function () {
+        var select = el('targetColumn');
+        return select && select.querySelector('option[value="' + dataset.target + '"]');
+      }).then(function () {
+        handOverTarget(dataset.target);
+        return waitFor(function () {
+          return document.querySelectorAll('#featureList input[data-feature]').length;
+        });
+      }).then(function () {
+        handOverFeatures(dataset.features);
+        handOverModel(modelType);
+        // Land on "Choose and train" if the inherited lock cascade has opened it;
+        // goToPanel refuses locked targets, so this can never skip a required stage.
+        if (global.EMSProjectShell) global.EMSProjectShell.goToPanel('step-model');
+        showHandoverNote(ex, MODEL_LABELS[modelType] || modelType);
+      });
+    }).catch(function (error) {
+      var host = el('alertRegion');
+      if (host) {
+        var note = document.createElement('div');
+        note.className = 'alert error';
+        note.textContent = 'Could not carry the Explore example over automatically (' +
+          error.message + '). You can still load the dataset yourself.';
+        host.appendChild(note);
+      }
+    });
+  }
+
   // --- Wiring --------------------------------------------------------------------
   function wire() {
     if (state.wired) return;
@@ -972,6 +1084,8 @@
 
     var trainBtn = el('exploreTrainBtn'); if (trainBtn) trainBtn.addEventListener('click', function () { train(); });
     var restartBtn = el('exploreRestart'); if (restartBtn) restartBtn.addEventListener('click', restart);
+    var toProject = el('exploreToProjectBtn');
+    if (toProject) toProject.addEventListener('click', function () { continueInProject(); });
 
     updateApproachControls();
     goToStage(1);
@@ -998,6 +1112,7 @@
     train: function () { return train(); },
     goToStage: goToStage,
     loadDataset: loadDataset,
-    selectExample: selectExample
+    selectExample: selectExample,
+    continueInProject: continueInProject
   });
 })(window);
