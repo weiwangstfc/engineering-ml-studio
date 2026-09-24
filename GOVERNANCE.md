@@ -20,7 +20,8 @@ work done after the fork point.
   ownership over the original code (see [`NOTICE.md`](NOTICE.md)).
 - Maintainers control **pull requests, releases, and technical direction**.
 - Maintainers are responsible for upholding the licence and attribution obligations in every
-  release (see [`NOTICE.md`](NOTICE.md) and [`LICENSES.txt`](LICENSES.txt)).
+  release (see [`LICENSE`](LICENSE), [`NOTICE`](NOTICE), [`NOTICE.md`](NOTICE.md) and
+  [`LICENSES.txt`](LICENSES.txt)).
 - **Target:** at least **two maintainers** should eventually hold administrative access, to avoid a
   single point of control and to allow review continuity. *(Not yet satisfied at Phase 0 — Wei Wang
   is currently the sole maintainer.)*
@@ -36,14 +37,16 @@ work done after the fork point.
 ## Releases
 
 - Releases are cut by maintainers according to the [`ROADMAP.md`](ROADMAP.md).
-- Every release must retain the original copyright, the MIT licence, third-party notices, and the
-  attribution to Yu Duan and Local Regression Studio.
+- Every release must ship [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE), and must retain the
+  original copyright and permission notice, third-party notices, and the attribution to Yu Duan
+  and Local Regression Studio.
 
 ## Non-negotiable obligations
 
 Regardless of how governance evolves, the project must **always**:
 
 1. Retain Yu Duan's credit as original developer.
-2. Retain the original MIT licence and copyright notices unchanged.
+2. Retain the original copyright and permission notice ([`LICENSES.txt`](LICENSES.txt)) unchanged.
 3. Retain third-party licences and notices.
 4. State clearly that Engineering ML Studio is an independent derivative.
+5. Reproduce the [`NOTICE`](NOTICE) file in distributions, as Apache-2.0 section 4(d) requires.

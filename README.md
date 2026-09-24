@@ -7,6 +7,9 @@ entirely in the browser, keeps data on the user's own machine, and aims to make 
 exploring, and building small engineering ML projects approachable for people who are not
 machine-learning specialists.
 
+**Try it: <https://weiwangstfc.github.io/engineering-ml-studio/>** — nothing to install, and no
+data ever leaves your machine.
+
 ## Purpose
 
 To give engineers a private, no-installation environment where they can load data, train and
@@ -48,6 +51,27 @@ STFC project is held by **UK Research and Innovation (UKRI)**, unless otherwise 
 **not** transfer or replace the copyright of the original authors. Future development, releases, and
 roadmap for Engineering ML Studio are decided independently (see [`GOVERNANCE.md`](GOVERNANCE.md)).
 
+## Licence
+
+Engineering ML Studio is released under the **Apache License, Version 2.0** — see
+[`LICENSE`](LICENSE). You may use, modify and redistribute it, including commercially, provided you
+keep the licence, the copyright notices and the [`NOTICE`](NOTICE) file, and state what you changed.
+Apache-2.0 also grants an explicit patent licence, which is why it was chosen over MIT/BSD.
+
+Two things the licence does **not** cover, and which are held separately:
+
+- **The name and logo.** "Engineering ML Studio" identifies the project and its official training
+  and certification. The licence grants no trademark rights (Apache-2.0 section 6). Forks and
+  derivatives are welcome, under a different name.
+- **Training course materials.** Any curriculum, exercises, solutions, assessment and instructor
+  material produced for courses run on this platform are **not** part of this repository and are
+  **not** covered by this licence.
+
+The inherited Local Regression Studio code remains under its original permissive terms
+([`LICENSES.txt`](LICENSES.txt)), which permit sublicensing; those notices are retained unchanged.
+See [`NOTICE`](NOTICE) for the short-form attribution required in redistributions, and
+[`NOTICE.md`](NOTICE.md) for the full provenance.
+
 ## Running locally
 
 This is a static site and must be served over HTTP (not opened as a `file://`). From the repository
@@ -60,6 +84,13 @@ python3 -m http.server 8000
 
 Full instructions, browser requirements, and how to run the automated tests are in
 [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
+
+## Publishing
+
+Every push to `main` publishes the site to GitHub Pages via
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml). There is no build step — the
+repository root is the site — so the workflow simply uploads the checked-out tree and deploys it.
+It uses no secrets and contacts no external service.
 
 ## Status
 

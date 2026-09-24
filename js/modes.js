@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 UK Research and Innovation (UKRI)
 // Engineering ML Studio — mode/router layer (Phase 1 prototype).
 //
 // A tiny view switcher over the existing single-page application. It shows exactly
@@ -36,6 +38,20 @@
     var indicator = el('modeIndicator');
     if (indicator) indicator.textContent = LABELS[mode] ? LABELS[mode] + ' mode' : '';
 
+    // Expose the current mode on <body> so the stylesheet can adapt chrome per view.
+    // Project mode renders its own application top bar, so the global nav is hidden
+    // there and the app top bar becomes the single header (see css/app.css).
+    //
+    // This must be a CLASS, not a data-mode attribute: onModeClick below resolves its
+    // trigger with closest('[data-mode]'), so a data-mode on <body> would match every
+    // click in the document and preventDefault() it — which silently stops radios and
+    // checkboxes anywhere in the app from being selected.
+    if (document.body) {
+      VIEWS.forEach(function (name) {
+        document.body.classList.toggle('is-mode-' + name, name === mode);
+      });
+    }
+
     // Keep the URL hash in sync without adding a second history entry per click.
     if (global.location && ('#' + mode) !== global.location.hash) {
       try { global.history.replaceState(null, '', '#' + mode); }
@@ -70,6 +86,10 @@
   function onModeClick(event) {
     var trigger = event.target && event.target.closest ? event.target.closest('[data-mode]') : null;
     if (!trigger) return;
+    // Belt and braces: data-mode marks a navigation control, never a container. If it ever
+    // lands on <body>/<html> again, every click in the document would be preventDefault()ed
+    // and no radio or checkbox anywhere in the app could be selected.
+    if (trigger === document.body || trigger === document.documentElement) return;
     var mode = trigger.getAttribute('data-mode');
     if (!isValid(mode)) return;
     event.preventDefault();

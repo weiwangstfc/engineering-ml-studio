@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Governed, private browser-only regression modelling, approval, prediction and monitoring.">
+  <meta name="description" content="Engineering ML Studio — learn and apply machine-learning regression to engineering data (mechanics, heat transfer, fluids) entirely in your browser. No install, no upload, no account.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
-  <title>Local Regression Studio v1.0.11</title>
-  <link rel="stylesheet" href="./css/app.css?v=1.0.12">
-  <link rel="stylesheet" href="./css/explore.css?v=1.0.12">
+  <title>Engineering ML Studio — browser-only machine learning for engineers</title>
+  <link rel="stylesheet" href="./css/app.css?v=1.0.13">
+  <link rel="stylesheet" href="./css/explore.css?v=1.0.13">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
@@ -264,7 +264,8 @@
         <div class="explore-nav">
           <button class="button secondary" id="exploreBackTo3" type="button">Back</button>
           <button class="button secondary" id="exploreRestart" type="button">Start over</button>
-          <button class="button secondary" data-mode="project" type="button">Continue in Project mode</button>
+          <button class="button secondary" id="exploreToProjectBtn" type="button"
+            title="Opens Project mode with this dataset, target, inputs and model already chosen. Nothing is trained until you say so.">Continue in Project mode</button>
         </div>
       </section>
     </div>
@@ -361,6 +362,14 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
         code. Copyright in new Engineering ML Studio contributions developed under this STFC project
         is held by UK Research and Innovation (UKRI), unless otherwise stated. The project is led and
         maintained by Wei Wang at STFC. See <code>NOTICE.md</code> and <code>LICENSES.txt</code>.</p>
+      <h2>Licence</h2>
+      <p>Engineering ML Studio is open source under the <strong>Apache License, Version 2.0</strong>
+        (see <code>LICENSE</code> and <code>NOTICE</code>). You may use, modify and redistribute it,
+        including commercially, provided you keep the licence and copyright notices and state what
+        you changed. The licence grants no rights in the <strong>Engineering ML Studio name or
+        logo</strong>, which identify the project and its official training and certification;
+        forks are welcome under a different name. Training course materials are held separately and
+        are not covered by this licence.</p>
       <p><button class="button secondary" data-mode="home" type="button">Back to home</button></p>
     </div>
   </section>

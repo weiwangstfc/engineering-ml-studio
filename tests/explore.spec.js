@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 UK Research and Innovation (UKRI)
 // Phase 1 tests — landing page + guided, problem-led Explore mode.
 //
 // These cover the NEW front door (landing page, top navigation) and the beginner

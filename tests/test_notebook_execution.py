@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 UK Research and Innovation (UKRI)
 """End-to-end execution test for the Learn the Code notebook.
 
 This actually *runs* the notebook top to bottom, exactly as a learner would, and

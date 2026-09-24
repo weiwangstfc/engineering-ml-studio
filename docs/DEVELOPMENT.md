@@ -126,10 +126,21 @@ Both suites (browser and Python) run in CI; see `.github/workflows/test.yml`.
 
 ## Deployment (current)
 
-The current deployment model is a **static website**. The repository is served via GitHub Pages
-using branch serving (`CNAME` and `.nojekyll` are present). Deploying elsewhere only requires
-serving the repository's static files from any web server or static host — there is no build
-artifact to produce.
+The current deployment model is a **static website**, published to GitHub Pages at
+<https://weiwangstfc.github.io/engineering-ml-studio/> by `.github/workflows/pages.yml`. The
+workflow runs on every push to `main` (and on demand from the Actions tab), uploads the
+checked-out repository root as the Pages artifact and deploys it. There is no build step and no
+build artifact to produce: the repository root *is* the site (`.nojekyll` stops Jekyll
+processing).
+
+The repository must have **Settings → Pages → Build and deployment → Source: "GitHub Actions"**
+selected for the workflow to publish.
+
+The site is served from the `/engineering-ml-studio/` sub-path, so every asset reference must
+stay relative (`./css/app.css`, `./js/lrs-worker.js`); a root-absolute `/css/...` would 404.
+
+Deploying elsewhere only requires serving the repository's static files from any web server or
+static host.
 
 The **primary supported distribution is this browser-based static web app.** The original Local
 Regression Studio documentation mentioned packaged "editions" and per-OS launcher scripts; those

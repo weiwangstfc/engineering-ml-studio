@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 UK Research and Innovation (UKRI)
 """Structure/validation tests for the Learn the Code notebook.
 
 These use only the Python standard library (the notebook is parsed as JSON), so

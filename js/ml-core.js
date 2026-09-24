@@ -88,29 +88,48 @@
       (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
   }
 
+  const ID_NAME_PATTERN = /(^|_)(id|index|key|uuid)($|_)/i;
+
   function inferColumns(rows, headers) {
     const sample = rows.slice(0, Math.min(rows.length, 5000));
     const profiles = {};
     for (const h of headers) {
-      let nonMissing = 0, numeric = 0; const unique = new Set();
+      let nonMissing = 0, numeric = 0, integral = 0; const unique = new Set();
       for (const row of sample) {
         const v = row[h]; if (isMissing(v)) continue;
-        nonMissing++; if (Number.isFinite(toNumber(v))) numeric++;
+        nonMissing++;
+        const n = toNumber(v);
+        if (Number.isFinite(n)) { numeric++; if (Number.isInteger(n)) integral++; }
         if (unique.size <= 1000) unique.add(String(v));
       }
       const numericRatio = nonMissing ? numeric / nonMissing : 0;
       const uniqueRatio = nonMissing ? unique.size / nonMissing : 0;
+      const integerRatio = numeric ? integral / numeric : 0;
+      // A continuous measurement (velocity, diameter, density, …) takes fractional
+      // values and is therefore almost entirely unique by nature. Uniqueness alone must
+      // never mark such a column as an identifier: doing so left engineering datasets
+      // with every input flagged "ID-like" and auto-detection selecting nothing at all.
+      // Identifiers are recognised by name, or by near-total uniqueness in a column that
+      // is not a continuous measurement (text keys, integer row numbers, serials).
+      const continuousMeasurement = numericRatio >= 0.9 && integerRatio < 0.99;
       profiles[h] = {
         type: numericRatio >= 0.9 ? 'numeric' : 'categorical', nonMissing,
         missing: sample.length - nonMissing, unique: unique.size, uniqueRatio, numericRatio,
-        idLike: /(^|_)(id|index|key|uuid)($|_)/i.test(h) || (uniqueRatio > 0.97 && nonMissing > 20)
+        integerRatio, continuousMeasurement,
+        idLike: ID_NAME_PATTERN.test(h) ||
+          (!continuousMeasurement && uniqueRatio > 0.97 && nonMissing > 20)
       };
     }
     return profiles;
   }
 
   function autoSelectFeatures(headers, target, profiles) {
-    return headers.filter(h => h !== target && !(profiles[h] && profiles[h].idLike));
+    const candidates = headers.filter(h => h !== target);
+    const selected = candidates.filter(h => !(profiles && profiles[h] && profiles[h].idLike));
+    // Never hand back an empty selection: if every candidate looks like an identifier the
+    // heuristic is more likely wrong than the dataset is unusable, so suggest them all and
+    // let the data-quality assistant raise the identifier warnings.
+    return selected.length ? selected : candidates;
   }
 
   function fitPreprocessor(rows, featureColumns, config, profiles) {
