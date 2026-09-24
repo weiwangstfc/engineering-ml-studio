@@ -197,4 +197,41 @@ test.describe('Engineering ML Studio — baseline browser application', () => {
     await page.locator('#metricsTableWrap').click({ position: { x: 1, y: 1 } });
     expect(pageErrors, `Unexpected page errors:\n${pageErrors.join('\n')}`).toEqual([]);
   });
+
+  // The CSP is delivered in a <meta> element, where browsers ignore `frame-ancestors`,
+  // and GitHub Pages cannot set response headers. js/frame-guard.js is the protection
+  // that works regardless; these two tests pin both halves of its contract.
+  test('10. the application refuses to render inside a frame', async ({ page }) => {
+    await page.goto('/?localOnly=1');
+    // Host the app in an iframe on a same-origin page, then assert it blanked itself.
+    const outcome = await page.evaluate(async (src) => {
+      document.body.innerHTML = '';
+      const frame = document.createElement('iframe');
+      frame.style.cssText = 'width:900px;height:600px';
+      frame.src = src;
+      document.body.appendChild(frame);
+      await new Promise(resolve => frame.addEventListener('load', resolve, { once: true }));
+      const doc = frame.contentDocument;
+      return {
+        text: doc.body.textContent.trim(),
+        appShellVisible: !!doc.querySelector('main.app-shell')
+      };
+    }, '/?localOnly=1');
+
+    expect(outcome.text).toContain('cannot run inside a frame');
+    // The inherited application shell must not be present at all, so there is
+    // nothing for an attacker to overlay and no control left to click.
+    expect(outcome.appShellVisible).toBe(false);
+  });
+
+  test('11. the frame guard does not interfere with normal top-level loading', async ({ page }) => {
+    const { pageErrors } = instrument(page);
+    await page.goto('/?localOnly=1');
+    await page.waitForFunction(() => !!(window.LocalRegressionApp && window.LocalRegressionApp.version));
+    // Visible, not hidden by the guard, and no console error from an ignored
+    // `frame-ancestors` directive in the meta CSP.
+    await expect(page.locator('nav.top-nav')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.style.display)).toBe('');
+    expect(pageErrors, `Unexpected page errors:\n${pageErrors.join('\n')}`).toEqual([]);
+  });
 });

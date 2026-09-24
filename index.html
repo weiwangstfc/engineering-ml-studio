@@ -4,8 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Engineering ML Studio — learn and apply machine-learning regression to engineering data (mechanics, heat transfer, fluids) entirely in your browser. No install, no upload, no account.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
+  <!-- `frame-ancestors` is deliberately absent: browsers ignore it in a <meta> CSP, so it
+       provided no protection and logged a console error on every load. Clickjacking is
+       handled by js/frame-guard.js below, which works without response headers (GitHub
+       Pages cannot set them). See docs/DEVELOPMENT.md and THREAT_MODEL.md. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
   <title>Engineering ML Studio — browser-only machine learning for engineers</title>
+  <!-- Must run before anything paints, and before any other script. -->
+  <script src="./js/frame-guard.js"></script>
   <link rel="stylesheet" href="./css/app.css?v=1.0.13">
   <link rel="stylesheet" href="./css/explore.css?v=1.0.13">
 </head>

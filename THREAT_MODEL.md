@@ -18,6 +18,7 @@
 | Malformed/oversized JSON | File, depth, node, array, type, schema, and hash checks | Novel semantic corruption may require additional model-specific checks |
 | Spreadsheet formula injection | Prefix dangerous exported cells with an apostrophe | Users can manually remove protection after download |
 | HTML/script injection | Escaping and CSP | Deployment modifications can weaken CSP |
+| Clickjacking (UI redress) | `js/frame-guard.js` refuses to render the application in a frame, before anything paints | A host that can set response headers should also send `frame-ancestors 'none'` / `X-Frame-Options: DENY`; GitHub Pages cannot, so the script is the only layer there. `frame-ancestors` is **deliberately absent from the `<meta>` CSP**, where browsers ignore it |
 | Package tampering | SHA-256 integrity and embedded self-test vectors | Hash alone does not prove organizational origin |
 | False signer identity | Administrator-pinned trusted keys | Key custody, rotation, and revocation are organizational responsibilities |
 | Unauthorized Studio access | Separate prediction edition and deployment guidance | Static editions do not provide authentication |
