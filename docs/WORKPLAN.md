@@ -53,7 +53,8 @@ Live at <https://weiwangstfc.github.io/engineering-ml-studio/>, deployed from `m
 | Inherited sample data is not engineering data — `house_prices_sample.csv`, two synthetic `nonlinear_*` files. | `examples/` |
 | **One notebook**, covering the same single dataset as Explore. | `notebooks/` |
 | **Aim 2 is the least developed.** Project mode presents the inherited workflow well, but offers nothing to help someone start *their own* project: no templates, no worked end-to-end example, thin guidance on bringing messy real data. | `ROADMAP.md` Phase 3 |
-| Training runs on the **main thread** despite worker plumbing existing; large CSVs will freeze the tab. | `docs/ARCHITECTURE_AUDIT.md`, "Deployment" section |
+| Training runs on the **main thread** despite worker plumbing existing; large CSVs will freeze the tab. (**D3, approved**.) | `docs/ARCHITECTURE_AUDIT.md`, "Deployment" section |
+| The CSV accept limit (200,000 rows) is ~10× what any model can train on and 100× the Gaussian process limit, so oversized data fails late and cryptically instead of at load. (**C1**.) | `js/security-core.js:5` vs `js/advanced-core.js:105` |
 | Tests run **chromium only**. | `playwright.config.js` |
 | The app still reports the inherited version **v1.0.11**; the project has no version of its own. | `index.html` footer, `js/approval-core.js` |
 | No accessibility audit has been done. | — |
@@ -185,7 +186,7 @@ than any bundled example.*
 
 | ID | Task | Est. |
 |---|---|---|
-| **C1** | **Real-data import hardening.** Systematically walk a set of deliberately awkward CSVs — European decimal commas, units embedded in headers, blank rows, mixed types, duplicate columns, thousands separators, dates. For each: a clear, specific, actionable message at the point of failure. Today several fail silently or generically. Write the awkward CSVs as fixtures and test each message. **Do not change the parser's success path** without discussion. | 5–7 d |
+| **C1** | **Real-data import hardening.** Systematically walk a set of deliberately awkward CSVs — European decimal commas, units embedded in headers, blank rows, mixed types, duplicate columns, thousands separators, dates. For each: a clear, specific, actionable message at the point of failure. Today several fail silently or generically. Write the awkward CSVs as fixtures and test each message. **Do not change the parser's success path** without discussion.<br><br>**Includes a latent bug worth fixing here** (found 2026-09-24): the CSV accept limit is 200,000 rows, roughly 10× what any model can train on and **100× the Gaussian process limit of 2,000**. So a 200k-row CSV loads cleanly, produces a dataset summary, and lets the user pick a target and features — then fails several steps later with `Exact/subset GP state contains 200000 rows; the configured hard limit is 2000`. The error arrives long after the cause and names an internal concept. Warn at **load** time, against the limits of the models the user is likely to reach. See the limit table under Workstream D. | 5–7 d |
 | **C2** | **Project templates.** "Start from a template" that preconfigures a project for a common shape of engineering problem. **Implement as a presentation-layer handoff**, exactly like `continueInProject` in `js/explore.js`: drive Project mode's own controls and change events, write no state directly, unlock no panel, and train nothing automatically. This keeps the saved-project schema untouched. | 6–8 d |
 | **C3** | **A worked end-to-end project**, documented: bring a dataset, prepare it, train, validate, approve, predict, record monitoring. Written as the reference an engineer follows for their own work. Doubles as course material scaffolding — keep the *platform-facing* version here, curriculum in the separate repo. | 3 d |
 | **C4** | **Save / resume UX.** Saving and reopening projects exists but is undersold and easy to miss. Make the round trip obvious and reassuring. **Schema unchanged** — presentation only. | 3 d |
@@ -197,7 +198,7 @@ than any bundled example.*
 |---|---|---|
 | **D1** | **Accessibility audit and fixes**, targeting WCAG 2.2 AA. Keyboard-only path through Explore and all six Project stages, focus order and visible focus, form labelling, colour contrast, screen-reader pass on the stage navigation. 47 `aria-` attributes exist but nothing has been audited. Add automated checks where practical. | 5–7 d |
 | **D2** | **Responsive pass over Project mode.** The recent fixes (single header, unclipped status readout) were spot repairs. Do the whole six-stage flow at 390 px properly — tables, plots, the advanced disclosures. | 4 d |
-| **D3a** | **Spike: move training off the main thread** — *approved 2026-09-24, implementation to follow*. **Time-box strictly to 3 days; produce a written proposal, not code.** Read the four findings below first — they are already established, so do not re-derive them. Settle the three genuinely open questions: (i) **cooperative cancellation** — the worker only checks `cancelled.has(requestId)` between awaits, so a synchronous training loop cannot be interrupted; decide whether loops yield periodically, and how invasive that is in inherited code; (ii) **progress reporting** — `worker-client.js` already handles `PROGRESS` messages but nothing ever sends one, so decide where a progress hook can go in each trainer without restructuring it; (iii) **payload cost** — what crosses the boundary per train, whether it is structured-cloneable, and whether copying a large matrix undoes the benefit. **Deliverable: `docs/WORKER_TRAINING_PROPOSAL.md` with a go/no-go per model and a firm estimate for D3b.** | 3 d |
+| **D3a** | **Spike: move training off the main thread** — *approved 2026-09-24, implementation to follow*. **Time-box strictly to 3 days; produce a written proposal, not code.** Read the four findings below first — they are already established, so do not re-derive them. Settle the three genuinely open questions: (i) **cooperative cancellation** — the worker only checks `cancelled.has(requestId)` between awaits, so a synchronous training loop cannot be interrupted; decide whether loops yield periodically, and how invasive that is in inherited code; (ii) **progress reporting** — `worker-client.js` already handles `PROGRESS` messages but nothing ever sends one, so decide where a progress hook can go in each trainer without restructuring it; (iii) **payload cost** — what crosses the boundary per train, whether it is structured-cloneable, and whether copying a large matrix undoes the benefit. **Start by measuring, not estimating:** train all eleven models on the current main-thread path at 1k / 10k / 50k rows × 30 columns and record wall-clock for each. That shows which models actually need the worker (expect Gaussian process, neural network and gradient boosting to dominate; linear will not), and the same harness becomes the baseline the D3b bit-identical test compares against — so it is not throwaway spike code. **Deliverable: `docs/WORKER_TRAINING_PROPOSAL.md` with the timing table, a go/no-go per model, and a firm estimate for D3b.** | 3 d |
 | **D3b** | **Implement worker-based training**, per the D3a proposal. Non-negotiable gate: a test that trains every model on a fixed seed both ways and asserts **bit-identical** metrics and predictions — write that test *first*, against the current main-thread path, so it is proven meaningful before anything moves. Migrate model by model, each behind its own commit, so any regression bisects cleanly. **Watch the timeout:** `WorkerClient.request()` defaults to 15 s and rejects with "Worker operation timed out"; training must pass a much larger value or opt out, or large jobs will fail spuriously. Keep the existing graceful degradation — if the worker is unavailable, `failureReason` is set and training must still work on the main thread. No algorithm, model ID or schema changes. | 5–8 d, **confirm from D3a** |
 | **D4** | **Cross-browser testing.** `playwright.config.js` runs chromium only. Add Firefox and WebKit, fix what falls out. Engineers at large firms are often on locked-down browsers. | 2–3 d |
 | **D5** | **Empty and error states.** Every mode should say something useful when it has nothing to show, and every failure should say what to do next. Overlaps D3b, which introduces a training progress state — sequence them together. | 2 d |
@@ -220,6 +221,40 @@ two-to-three weeks a "move training to a worker" task usually implies):
 
 Related: the worker reports `workerVersion: '1.0.11'` and `LRSWorkerClient.version` is the same
 inherited string — fold both into **F1**.
+
+#### Target dataset size — *proposed, confirm before week 5*
+
+D3a needs a size to design against. The platform already enforces limits, and **they disagree with
+each other by two orders of magnitude**:
+
+| Layer | Limit | Where |
+|---|---|---|
+| CSV accept (denial-of-service guard) | 50 MB, **200,000 rows**, 500 columns | `js/security-core.js:5` |
+| k-nearest neighbours | 25,000 rows | `js/modelling-core.js:237` |
+| Random forest | 20,000 rows per tree (subsamples above this) | `js/ml-core.js:465` |
+| **Gaussian process** | **2,000 rows, hard failure** | `js/advanced-core.js:105` |
+| Neural network | 1,000,000 trainable parameters | `js/advanced-core.js:269` |
+
+The inherited engine's real design point is **~20–25k rows**; the 200k figure is a DoS guard, not a
+capability claim.
+
+**Proposed target: 10,000 rows × 30 columns. Interactive ceiling: 50,000 × 100.**
+
+- The generated teaching datasets are ~500 rows. A learner's own data — a test-rig log, a simulation
+  sweep, a sensor export — is realistically hundreds to low thousands of rows. 10k × 30 covers
+  essentially all of it with headroom.
+- 10k × 30 is 300,000 doubles, about **2.4 MB**. Memory is a non-issue at that scale; wall-clock
+  time is the only real question.
+- It sits below every inherited per-model guard, so D3 need not change any of them.
+
+> **A worker does not raise the size limit.** It turns a frozen tab into a responsive one with a
+> progress bar and a working cancel. Complexity is unchanged — a Gaussian process is O(n³) time and
+> O(n²) memory on a worker thread exactly as on the main thread. D3 is about **responsiveness, not
+> scale**. Handling genuinely large data would be a different project (subsampling, algorithmic
+> caps, streaming) and is not obviously worth doing: no engineering teaching dataset needs it.
+
+*This target is inferred from the code and the bundled datasets, not from knowledge of who actually
+attends the courses. Wei Wang to confirm or replace it — see §8.*
 
 ### Workstream E — Course enablement (P2)
 
@@ -279,9 +314,12 @@ A single engineer, roughly one quarter. Adjust once A1 reveals the real pace.
    course actually teach?
 2. **A1/A3** — synthetic only, or is there real, clearance-checked experimental data available? Real
    data would be a significant differentiator and a significant IP conversation.
-3. **D3a input** — **what dataset size must the platform handle in a classroom?** Rows × columns.
-   The spike needs a target to design against, and "as big as possible" is not one. This is the
-   single question most worth answering before week 5.
+3. **D3a input — confirm the target dataset size.** A proposal is now on the table (**10,000 rows ×
+   30 columns**, ceiling 50,000 × 100) with the reasoning under Workstream D. It is inferred from
+   the code's own limits and the bundled datasets, not from knowing who attends the courses — so it
+   needs a yes, or a replacement, **before week 5**. If real course data will be much larger than
+   this, say so early: it changes D3 from a responsiveness task into a scale task, which is a
+   different and considerably larger piece of work.
 4. **Sequencing** — 15 weeks, or defer B3/D4 to land at 13? See the note under §7.
 5. **F1** — version scheme, and whether to cut a `v1.0.0` of Engineering ML Studio proper.
 
