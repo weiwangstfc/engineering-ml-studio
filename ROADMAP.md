@@ -97,7 +97,10 @@ Make the existing regression capability genuinely approachable. Priorities:
 ## Distribution and offline strategy (decided)
 
 - **Primary supported mode:** a **browser-based web application**.
-- **Primary deployment:** a **static website** (currently GitHub Pages via branch serving).
+- **Primary deployment:** a **static website**, published to GitHub Pages by the
+  `.github/workflows/pages.yml` workflow on every push to `main`, at
+  <https://weiwangstfc.github.io/engineering-ml-studio/>. There is no build step: the
+  repository root is the site.
 - **Local development:** a simple, documented local HTTP server (see
   [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md)). No packaged editions or platform launchers.
 - The application already runs fully in the browser with no backend, and can run offline with

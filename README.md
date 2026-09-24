@@ -7,6 +7,9 @@ entirely in the browser, keeps data on the user's own machine, and aims to make 
 exploring, and building small engineering ML projects approachable for people who are not
 machine-learning specialists.
 
+**Try it: <https://weiwangstfc.github.io/engineering-ml-studio/>** — nothing to install, and no
+data ever leaves your machine.
+
 ## Purpose
 
 To give engineers a private, no-installation environment where they can load data, train and
@@ -60,6 +63,13 @@ python3 -m http.server 8000
 
 Full instructions, browser requirements, and how to run the automated tests are in
 [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
+
+## Publishing
+
+Every push to `main` publishes the site to GitHub Pages via
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml). There is no build step — the
+repository root is the site — so the workflow simply uploads the checked-out tree and deploys it.
+It uses no secrets and contacts no external service.
 
 ## Status
 

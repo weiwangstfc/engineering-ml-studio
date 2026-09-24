@@ -194,7 +194,8 @@ remains **presentation, layout and navigation only**.
 - **Diagnostics, prediction, governance:** metrics and diagnostic charts (via bundled Plotly),
   prediction on new data, prediction intervals, model comparison, validation, an approval/
   approved-package workflow, and post-deployment monitoring/revalidation records.
-- **Deployment:** GitHub Pages via branch serving (`CNAME`, `.nojekyll`).
+- **Deployment:** GitHub Pages via GitHub Actions (`.github/workflows/pages.yml`, `.nojekyll`),
+  published at <https://weiwangstfc.github.io/engineering-ml-studio/>.
 - **Reproducible baseline:** documented local-run procedure and an automated test foundation
   (Playwright smoke + ML-core unit tests) with a CI workflow; see
   [`DEVELOPMENT.md`](DEVELOPMENT.md), [`BASELINE_BEHAVIOUR.md`](BASELINE_BEHAVIOUR.md), and
