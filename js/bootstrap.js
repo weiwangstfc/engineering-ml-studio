@@ -104,6 +104,8 @@
       await loadScript('./js/explore.js', 'EMSExplore', 15000);
       // Phase 3: Project-mode six-stage presentation shell (thin navigation layer).
       await loadScript('./js/project-shell.js', 'EMSProjectShell', 15000);
+      // Presentation-only explanations for the Project-mode settings.
+      await loadScript('./js/project-guidance.js', 'EMSProjectGuidance', 15000);
     } catch (error) {
       const region = document.getElementById('alertRegion');
       if (region) region.innerHTML = `<div class="alert error"><strong>Application startup failed.</strong><br>${escapeHtml(error.message)}</div>`;

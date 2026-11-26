@@ -74,7 +74,9 @@
     els.targetTransform.addEventListener('change', updateTransformHelp);
     els.featureSearch.addEventListener('input', renderFeatureList);
     els.autoFeaturesBtn.addEventListener('click', autoSelectFeatures);
-    els.selectAllFeatures.addEventListener('click', () => {
+    // The duplicate "Select all eligible" button was removed from the page (it called the same
+    // function as auto-detect); keep the binding tolerant so older markup still works.
+    if (els.selectAllFeatures) els.selectAllFeatures.addEventListener('click', () => {
       state.selectedFeatures = new Set(MLCore.autoSelectFeatures(state.headers, state.target, state.profiles)); renderFeatureList(); estimatePreprocessing(); renderDataQuality(); unlockWorkflow();
     });
     els.clearFeatures.addEventListener('click', () => { state.selectedFeatures.clear(); renderFeatureList(); estimatePreprocessing(); renderDataQuality(); });
@@ -834,7 +836,36 @@
     };
   }
 
+  // Guidance only: say which preparation settings actually affect the selected
+  // inputs (e.g. no categorical inputs -> the categorical settings do nothing).
+  // Reads the existing column profiles; changes no setting and no data.
+  function updatePreprocessRelevance() {
+    const numericNote = $('prepNumericRelevance'), categoricalNote = $('prepCategoricalRelevance');
+    if (!numericNote || !categoricalNote) return;
+    const mark = (selector, notApplicable) => { const node = document.querySelector(selector); if (node) node.classList.toggle('is-not-applicable', notApplicable); };
+    const selected = Array.from(state.selectedFeatures).map(name => state.profiles[name]).filter(Boolean);
+    if (!selected.length) {
+      numericNote.textContent = ''; categoricalNote.textContent = '';
+      ['#prepGroupNumeric', '#prepGroupCategorical', '[data-prep-option="numericMissing"]', '[data-prep-option="categoricalMissing"]'].forEach(sel => mark(sel, false));
+      return;
+    }
+    const numeric = selected.filter(p => p.type === 'numeric'), categorical = selected.filter(p => p.type !== 'numeric');
+    const numericMissing = numeric.filter(p => p.missing > 0).length, categoricalMissing = categorical.filter(p => p.missing > 0).length;
+    const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+    numericNote.textContent = numeric.length
+      ? `Your data: ${plural(numeric.length, 'numeric input')}, ` + (numericMissing ? `${numericMissing} with missing values.` : 'none with missing values, so the missing-value setting has no effect.')
+      : 'Your data: no numeric inputs are selected, so these settings have no effect.';
+    categoricalNote.textContent = categorical.length
+      ? `Your data: ${plural(categorical.length, 'categorical input')}, ` + (categoricalMissing ? `${categoricalMissing} with blank entries.` : 'none with blank entries, so the missing-value setting has no effect.')
+      : 'Your data: no categorical inputs are selected, so these settings have no effect.';
+    mark('#prepGroupNumeric', !numeric.length);
+    mark('#prepGroupCategorical', !categorical.length);
+    mark('[data-prep-option="numericMissing"]', numeric.length > 0 && !numericMissing);
+    mark('[data-prep-option="categoricalMissing"]', categorical.length > 0 && !categoricalMissing);
+  }
+
   function estimatePreprocessing() {
+    updatePreprocessRelevance();
     if (!state.rows.length || !state.target || !state.selectedFeatures.size) {
       els.preprocessEstimate.textContent = 'Select a target and at least one feature to estimate the processed feature count.'; return;
     }

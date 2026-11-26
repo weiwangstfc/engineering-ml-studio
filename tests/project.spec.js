@@ -521,6 +521,77 @@ test.describe('Project mode — guidance for new users (step 1)', () => {
   });
 });
 
+test.describe('Project mode — stage 2 and 3 layout (review feedback)', () => {
+  const PIPE_CSV = path.join(__dirname, '..', 'examples', 'pipe_pressure_drop_sample.csv');
+
+  test('S1. stage 2 separates the target from the input variables, with one suggestion button', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await loadDataset(page);
+    await goToStage(page, 'step-features');
+    const target = page.locator('#step-features .feature-section', { has: page.locator('#targetSectionHeading') });
+    const inputs = page.locator('#step-features .feature-section', { has: page.locator('#inputsSectionHeading') });
+    await expect(target.locator('#targetColumn')).toHaveCount(1);
+    await expect(target.locator('#targetTransform')).toHaveCount(1);
+    await expect(inputs.locator('#autoFeaturesBtn')).toHaveCount(1);
+    await expect(inputs.locator('#featureSearch')).toHaveCount(1);
+    await expect(inputs.locator('#featureList')).toHaveCount(1);
+    await expect(inputs).toContainText('identifiers');
+    // The duplicate "Select all eligible" button (same function as auto-detect) is gone.
+    await expect(page.locator('#selectAllFeatures')).toHaveCount(0);
+  });
+
+  test('S2. stage 3 lists every setting in one column and explains the chosen value on demand', async ({ page }) => {
+    await fullWorkflow(page);
+    await goToStage(page, 'step-preprocess');
+    const rows = page.locator('#step-preprocess .prep-option');
+    await expect(rows).toHaveCount(6);
+    const boxes = [];
+    for (let i = 0; i < 6; i++) boxes.push(await rows.nth(i).boundingBox());
+    for (let i = 1; i < 6; i++) {
+      expect(Math.abs(boxes[i].x - boxes[0].x), 'rows share one left edge').toBeLessThan(2);
+      expect(boxes[i].y, 'rows are stacked').toBeGreaterThan(boxes[i - 1].y);
+    }
+    // The reference-category checkbox is an ordinary row in the categorical group.
+    await expect(page.locator('#prepGroupCategorical [data-prep-option="dropFirstCategory"] #dropFirstCategory')).toHaveCount(1);
+
+    const scaling = page.locator('[data-prep-option="numericScaling"]');
+    const help = page.locator('#prepHelp-numericScaling');
+    await expect(help).toBeHidden();
+    await scaling.locator('.prep-help-toggle').click();
+    await expect(help).toBeVisible();
+    await expect(help).toContainText('Your choice — Standardise');
+    await page.selectOption('#numericScaling', 'minmax');
+    await expect(help).toContainText('Your choice — Min–max scale');
+    await page.selectOption('#numericScaling', 'standard');
+
+    // Clicking into another setting opens its explanation and closes the others.
+    await page.locator('#categoricalEncoding').focus();
+    await expect(page.locator('#prepHelp-categoricalEncoding')).toBeVisible();
+    await expect(page.locator('#prepHelp-categoricalEncoding')).toContainText('One-hot encoding');
+    await expect(help).toBeHidden();
+  });
+
+  test('S3. stage 3 says which settings affect the selected inputs', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await page.setInputFiles('#csvFile', PIPE_CSV);
+    await expect(page.locator('#targetColumn option', { hasText: 'pressure_drop_kpa' })).toHaveCount(1);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', 'pressure_drop_kpa');
+    await page.click('#autoFeaturesBtn');
+    await goToStage(page, 'step-preprocess');
+    await expect(page.locator('#prepCategoricalRelevance')).toContainText('no categorical inputs');
+    await expect(page.locator('#prepGroupCategorical')).toHaveClass(/is-not-applicable/);
+    await expect(page.locator('#prepNumericRelevance')).toContainText('5 numeric inputs, none with missing values');
+    await expect(page.locator('[data-prep-option="numericMissing"]')).toHaveClass(/is-not-applicable/);
+    await expect(page.locator('[data-prep-option="numericScaling"]')).not.toHaveClass(/is-not-applicable/);
+    // Guidance never changes a setting.
+    await expect(page.locator('#numericMissing')).toHaveValue('mean');
+    await expect(page.locator('#categoricalEncoding')).toHaveValue('onehot');
+  });
+});
+
 test.describe('Project mode — responsive layout and accessibility', () => {
   async function layout(page) {
     return page.evaluate(() => {

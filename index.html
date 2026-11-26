@@ -552,7 +552,6 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
       <section id="step-features" class="panel training-only locked" aria-disabled="true">
         <div class="panel-heading">
           <div><span class="step-kicker">Stage 2 of 6</span><h2>Choose inputs and quantity to predict</h2></div>
-          <button id="autoFeaturesBtn" class="button secondary" type="button">Detect input variables automatically</button>
         </div>
         <details class="stage-guidance">
           <summary>Stage guidance</summary>
@@ -560,8 +559,11 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <p><strong>Why it matters:</strong> the model can only learn from the input variables you provide.</p>
           <p><strong>Look for:</strong> avoid including identifiers, duplicated quantities, or information that would not be available when making a future prediction.</p>
         </details>
-        <div class="form-grid three">
-          <label>Quantity to predict <span class="term-note">(target)</span><select id="targetColumn"><option value="">Choose target…</option></select></label>
+        <section class="feature-section" aria-labelledby="targetSectionHeading">
+          <h3 id="targetSectionHeading"><span class="feature-section-num">1</span> Quantity to predict <span class="term-note">(target)</span></h3>
+          <p class="fine-print">The one measured quantity you want the model to predict — for example pressure drop or yield strength. Every other column can be used as an input.</p>
+          <div class="form-grid two">
+          <label><span>Quantity to predict <span class="term-note">(target)</span></span><select id="targetColumn"><option value="">Choose target…</option></select></label>
           <label>Target transformation
             <select id="targetTransform">
               <option value="none">None</option>
@@ -572,8 +574,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
               <option value="yeojohnson">Yeo–Johnson</option>
             </select>
           </label>
-          <label>Filter columns<input id="featureSearch" type="search" placeholder="Type part of a column name"></label>
-        </div>
+          </div>
         <div id="targetTransformHelp" class="info-box compact-box">Predictions and uncertainty bounds are converted back to the original target scale.</div>
         <p id="targetTransformHint" class="target-transform-hint hidden" aria-live="polite"></p>
         <details class="field-explainer" id="targetTransformExplainer">
@@ -587,12 +588,18 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
             <li><strong>Check rather than guess</strong>: train once with and once without, then compare validation RMSE in Evaluate results.</li>
           </ul>
         </details>
-        <div class="feature-toolbar">
-          <button id="selectAllFeatures" class="text-button" type="button">Select all eligible</button>
-          <button id="clearFeatures" class="text-button" type="button">Clear selection</button>
-          <span id="featureCount">0 selected</span>
-        </div>
+        </section>
+        <section class="feature-section" aria-labelledby="inputsSectionHeading">
+          <h3 id="inputsSectionHeading"><span class="feature-section-num">2</span> Input variables <span class="term-note">(features)</span></h3>
+          <p class="fine-print">The measured conditions the model uses to predict the target. <strong>Suggested input variables</strong> are every column except the target and columns that look like identifiers (row numbers, sample IDs): an identifier lets a model memorise rows instead of learning the engineering relationship. Untick anything that would not be known when you make a future prediction.</p>
+          <div class="feature-toolbar">
+            <button id="autoFeaturesBtn" class="button secondary" type="button">Select suggested input variables</button>
+            <button id="clearFeatures" class="text-button" type="button">Clear selection</button>
+            <label class="feature-filter">Filter columns<input id="featureSearch" type="search" placeholder="Type part of a column name"></label>
+            <span id="featureCount">0 selected</span>
+          </div>
         <div id="featureList" class="feature-list"></div>
+        </section>
         <section class="subpanel data-quality-workspace" aria-live="polite">
           <div class="panel-heading compact-heading">
             <div><h3>Data-quality assistant <button id="dataQualityHelpBtn" class="help-button" type="button" aria-label="What does the data-quality assistant check?">?</button></h3><p class="fine-print">Automated checks update with the selected target and features. They identify common risks but do not replace scientific or domain review.</p></div>
@@ -612,21 +619,64 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <p><strong>Look for:</strong> the recommended starting point below is a reasonable default for many datasets — adjust it only if you have a specific reason.</p>
         </details>
         <div class="recommendation-note info-box compact-box"><strong>Recommended starting point:</strong> replace missing numeric values with the mean, standardise numeric inputs (fitted on training data only), and treat missing categories as their own “Missing” level. These defaults are already selected. They are a sensible starting point, not always the best choice for every dataset.</div>
-        <div class="form-grid three">
-          <label>Numeric missing values
-            <select id="numericMissing"><option value="mean">Replace with mean</option><option value="median">Replace with median</option><option value="zero">Replace with zero</option><option value="drop">Drop affected rows</option></select>
-          </label>
-          <label>Numeric scaling fitted on training data
-            <select id="numericScaling"><option value="standard">Standardise</option><option value="minmax">Min–max scale</option><option value="none">No scaling</option></select>
-          </label>
-          <label>Categorical missing values
-            <select id="categoricalMissing"><option value="missing">Use “Missing” category</option><option value="mode">Replace with most frequent</option><option value="drop">Drop affected rows</option></select>
-          </label>
-          <label>Categorical encoding
-            <select id="categoricalEncoding"><option value="onehot">One-hot encoding</option><option value="ordinal">Ordinal integer encoding</option><option value="exclude">Exclude categorical columns</option></select>
-          </label>
-          <label>Maximum categories per column<input id="maxCategories" type="number" min="2" max="200" value="50"></label>
-          <label class="toggle-card"><input id="dropFirstCategory" type="checkbox" checked><span><strong>Remove one reference category from each categorical feature</strong><small>Recommended for linear and ridge regression to avoid redundant one-hot columns. Usually unnecessary for tree models.</small></span></label>
+        <p class="fine-print prep-intro">Each setting is learned from the training rows only and then applied unchanged to validation, test and future data. Click a setting, or <em>What does this mean?</em>, to see what each choice does and when to change it.</p>
+        <div class="prep-list">
+          <section class="prep-group" id="prepGroupNumeric" aria-labelledby="prepNumericHeading">
+            <div class="prep-group-heading"><h3 id="prepNumericHeading">Numeric inputs</h3><p class="prep-relevance" id="prepNumericRelevance"></p></div>
+            <div class="prep-option" data-prep-option="numericMissing">
+              <div class="prep-option-main">
+                <label>Numeric missing values
+                  <select id="numericMissing"><option value="mean">Replace with mean</option><option value="median">Replace with median</option><option value="zero">Replace with zero</option><option value="drop">Drop affected rows</option></select>
+                </label>
+                <button class="prep-help-toggle" type="button" aria-expanded="false" aria-controls="prepHelp-numericMissing">What does this mean?</button>
+              </div>
+              <div class="prep-option-help" id="prepHelp-numericMissing" hidden></div>
+            </div>
+            <div class="prep-option" data-prep-option="numericScaling">
+              <div class="prep-option-main">
+                <label>Numeric scaling
+                  <select id="numericScaling"><option value="standard">Standardise</option><option value="minmax">Min–max scale</option><option value="none">No scaling</option></select>
+                </label>
+                <button class="prep-help-toggle" type="button" aria-expanded="false" aria-controls="prepHelp-numericScaling">What does this mean?</button>
+              </div>
+              <div class="prep-option-help" id="prepHelp-numericScaling" hidden></div>
+            </div>
+          </section>
+          <section class="prep-group" id="prepGroupCategorical" aria-labelledby="prepCategoricalHeading">
+            <div class="prep-group-heading"><h3 id="prepCategoricalHeading">Categorical (text) inputs</h3><p class="prep-relevance" id="prepCategoricalRelevance"></p></div>
+            <div class="prep-option" data-prep-option="categoricalMissing">
+              <div class="prep-option-main">
+                <label>Categorical missing values
+                  <select id="categoricalMissing"><option value="missing">Use “Missing” category</option><option value="mode">Replace with most frequent</option><option value="drop">Drop affected rows</option></select>
+                </label>
+                <button class="prep-help-toggle" type="button" aria-expanded="false" aria-controls="prepHelp-categoricalMissing">What does this mean?</button>
+              </div>
+              <div class="prep-option-help" id="prepHelp-categoricalMissing" hidden></div>
+            </div>
+            <div class="prep-option" data-prep-option="categoricalEncoding">
+              <div class="prep-option-main">
+                <label>Categorical encoding
+                  <select id="categoricalEncoding"><option value="onehot">One-hot encoding</option><option value="ordinal">Ordinal integer encoding</option><option value="exclude">Exclude categorical columns</option></select>
+                </label>
+                <button class="prep-help-toggle" type="button" aria-expanded="false" aria-controls="prepHelp-categoricalEncoding">What does this mean?</button>
+              </div>
+              <div class="prep-option-help" id="prepHelp-categoricalEncoding" hidden></div>
+            </div>
+            <div class="prep-option" data-prep-option="maxCategories">
+              <div class="prep-option-main">
+                <label>Maximum categories per column<input id="maxCategories" type="number" min="2" max="200" value="50"></label>
+                <button class="prep-help-toggle" type="button" aria-expanded="false" aria-controls="prepHelp-maxCategories">What does this mean?</button>
+              </div>
+              <div class="prep-option-help" id="prepHelp-maxCategories" hidden></div>
+            </div>
+            <div class="prep-option" data-prep-option="dropFirstCategory">
+              <div class="prep-option-main">
+                <label class="prep-check"><input id="dropFirstCategory" type="checkbox" checked><span>Remove one reference category from each categorical feature</span></label>
+                <button class="prep-help-toggle" type="button" aria-expanded="false" aria-controls="prepHelp-dropFirstCategory">What does this mean?</button>
+              </div>
+              <div class="prep-option-help" id="prepHelp-dropFirstCategory" hidden></div>
+            </div>
+          </section>
         </div>
         <div id="preprocessEstimate" class="info-box">Select a target and at least one feature to estimate the processed feature count.</div>
         <div class="stage-nav"><button class="button secondary stage-continue" type="button" data-target="step-model">Continue to model selection</button></div>
