@@ -26,6 +26,7 @@
       }
     },
     numericScaling: {
+      figure: function () { return SCALING_FIGURE; },
       what: 'Inputs measured in very different units (metres, pascals, kelvin) are put on comparable scales. ' +
         'The scaling is learned from the training rows only, then applied unchanged to all other data.',
       choices: {
@@ -43,6 +44,7 @@
       }
     },
     categoricalEncoding: {
+      figure: function () { return ENCODING_FIGURE; },
       what: 'Models work with numbers, so text categories (steel grade, supplier, rig) must be turned into numeric columns.',
       choices: {
         onehot: 'Creates one 0/1 column per category, so no order is implied between, say, “aluminium” and “steel”. The safe default.',
@@ -68,6 +70,53 @@
       }
     }
   };
+
+  // Small illustrations for the two least intuitive settings. Static, trusted markup.
+  // Scaling: the same two inputs in original units, standardised, and min–max scaled.
+  function scaleRow(y, label, from, to, ticks, color) {
+    var x0 = 150, x1 = 450, out = '';
+    out += '<text x="8" y="' + (y + 4) + '" font-size="11" fill="#16202a">' + label + '</text>';
+    out += '<line x1="' + x0 + '" y1="' + y + '" x2="' + x1 + '" y2="' + y + '" stroke="#9bb4be" stroke-width="1"></line>';
+    var a = x0 + (x1 - x0) * from, b = x0 + (x1 - x0) * to;
+    out += '<line x1="' + a + '" y1="' + y + '" x2="' + b + '" y2="' + y + '" stroke="' + color + '" stroke-width="6" stroke-linecap="round"></line>';
+    ticks.forEach(function (t) {
+      var x = x0 + (x1 - x0) * t[0];
+      var anchor = t[0] >= 0.99 ? 'end' : (t[0] <= 0.01 ? 'start' : 'middle');
+      out += '<text x="' + x + '" y="' + (y + 16) + '" font-size="9" fill="#555" text-anchor="' + anchor + '">' + t[1] + '</text>';
+    });
+    return out;
+  }
+  var SCALING_FIGURE =
+    '<figure class="prep-figure">' +
+      '<svg viewBox="0 0 460 224" role="img" aria-label="Two inputs on very different scales: pipe length from 2 to 30 metres and pressure from 1,000 to 100,000 pascals. ' +
+        'After standardising, both are centred on 0 and spread over roughly minus 2 to plus 2. After min-max scaling, both run from 0 to 1.">' +
+        '<text x="8" y="14" font-size="11" font-weight="700" fill="#16202a">Original units</text>' +
+        scaleRow(34, 'pipe length (m)', 0.0, 0.0003, [[0, '0'], [1, '100,000']], '#125f76') +
+        scaleRow(62, 'pressure (Pa)', 0.01, 1, [[0.01, '1,000'], [0.5, '50,000'], [1, '100,000']], '#a52b2b') +
+        '<text x="452" y="30" font-size="9" fill="#125f76" text-anchor="end">length: 2–30, invisible at this scale</text>' +
+        '<text x="8" y="98" font-size="11" font-weight="700" fill="#16202a">Standardised</text>' +
+        scaleRow(118, 'pipe length', 0.1, 0.9, [[0.1, '−2'], [0.5, '0'], [0.9, '+2']], '#125f76') +
+        scaleRow(146, 'pressure', 0.12, 0.88, [[0.12, '−2'], [0.5, '0'], [0.88, '+2']], '#a52b2b') +
+        '<text x="8" y="182" font-size="11" font-weight="700" fill="#16202a">Min–max</text>' +
+        scaleRow(200, 'both inputs', 0.0, 1, [[0, '0'], [1, '1']], '#555') +
+      '</svg>' +
+      '<figcaption>Before scaling, a model that measures distances or sizes of coefficients treats pressure as thousands of times more important than length, purely because of its units.</figcaption>' +
+    '</figure>';
+  var ENCODING_FIGURE =
+    '<figure class="prep-figure">' +
+      '<div class="prep-figure-tables">' +
+        '<table><caption>Original</caption><thead><tr><th>material</th></tr></thead>' +
+          '<tbody><tr><td>steel</td></tr><tr><td>aluminium</td></tr><tr><td>copper</td></tr><tr><td>steel</td></tr></tbody></table>' +
+        '<span class="prep-figure-arrow" aria-hidden="true">→</span>' +
+        '<table><caption>One-hot</caption><thead><tr><th>material = aluminium</th><th>material = copper</th></tr></thead>' +
+          '<tbody><tr><td>0</td><td>0</td></tr><tr><td>1</td><td>0</td></tr><tr><td>0</td><td>1</td></tr><tr><td>0</td><td>0</td></tr></tbody></table>' +
+        '<span class="prep-figure-arrow">or</span>' +
+        '<table><caption>Ordinal</caption><thead><tr><th>material</th></tr></thead>' +
+          '<tbody><tr><td>2</td></tr><tr><td>0</td></tr><tr><td>1</td></tr><tr><td>2</td></tr></tbody></table>' +
+      '</div>' +
+      '<figcaption>One-hot: one 0/1 column per category; “steel” is the removed reference category, so a row of zeros means steel. ' +
+        'Ordinal: one integer column, which tells the model that copper lies between aluminium and steel — usually not true.</figcaption>' +
+    '</figure>';
 
   function el(id) { return document.getElementById(id); }
 
@@ -103,6 +152,7 @@
       choice.appendChild(document.createTextNode(choiceText));
       help.appendChild(choice);
     }
+    if (spec.figure) help.insertAdjacentHTML('beforeend', spec.figure());
   }
 
   function setOpen(row, open) {

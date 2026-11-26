@@ -574,6 +574,22 @@ test.describe('Project mode — stage 2 and 3 layout (review feedback)', () => {
     await expect(help).toBeHidden();
   });
 
+  test('S4. scaling and encoding explanations include an illustration', async ({ page }) => {
+    await fullWorkflow(page);
+    await goToStage(page, 'step-preprocess');
+    await page.locator('#numericScaling').focus();
+    const scalingFigure = page.locator('#prepHelp-numericScaling .prep-figure svg');
+    await expect(scalingFigure).toBeVisible();
+    expect((await scalingFigure.getAttribute('aria-label')).length).toBeGreaterThan(60);
+    await page.locator('#categoricalEncoding').focus();
+    const encoding = page.locator('#prepHelp-categoricalEncoding .prep-figure');
+    await expect(encoding).toBeVisible();
+    await expect(encoding.locator('table')).toHaveCount(3);
+    await expect(encoding).toContainText('material = aluminium');
+    // Settings without an illustration stay text-only.
+    await expect(page.locator('#prepHelp-numericMissing .prep-figure')).toHaveCount(0);
+  });
+
   test('S3. stage 3 says which settings affect the selected inputs', async ({ page }) => {
     await ready(page);
     await enterProjectMode(page);
