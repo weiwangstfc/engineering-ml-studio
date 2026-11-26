@@ -612,3 +612,22 @@ details.eval-section[open] .eval-summary-title::after, details.eval-section[open
 .eval-intro { margin: .2rem 0 0; max-width: 80ch; }
 .chart-caption { margin: .1rem .2rem .3rem; color: var(--muted); font-size: .8rem; line-height: 1.4; }
 #evalGovernance.governance-details { background: var(--surface-soft); }
+
+/* Stage 4: model choice — families, plain-language cards, a data-aware start. */
+.model-suggestion { margin: .2rem 0 1rem; padding: .9rem 1rem; border: 1px solid #b9dce4; border-left: 4px solid var(--primary); border-radius: 10px; background: var(--accent); }
+.model-suggestion h3 { margin: 0 0 .3rem; font-size: 1rem; }
+.model-suggestion-data { margin: 0 0 .4rem; font-size: .86rem; color: var(--muted); }
+.model-suggestion-list { margin: 0 0 .4rem; padding-left: 1.3rem; display: grid; gap: .3rem; font-size: .88rem; line-height: 1.5; }
+.model-suggestion-compare { margin: .3rem 0 0; font-size: .86rem; line-height: 1.5; }
+.model-suggestion .text-button { padding: 0 .2rem; }
+.model-card .model-meta { display: block; margin-top: .25rem; font-size: .76rem; }
+.model-family-chip { display: inline-block; margin-right: .3rem; padding: 0 .4rem; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--primary); font-weight: 650; }
+.model-group-hint { display: block; font-weight: 400; font-size: .82rem; color: var(--muted); margin-top: .15rem; }
+.model-family { margin-top: .9rem; }
+.model-family-title { margin: 0; font-size: .92rem; }
+.model-family-hint { margin: .15rem 0 .5rem; font-size: .82rem; color: var(--muted); max-width: 80ch; }
+.model-choice-guide { margin-top: 1rem; }
+.model-choice-table td, .model-choice-table th { white-space: normal; vertical-align: top; }
+.model-choice-table td:nth-child(2) { font-weight: 650; }
+/* .model-card span{display:grid} (inherited) stretched these tags to full width. */
+.model-card .model-meta .model-family-chip, .model-card strong .advanced-badge { display: inline-block; width: auto; }

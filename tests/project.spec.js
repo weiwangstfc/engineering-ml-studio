@@ -644,6 +644,79 @@ test.describe('Project mode — Evaluate results grouping (step 2)', () => {
   });
 });
 
+test.describe('Project mode — model choice guidance (step 3)', () => {
+  const STEEL_CSV = path.join(__dirname, '..', 'examples', 'steel_tensile_strength_sample.csv');
+
+  async function toModelStage(page, csv, target) {
+    await page.setInputFiles('#csvFile', csv);
+    await expect(page.locator('#targetColumn option', { hasText: target })).toHaveCount(1);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', target);
+    await page.click('#autoFeaturesBtn');
+    await goToStage(page, 'step-model');
+  }
+
+  test('M1. every model card says what it is in plain language and which family it belongs to', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    const cards = page.locator('#step-model .model-card');
+    await expect(cards).toHaveCount(11);
+    for (let i = 0; i < 11; i++) {
+      await expect(cards.nth(i).locator('.model-family-chip')).toHaveCount(1);
+      await expect(cards.nth(i).locator('small').first()).not.toBeEmpty();
+    }
+    const family = async title => page.locator('#step-model .model-family', { has: page.locator('.model-family-title', { hasText: title }) })
+      .locator('input[name="modelType"]').evaluateAll(els => els.map(e => e.value).sort());
+    expect(await family('Straight-line family')).toEqual(['elasticnet', 'quantile', 'ridge', 'robust']);
+    expect(await family('Tree-based family')).toEqual(['tree']);
+    expect(await family('Similarity-based family')).toEqual(['gp', 'knn']);
+    expect(await family('Neural network')).toEqual(['ann']);
+    await expect(page.locator('#modelChoiceGuide')).toHaveJSProperty('open', false);
+    await expect(page.locator('#modelChoiceGuide tbody tr')).toHaveCount(7);
+  });
+
+  test('M2. the starting suggestion follows the data and never picks a model', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    // 500 rows, six numeric inputs: a Gaussian process is a sensible extra.
+    await toModelStage(page, STEEL_CSV, 'yield_strength_mpa');
+    const box = page.locator('#modelSuggestion');
+    await expect(box).toBeVisible();
+    await expect(page.locator('#modelSuggestionData')).toContainText('500 rows and 6 input variables');
+    await expect(page.locator('#modelSuggestionList li').first()).toContainText('Linear regression');
+    await expect(page.locator('#modelSuggestionList')).toContainText('Gaussian process');
+    await expect(page.locator('#step-model input[name="modelType"][value="linear"]')).toBeChecked();
+
+    // Categorical inputs: no Gaussian-process suggestion.
+    await toModelStage(page, HOUSE_CSV, 'price');
+    await expect(page.locator('#modelSuggestionData')).toContainText('categorical');
+    await expect(page.locator('#modelSuggestionList')).not.toContainText('Gaussian process');
+
+    // Above the Gaussian-process row limit: it is not suggested, and the limit is stated.
+    const header = 'a,b,c,y';
+    const lines = [header];
+    for (let i = 0; i < 2500; i++) lines.push([i % 7, (i * 13) % 11, (i * 7) % 5, i % 17].join(','));
+    await page.setInputFiles('#csvFile', { name: 'big.csv', mimeType: 'text/csv', buffer: Buffer.from(lines.join('\n')) });
+    await expect(page.locator('#targetColumn option', { hasText: /^y$/ })).toHaveCount(1);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', 'y');
+    await page.click('#autoFeaturesBtn');
+    await goToStage(page, 'step-model');
+    await expect(page.locator('#modelSuggestionList')).not.toContainText('Gaussian process');
+    await expect(page.locator('#modelSuggestionLimits')).toContainText('Gaussian process is not available for 2,500 rows');
+  });
+
+  test('M3. "train several models at once" opens the existing baseline comparison tool', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await toModelStage(page, STEEL_CSV, 'yield_strength_mpa');
+    await page.click('#openBaselineComparisonBtn');
+    await expect(page.locator('#step-split')).toBeVisible();
+    await expect(page.locator('#comparisonToolPanel')).toBeVisible();
+    await expect(page.locator('#toggleComparisonToolsBtn')).toHaveAttribute('aria-expanded', 'true');
+  });
+});
+
 test.describe('Project mode — responsive layout and accessibility', () => {
   async function layout(page) {
     return page.evaluate(() => {

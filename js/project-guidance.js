@@ -4,9 +4,10 @@
 //
 // Explains the Project-mode settings in plain engineering language: what each
 // setting does, what the currently selected choice means, and when to change
-// it. This module only reads control values and writes explanatory text. It
-// never changes a setting, never reads the dataset, and never computes a
-// result; the inherited app (js/app.js) remains the only owner of state.
+// it. This module reads control values and a few counts from the app's state
+// (rows, selected inputs, column types) to describe them, and writes
+// explanatory text. It never changes a setting or a model choice, and never
+// computes a result; the inherited app (js/app.js) remains the owner of state.
 
 (function (global) {
   'use strict';
@@ -186,9 +187,78 @@
     updateCompareSection();
   }
 
+  // --- Stage 4: a starting suggestion for model choice ----------------------------
+  // Transparent rules of thumb from the data size, stated with their reasons. They
+  // propose where to start; they never select a model, and they defer to comparing
+  // models on validation error.
+  var GP_ROW_LIMIT = 2000, KNN_ROW_LIMIT = 25000;
+
+  function addItem(list, name, reason) {
+    var li = document.createElement('li');
+    var strong = document.createElement('strong');
+    strong.textContent = name;
+    li.appendChild(strong);
+    li.appendChild(document.createTextNode(' — ' + reason));
+    list.appendChild(li);
+  }
+
+  function updateModelSuggestion() {
+    var box = el('modelSuggestion'), data = el('modelSuggestionData'), list = el('modelSuggestionList'), limits = el('modelSuggestionLimits');
+    var app = global.LocalRegressionApp, state = app && app.state;
+    if (!box || !state || !Array.isArray(state.rows) || !state.rows.length || !state.target || !state.selectedFeatures || !state.selectedFeatures.size) {
+      if (box) box.classList.add('hidden');
+      return;
+    }
+    var rows = state.rows.length, inputs = state.selectedFeatures.size, categorical = 0;
+    state.selectedFeatures.forEach(function (name) {
+      var profile = state.profiles && state.profiles[name];
+      if (profile && profile.type !== 'numeric') categorical += 1;
+    });
+    data.textContent = 'Your data: ' + rows.toLocaleString('en') + ' rows and ' + inputs + ' input variable' + (inputs === 1 ? '' : 's') +
+      (categorical ? ' (' + categorical + ' categorical)' : '') + '.';
+    list.textContent = '';
+    addItem(list, 'Linear regression', 'start here as the baseline: fast, easy to explain, and the yardstick every other model should beat.');
+    if (rows < 300) addItem(list, 'Random forest', 'then a flexible model. With a few hundred rows, a forest is a safe choice: it copes well with small datasets and needs little tuning.');
+    else addItem(list, 'Gradient-boosted trees or Random forest', 'then a flexible model. Tree ensembles are usually the strongest general-purpose choice on tabular engineering data.');
+    if (rows <= GP_ROW_LIMIT && inputs <= 20 && !categorical) {
+      addItem(list, 'Gaussian process', 'also worth a try: with this few rows and all-numeric inputs it can fit smooth relationships and gives built-in uncertainty.');
+    }
+    var notes = [];
+    if (rows > GP_ROW_LIMIT) notes.push('Gaussian process is not available for ' + rows.toLocaleString('en') + ' rows (limit ' + GP_ROW_LIMIT.toLocaleString('en') + ').');
+    if (rows > KNN_ROW_LIMIT) notes.push('k-nearest neighbours is not available above ' + KNN_ROW_LIMIT.toLocaleString('en') + ' rows.');
+    limits.textContent = notes.join(' ');
+    limits.classList.toggle('hidden', !notes.length);
+    box.classList.remove('hidden');
+  }
+
+  // Take the user to the existing baseline-comparison tool, opening it through its
+  // own button so the app's behaviour is exactly what a click would do.
+  function openBaselineComparison() {
+    if (global.EMSProjectShell && global.EMSProjectShell.goToPanel) global.EMSProjectShell.goToPanel('step-split');
+    var toggle = el('toggleComparisonToolsBtn');
+    if (toggle && toggle.getAttribute('aria-expanded') !== 'true') toggle.click();
+    var panel = el('comparisonToolPanel');
+    if (panel && panel.scrollIntoView) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function wireModelChoice() {
+    var stage = el('step-model');
+    if (!stage) return;
+    // Refresh whenever stage 4 is shown, so the counts match the current selection.
+    if (global.MutationObserver) {
+      new MutationObserver(function () {
+        if (stage.classList.contains('is-active-panel')) updateModelSuggestion();
+      }).observe(stage, { attributes: true, attributeFilter: ['class'] });
+    }
+    var button = el('openBaselineComparisonBtn');
+    if (button) button.addEventListener('click', openBaselineComparison);
+    updateModelSuggestion();
+  }
+
   function init() {
     wirePrep();
     wireEvaluate();
+    wireModelChoice();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
@@ -196,6 +266,7 @@
 
   global.EMSProjectGuidance = Object.freeze({
     prepHelp: PREP_HELP,
-    renderPrepHelp: renderPrepHelp
+    renderPrepHelp: renderPrepHelp,
+    updateModelSuggestion: updateModelSuggestion
   });
 })(window);

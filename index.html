@@ -690,26 +690,71 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <p><strong>Why it matters:</strong> a more complex model is not automatically more accurate or more suitable for engineering use.</p>
           <p><strong>Look for:</strong> begin simple, then compare against a flexible model to see whether the extra complexity is justified.</p>
         </details>
+        <aside id="modelSuggestion" class="model-suggestion hidden" aria-live="polite">
+          <h3>A starting point for your data</h3>
+          <p id="modelSuggestionData" class="model-suggestion-data"></p>
+          <ol id="modelSuggestionList" class="model-suggestion-list"></ol>
+          <p id="modelSuggestionLimits" class="fine-print"></p>
+          <p class="model-suggestion-compare">No rule can tell which model will be best for your data — that is decided by comparing them on validation error.
+            <button id="openBaselineComparisonBtn" class="text-button" type="button">Train several models at once and compare them →</button></p>
+        </aside>
         <div class="model-group">
           <h3 class="model-group-title">Recommended starting models</h3>
           <div class="model-grid">
-            <label class="model-card"><input type="radio" name="modelType" value="linear" checked><span><strong>Linear regression</strong><small>Fast, interpretable baseline with analytical prediction intervals.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="forest"><span><strong>Random forest</strong><small>Tree ensemble with approximate between-tree intervals.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="gboost"><span><strong>Gradient-boosted trees</strong><small>Sequential shallow trees for strong nonlinear tabular prediction.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="linear" checked><span><strong>Linear regression</strong><small>Fits one straight-line (weighted-sum) relationship. Fast, easy to explain, and the baseline every other model should beat.</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> Fast, interpretable baseline with analytical prediction intervals.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="forest"><span><strong>Random forest</strong><small>Averages many decision trees. Captures curved relationships and interactions with little tuning; a strong general-purpose choice.</small><small class="model-meta"><span class="model-family-chip">Tree-based</span> Tree ensemble with approximate between-tree intervals.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="gboost"><span><strong>Gradient-boosted trees</strong><small>Builds small trees one after another, each correcting the last. Often the most accurate on tabular data; needs more rows and care than a forest.</small><small class="model-meta"><span class="model-family-chip">Tree-based</span> Sequential shallow trees for strong nonlinear tabular prediction.</small></span></label>
           </div>
         </div>
         <details class="model-group other-models-group">
-          <summary><span class="model-group-title">Other modelling approaches</span></summary>
-          <div class="model-grid">
-            <label class="model-card"><input type="radio" name="modelType" value="ridge"><span><strong>Ridge regression</strong><small>L2 coefficient shrinkage with bootstrap uncertainty.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="elasticnet"><span><strong>Elastic net</strong><small>Combined L1 and L2 shrinkage for sparse, correlated linear models.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="robust"><span><strong>Huber robust regression</strong><small>Downweights large residuals to reduce outlier influence.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="tree"><span><strong>Decision tree</strong><small>Nonlinear model with approximate leaf-based intervals.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="knn"><span><strong>k-nearest neighbours</strong><small>Local prediction from similar processed training rows.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="quantile"><span><strong>Linear quantile regression</strong><small>Predicts a conditional quantile and fitted lower/upper quantile bounds.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="gp"><span><strong>Gaussian process</strong><small>Exact or representative-subset GP with native predictive uncertainty.</small></span></label>
-            <label class="model-card model-card-advanced"><input type="radio" name="modelType" value="ann"><span><strong>Artificial neural network <span class="advanced-badge">Advanced</span></strong><small>Flexible feed-forward network. Needs its inputs on a common scale (handled automatically) and more care to train well.</small></span></label>
+          <summary><span class="model-group-title">Other modelling approaches</span><span class="model-group-hint">Eight more models, grouped by family: models in the same family work in a similar way.</span></summary>
+          <div class="model-family">
+            <h4 class="model-family-title">Straight-line family</h4>
+            <p class="model-family-hint">One weighted-sum relationship that is easy to explain. The variants differ in how they handle correlated inputs, outliers and bounds.</p>
+            <div class="model-grid">
+              <label class="model-card"><input type="radio" name="modelType" value="ridge"><span><strong>Ridge regression</strong><small>Linear regression that keeps coefficients small, so it stays stable when inputs are strongly correlated with each other.</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> L2 coefficient shrinkage with bootstrap uncertainty.</small></span></label>
+              <label class="model-card"><input type="radio" name="modelType" value="elasticnet"><span><strong>Elastic net</strong><small>Linear regression that can shrink unhelpful inputs to exactly zero, leaving a simpler model.</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> Combined L1 and L2 shrinkage for sparse, correlated linear models.</small></span></label>
+              <label class="model-card"><input type="radio" name="modelType" value="robust"><span><strong>Huber robust regression</strong><small>Linear regression that is pulled less by a few badly wrong measurements (outliers).</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> Downweights large residuals to reduce outlier influence.</small></span></label>
+              <label class="model-card"><input type="radio" name="modelType" value="quantile"><span><strong>Linear quantile regression</strong><small>Predicts a chosen percentile, such as a lower and an upper bound, instead of only the average.</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> Predicts a conditional quantile and fitted lower/upper quantile bounds.</small></span></label>
+            </div>
           </div>
+          <div class="model-family">
+            <h4 class="model-family-title">Tree-based family</h4>
+            <p class="model-family-hint">Yes/no splits on the inputs. They capture curved relationships and interactions; Random forest and Gradient-boosted trees above are the stronger members.</p>
+            <div class="model-grid">
+              <label class="model-card"><input type="radio" name="modelType" value="tree"><span><strong>Decision tree</strong><small>One readable set of yes/no rules. Easy to inspect, but less accurate and less stable than a forest.</small><small class="model-meta"><span class="model-family-chip">Tree-based</span> Nonlinear model with approximate leaf-based intervals.</small></span></label>
+            </div>
+          </div>
+          <div class="model-family">
+            <h4 class="model-family-title">Similarity-based family</h4>
+            <p class="model-family-hint">Predict from training rows that resemble the new one, or from a smooth surface through them. Best suited to smaller datasets.</p>
+            <div class="model-grid">
+              <label class="model-card"><input type="radio" name="modelType" value="knn"><span><strong>k-nearest neighbours</strong><small>Predicts from the most similar rows in the training data. Simple, but slow on large datasets; up to 25,000 rows.</small><small class="model-meta"><span class="model-family-chip">Similarity-based</span> Local prediction from similar processed training rows.</small></span></label>
+              <label class="model-card"><input type="radio" name="modelType" value="gp"><span><strong>Gaussian process</strong><small>Fits a smooth surface through the data with built-in uncertainty. Excellent for small, smooth datasets such as simulation sweeps; up to 2,000 rows.</small><small class="model-meta"><span class="model-family-chip">Similarity-based</span> Exact or representative-subset GP with native predictive uncertainty.</small></span></label>
+            </div>
+          </div>
+          <div class="model-family">
+            <h4 class="model-family-title">Neural network</h4>
+            <p class="model-family-hint">The most flexible family, and the one that needs the most data and care. Compare it against a tree ensemble before relying on it.</p>
+            <div class="model-grid">
+              <label class="model-card model-card-advanced"><input type="radio" name="modelType" value="ann"><span><strong>Artificial neural network <span class="advanced-badge">Advanced</span></strong><small>Layers of weighted sums that can fit very complex relationships. Needs more data and care than the other models.</small><small class="model-meta"><span class="model-family-chip">Neural network</span> Flexible feed-forward network. Needs its inputs on a common scale (handled automatically) and more care to train well.</small></span></label>
+            </div>
+          </div>
+        </details>
+        <details class="field-explainer model-choice-guide" id="modelChoiceGuide">
+          <summary>Which model when? Choose by what you need</summary>
+          <div class="table-wrap"><table class="model-choice-table">
+            <thead><tr><th>If you need…</th><th>Start with</th><th>Why</th></tr></thead>
+            <tbody>
+              <tr><td>To explain the result to a colleague</td><td>Linear regression (Ridge if inputs are correlated)</td><td>Each input has one coefficient you can read and check against the physics.</td></tr>
+              <tr><td>The best accuracy on curved, interacting relationships</td><td>Gradient-boosted trees or Random forest</td><td>Tree ensembles capture curvature and interactions with little preparation.</td></tr>
+              <tr><td>Robustness to a few bad measurements</td><td>Huber robust regression</td><td>Large errors are down-weighted instead of dominating the fit.</td></tr>
+              <tr><td>A lower and an upper bound, not just the average</td><td>Linear quantile regression</td><td>It fits percentiles of the target directly.</td></tr>
+              <tr><td>Uncertainty on a small, smooth dataset (up to 2,000 rows), such as a simulation sweep</td><td>Gaussian process</td><td>A smooth fit with built-in predictive uncertainty.</td></tr>
+              <tr><td>A simpler model that uses fewer inputs</td><td>Elastic net</td><td>It can shrink unhelpful inputs to zero.</td></tr>
+              <tr><td>To model very complex relationships, with plenty of data</td><td>Neural network (advanced)</td><td>The most flexible model, but it needs data and care; compare it with a forest first.</td></tr>
+            </tbody>
+          </table></div>
         </details>
         <details class="subpanel advanced-settings">
           <summary><span class="advanced-settings-title">Advanced model settings</span><span class="advanced-settings-hint">Tuning method and model-specific settings (including neural-network architecture and training settings)</span></summary>
