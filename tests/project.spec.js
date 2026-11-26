@@ -448,6 +448,79 @@ test.describe('Project mode — application shell (top bar, rail, workspace)', (
   });
 });
 
+test.describe('Project mode — guidance for new users (step 1)', () => {
+  const COOLING_CSV = path.join(__dirname, '..', 'examples', 'convective_cooling_sample.csv');
+  const STEEL_CSV = path.join(__dirname, '..', 'examples', 'steel_tensile_strength_sample.csv');
+
+  test('G1. each way to start explains what it is for and which file it takes', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    const options = page.locator('#step-upload .start-option');
+    await expect(options).toHaveCount(4);
+    for (const [control, fileType] of [['#projectFile', '.mlproject'], ['#modelFile', '.mlmodel'], ['#approvedPackageFile', '.mlpredict']]) {
+      const option = page.locator('#step-upload .start-option', { has: page.locator(control) });
+      await expect(option.locator('.start-file-type')).toHaveText(fileType);
+      await expect(option.locator('p')).toBeVisible();
+    }
+    await expect(page.locator('#startContinueHeading')).toHaveText('Continue earlier work');
+    await expect(page.locator('#startOperatorHeading')).toContainText('operators');
+    // The operator package is not styled as the main action for a new user...
+    await expect(page.locator('#approvedPackageLabel')).not.toHaveClass(/primary/);
+    const fullBg = await page.locator('#approvedPackageLabel').evaluate(el => getComputedStyle(el).backgroundColor);
+    // ...but it is in prediction-only mode, where it is the main action, and the
+    // "continue earlier work" group (training-only) disappears.
+    await page.click('#predictionOnlyModeBtn');
+    await expect(page.locator('body')).toHaveClass(/prediction-only/);
+    await expect(page.locator('#startContinueHeading')).toBeHidden();
+    const operatorBg = await page.locator('#approvedPackageLabel').evaluate(el => getComputedStyle(el).backgroundColor);
+    expect(operatorBg).not.toBe(fullBg);
+  });
+
+  test('G2. auto-detect refreshes the data-quality assistant', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await loadDataset(page);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', 'price');
+    await page.click('#autoFeaturesBtn');
+    await expect(page.locator('#dataQualityTable')).not.toContainText('No input features selected');
+  });
+
+  test('G3. the column filter is labelled as a filter, not a feature-selection step', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await loadDataset(page);
+    await goToStage(page, 'step-features');
+    await expect(page.locator('label', { has: page.locator('#featureSearch') })).toContainText('Filter columns');
+  });
+
+  test('G4. the target-transformation hint reads the data: log for a wide-range target, none for a compact one', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await page.setInputFiles('#csvFile', COOLING_CSV);
+    await expect(page.locator('#targetColumn option', { hasText: 'heat_dissipation_w' })).toHaveCount(1);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', 'heat_dissipation_w');
+    const hint = page.locator('#targetTransformHint');
+    await expect(hint).toBeVisible();
+    await expect(hint).toContainText('orders of magnitude');
+    await expect(hint).toContainText('Natural logarithm is worth trying');
+    // The hint never changes the user's selection.
+    await expect(page.locator('#targetTransform')).toHaveValue('none');
+
+    await page.setInputFiles('#csvFile', STEEL_CSV);
+    await expect(page.locator('#targetColumn option', { hasText: 'yield_strength_mpa' })).toHaveCount(1);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', 'yield_strength_mpa');
+    await expect(hint).toContainText('None is a sensible choice');
+
+    const explainer = page.locator('#targetTransformExplainer');
+    await expect(explainer).toHaveJSProperty('open', false);
+    await explainer.locator('summary').click();
+    await expect(explainer).toContainText('orders of magnitude');
+  });
+});
+
 test.describe('Project mode — responsive layout and accessibility', () => {
   async function layout(page) {
     return page.evaluate(() => {

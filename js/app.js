@@ -69,7 +69,7 @@
       location.href = url.toString();
     });
     els.targetColumn.addEventListener('change', () => {
-      state.target = els.targetColumn.value; state.selectedFeatures.delete(state.target); renderFeatureList(); estimatePreprocessing(); renderDataQuality(); unlockWorkflow();
+      state.target = els.targetColumn.value; state.selectedFeatures.delete(state.target); renderFeatureList(); estimatePreprocessing(); renderDataQuality(); unlockWorkflow(); updateTargetTransformHint();
     });
     els.targetTransform.addEventListener('change', updateTransformHelp);
     els.featureSearch.addEventListener('input', renderFeatureList);
@@ -212,7 +212,7 @@
       }).catch(error => {
         state.datasetFingerprint = { algorithm:'Unavailable', value:null, error:error.message }; renderDataset(); return state.datasetFingerprint;
       });
-      renderDataset(); populateColumnControls(); renderDataQuality(); unlockPanel('step-features');
+      renderDataset(); populateColumnControls(); renderDataQuality(); updateTargetTransformHint(); unlockPanel('step-features');
       if (state.pendingArtifact) { restoreArtifactSettings(state.pendingArtifact, true); state.pendingArtifact = null; }
       alertUser(`Loaded ${formatNumber(rows.length)} rows and ${formatNumber(headers.length)} columns locally.`, 'success');
     } catch (error) { alertUser(error.message, 'error'); }
@@ -782,7 +782,7 @@
   function autoSelectFeatures() {
     if (!state.target) return alertUser('Choose a target column first.', 'warning');
     state.selectedFeatures = new Set(MLCore.autoSelectFeatures(state.headers, state.target, state.profiles));
-    renderFeatureList(); estimatePreprocessing(); unlockWorkflow();
+    renderFeatureList(); estimatePreprocessing(); renderDataQuality(); unlockWorkflow();
   }
 
   function updateFeatureCount() { els.featureCount.textContent = `${state.selectedFeatures.size} selected`; }
@@ -797,7 +797,34 @@
       yeojohnson:'Yeo–Johnson supports negative, zero and positive values. Lambda is estimated from the training set only.'
     };
     els.targetTransformHelp.textContent = `${messages[els.targetTransform.value]} Predictions and intervals are converted back to the original target scale.`;
+    updateTargetTransformHint();
   }
+  // Guidance only: describe the shape of the selected target and say which
+  // transformation is worth trying. It reads the loaded rows, changes no
+  // setting, and never selects a transformation for the user.
+  function updateTargetTransformHint() {
+    const hint = $('targetTransformHint');
+    if (!hint) return;
+    const values = state.target && Array.isArray(state.rows)
+      ? state.rows.map(r => MLCore.toNumber(r[state.target])).filter(Number.isFinite)
+      : [];
+    if (values.length < 10) { hint.classList.add('hidden'); hint.textContent = ''; return; }
+    const n = values.length, mean = values.reduce((a, b) => a + b, 0) / n;
+    const sd = Math.sqrt(values.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1));
+    const skew = sd > 0 ? values.reduce((a, b) => a + ((b - mean) / sd) ** 3, 0) / n : 0;
+    const min = Math.min(...values), max = Math.max(...values);
+    const decades = min > 0 ? Math.log10(max / min) : null;
+    const fmt = v => Math.abs(v) >= 1e6 || (Math.abs(v) < 0.001 && v !== 0) ? v.toExponential(2) : Number(v.toPrecision(3)).toLocaleString('en');
+    const shape = `Your target ranges from ${fmt(min)} to ${fmt(max)}` +
+      (decades !== null ? ` (${decades.toFixed(1)} orders of magnitude)` : '') + `, skewness ${skew.toFixed(2)}. `;
+    let advice;
+    if (min > 0 && (decades >= 2 || skew > 1)) advice = 'It is strictly positive and ' + (decades >= 2 ? 'spans a wide range' : 'strongly right-skewed') + ', so Natural logarithm is worth trying. Compare it with None using validation RMSE.';
+    else if (min <= 0 && Math.abs(skew) > 1) advice = 'It includes zero or negative values and is strongly skewed, so a logarithm cannot be used; Yeo–Johnson is worth trying. Compare it with None using validation RMSE.';
+    else advice = 'It is not strongly skewed and spans a modest range, so None is a sensible choice.';
+    hint.textContent = shape + advice;
+    hint.classList.remove('hidden');
+  }
+
 
   function getPreprocessConfig() {
     return {
@@ -1909,8 +1936,8 @@
       unlockPanel('step-predict');
       const migrated = artifact.migration && artifact.migration.fromSchemaVersion < artifact.migration.toSchemaVersion;
       alertUser(migrated
-        ? `Fitted model migrated from schema ${artifact.migration.fromSchemaVersion} to ${artifact.migration.toSchemaVersion}. Step 7 can now predict a compatible CSV.`
-        : 'Fitted model loaded. Step 7 can now predict a compatible unknown CSV.', 'success');
+        ? `Fitted model migrated from schema ${artifact.migration.fromSchemaVersion} to ${artifact.migration.toSchemaVersion}. Stage 6 (Predict and monitor) can now predict a compatible CSV.`
+        : 'Fitted model loaded. Stage 6 (Predict and monitor) can now predict a compatible CSV.', 'success');
       renderApprovedPackageSummary(); renderMonitoringRecord(); refreshChangeExperimentOptions(); saveRecoverySnapshot();
       $('step-predict').scrollIntoView({behavior:'smooth'});
     } catch (error) { alertUser(error.message, 'error'); }

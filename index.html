@@ -12,8 +12,8 @@
   <title>Engineering ML Studio — browser-only machine learning for engineers</title>
   <!-- Must run before anything paints, and before any other script. -->
   <script src="./js/frame-guard.js"></script>
-  <link rel="stylesheet" href="./css/app.css?v=1.0.13">
-  <link rel="stylesheet" href="./css/explore.css?v=1.0.13">
+  <link rel="stylesheet" href="./css/app.css?v=1.0.14">
+  <link rel="stylesheet" href="./css/explore.css?v=1.0.14">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
@@ -514,11 +514,33 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <span>Recommended: up to 50,000 rows and 50 original columns</span>
           <button id="chooseCsvBtn" class="button primary" type="button">Choose CSV</button>
         </div>
+        <!-- Other ways to start. Each option says what it is for and which file it takes,
+             grouped by who needs it, so a new user is not faced with four unexplained buttons. -->
+        <div class="start-options">
+          <section class="start-group training-only" aria-labelledby="startContinueHeading">
+            <h3 id="startContinueHeading">Continue earlier work</h3>
+            <div class="start-option">
+              <label class="file-button button secondary">Open project<input id="projectFile" type="file" accept=".mlproject,.json,application/json" hidden></label>
+              <p><span class="start-file-type">.mlproject</span> Restores the experiments, settings and approval records you saved with <em>Save project</em>. The CSV is not stored in the file, so load it again to retrain.</p>
+            </div>
+            <div class="start-option">
+              <label class="file-button button secondary">Load fitted model<input id="modelFile" type="file" accept=".mlmodel,.json,application/json" hidden></label>
+              <p><span class="start-file-type">.mlmodel</span> Reuses one trained model you downloaded earlier: review its saved results and predict new data without retraining.</p>
+            </div>
+          </section>
+          <section class="start-group" aria-labelledby="startOperatorHeading">
+            <h3 id="startOperatorHeading">For operators using an approved model</h3>
+            <div class="start-option">
+              <label id="approvedPackageLabel" class="file-button button secondary">Load approved prediction package<input id="approvedPackageFile" type="file" accept=".mlpredict,.json,application/json" hidden></label>
+              <p><span class="start-file-type">.mlpredict</span> A model that has been reviewed and approved for routine use. Its integrity, approval status and review date are checked before it can predict.</p>
+            </div>
+            <div class="start-option">
+              <button id="predictionOnlyModeBtn" class="button secondary" type="button">Prediction-only mode</button>
+              <p>Hides model training and shows only what an operator needs: load an approved package, upload new inputs, download the predictions.</p>
+            </div>
+          </section>
+        </div>
         <div class="action-row compact wrap">
-          <label class="file-button button secondary training-only">Open project<input id="projectFile" type="file" accept=".mlproject,.json,application/json" hidden></label>
-          <label class="file-button button secondary training-only">Load fitted model<input id="modelFile" type="file" accept=".mlmodel,.json,application/json" hidden></label>
-          <label class="file-button button primary">Load approved prediction package<input id="approvedPackageFile" type="file" accept=".mlpredict,.json,application/json" hidden></label>
-          <button id="predictionOnlyModeBtn" class="button secondary" type="button">Prediction-only mode</button>
           <label class="toggle-inline training-only"><input id="forceOfflineMode" type="checkbox"> Use offline mode — local libraries only</label>
         </div>
         <p class="fine-print training-only">Offline mode reloads the app without attempting any CDN request. In either mode, CSV data is never sent to a CDN.</p>
@@ -550,9 +572,21 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
               <option value="yeojohnson">Yeo–Johnson</option>
             </select>
           </label>
-          <label>Feature search<input id="featureSearch" type="search" placeholder="Filter columns"></label>
+          <label>Filter columns<input id="featureSearch" type="search" placeholder="Type part of a column name"></label>
         </div>
         <div id="targetTransformHelp" class="info-box compact-box">Predictions and uncertainty bounds are converted back to the original target scale.</div>
+        <p id="targetTransformHint" class="target-transform-hint hidden" aria-live="polite"></p>
+        <details class="field-explainer" id="targetTransformExplainer">
+          <summary>Why transform the target, and when?</summary>
+          <p>A transformation changes the scale the model learns on; results are always converted back, so you still see predictions in the original units.</p>
+          <ul>
+            <li><strong>Consider one</strong> when the quantity you predict spans orders of magnitude (for example heat loss from a few watts to tens of kilowatts), is strongly skewed with a long tail of large values, or has errors that grow with its size. Without it, a few very large values dominate training and small values are fitted poorly.</li>
+            <li><strong>Why a logarithm helps</strong>: it compresses the range, and it turns a multiplicative relationship such as Q = h · A · ΔT into an additive one, which straight-line models can learn.</li>
+            <li><strong>Which one</strong>: Natural logarithm for strictly positive quantities; Square root for counts or mildly skewed non-negative values; Yeo–Johnson if the target can be zero or negative; Box–Cox and Yeo–Johnson estimate the strength of the transformation from the training data.</li>
+            <li><strong>When not to</strong>: if the target is roughly symmetric and spans a modest range, None is the right choice — a transformation then adds complexity for no gain.</li>
+            <li><strong>Check rather than guess</strong>: train once with and once without, then compare validation RMSE in Evaluate results.</li>
+          </ul>
+        </details>
         <div class="feature-toolbar">
           <button id="selectAllFeatures" class="text-button" type="button">Select all eligible</button>
           <button id="clearFeatures" class="text-button" type="button">Clear selection</button>
