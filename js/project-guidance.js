@@ -305,10 +305,242 @@
     updateModelSuggestion();
   }
 
+  // --- Every stage: a compact strip of the steps in this stage ---------------------
+  // Each step names the control it refers to; clicking it scrolls there (opening a
+  // closed section first) and briefly highlights it. Navigation only.
+  var STAGE_STEPS = {
+    'step-upload': [
+      ['Load a CSV file, or continue earlier work', '#dropZone'],
+      ['Check the row and column summary', '#datasetSummary'],
+      ['Continue to inputs and target', '#step-upload .stage-continue']
+    ],
+    'step-features': [
+      ['Choose the quantity to predict', '#targetColumn'],
+      ['Decide whether to transform it', '#targetTransform', true],
+      ['Select the input variables', '#autoFeaturesBtn'],
+      ['Review the data-quality findings', '#dataQualitySummary']
+    ],
+    'step-preprocess': [
+      ['Start from the recommended defaults', '#step-preprocess .recommendation-note'],
+      ['Change only the settings that apply to your data', '#prepGroupNumeric'],
+      ['Check the estimated processed features', '#preprocessEstimate']
+    ],
+    'step-model': [
+      ['Read the starting suggestion', '#modelSuggestion'],
+      ['Pick a model — begin with linear regression', '#step-model .model-group'],
+      ['Adjust advanced settings', '#step-model .advanced-settings', true]
+    ],
+    'step-split': [
+      ['Choose how to split the data', '#splitStrategy'],
+      ['Decide on prediction intervals', '#enableUncertainty'],
+      ['Preview the split', '#previewSplitBtn', true],
+      ['Train and evaluate — or compare several models', '#trainBtn']
+    ],
+    'step-diagnostics': [
+      ['Judge the model on the Test row', '#evalSummary'],
+      ['Check the errors for patterns', '#evalErrors'],
+      ['Compare experiments, if you trained several', '#evalCompare', true],
+      ['Save the project', '#evalSave']
+    ],
+    'step-predict': [
+      ['Have a model ready: trained here or an approved package', '#approvedPackageSummary'],
+      ['Upload a CSV of new input conditions', '#predictionFile'],
+      ['Check how many rows are inside the training range', '#predictionSummary'],
+      ['Download the predicted values', '#downloadUnknownPredictionsBtn']
+    ],
+    'step-monitor': [
+      ['Upload results measured in service, with their predictions', '#monitoringFile'],
+      ['Analyse monitoring data', '#analyseMonitoringBtn'],
+      ['Set and evaluate revalidation triggers', '#monitorMaxRmse'],
+      ['Decide whether the model needs revalidating', '#revalidationSummary']
+    ]
+  };
+
+  function goToStepTarget(selector) {
+    var target = document.querySelector(selector);
+    if (!target) return;
+    if (target.type === 'file' && target.closest('label')) target = target.closest('label');
+    var section = target.closest('details');
+    if (target.tagName === 'DETAILS') target.open = true;
+    else if (section && !section.open && !section.classList.contains('stage-guidance')) section.open = true;
+    if (!target.offsetParent) return; // not shown yet (e.g. appears after a later action)
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    target.classList.remove('step-target-flash');
+    void target.offsetWidth;
+    target.classList.add('step-target-flash');
+    if (typeof target.focus === 'function' && /^(SELECT|INPUT|BUTTON|TEXTAREA)$/.test(target.tagName)) target.focus({ preventScroll: true });
+  }
+
+  function buildStageSteps() {
+    Object.keys(STAGE_STEPS).forEach(function (panelId) {
+      var panel = el(panelId);
+      if (!panel || panel.querySelector('.stage-steps')) return;
+      var list = document.createElement('ol');
+      list.className = 'stage-steps';
+      list.setAttribute('aria-label', 'Steps in this stage');
+      STAGE_STEPS[panelId].forEach(function (step, index) {
+        var li = document.createElement('li');
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'stage-step';
+        button.setAttribute('data-step-target', step[1]);
+        var num = document.createElement('span');
+        num.className = 'stage-step-num';
+        num.textContent = String(index + 1);
+        var text = document.createElement('span');
+        text.className = 'stage-step-text';
+        text.textContent = step[0];
+        button.appendChild(num);
+        button.appendChild(text);
+        if (step[2]) {
+          var optional = document.createElement('span');
+          optional.className = 'stage-step-optional';
+          optional.textContent = 'optional';
+          button.appendChild(optional);
+        }
+        button.addEventListener('click', function () { goToStepTarget(step[1]); });
+        li.appendChild(button);
+        list.appendChild(li);
+      });
+      var anchor = panel.querySelector('.stage-guidance') || panel.querySelector('.panel-heading');
+      if (anchor) anchor.insertAdjacentElement('afterend', list);
+    });
+  }
+
+  // --- Stage 4B: what each validation setting means and what to enter ----------------
+  // Shown under the group of settings being edited, following the current value.
+  var FIELD_HELP = {
+    splitStrategy: {
+      what: 'How the rows are divided into training (fits the model), validation (chooses settings) and test (the final, untouched check). The test rows must resemble the data the model will be used on, or its score means little.',
+      choices: {
+        random: 'Rows are shuffled and divided at random. Right when every row is an independent measurement. Wrong when rows come in groups (same specimen, rig or simulation run) or in time order: near-duplicates land in both training and test, and the test score looks better than reality.',
+        source: 'Keeps all rows from one group (rig, batch, supplier, simulation run) together, in either training or test. Use it when you will predict for groups the model has not seen: it is the honest test of whether the model transfers.',
+        regime: 'Splits by operating regime, such as laminar and turbulent or low and high load: either holding whole regimes out, or splitting within each. Use it to test whether the model works across regimes, or to make sure every regime is represented.',
+        time: 'Earlier rows train the model and later rows test it. Use it for logged or transient data, so that the future never leaks into training.'
+      }
+    },
+    randomSeed: {
+      what: 'Fixes the random shuffle, so the same seed always gives the same split and the same numbers — essential when comparing models, or when a class should get identical results.',
+      choices: function (value) { return 'Seed ' + value + ': keep it fixed while you compare models; at the end, try one other seed to check the result does not depend on one lucky split.'; }
+    },
+    enableCV: {
+      what: 'Re-splits the training rows several times and fits the model on each part, giving an average validation score and how much it varies. It does not change the final model or the test score.',
+      choices: {
+        'true': 'On: slower (one extra fit per fold), but shows whether the validation score is stable. Most useful for small datasets of a few hundred rows.',
+        'false': 'Off: a single validation split. Fine for larger datasets.'
+      }
+    },
+    cvFolds: {
+      what: 'How many parts the training rows are divided into for cross-validation.',
+      choices: function (value) { return value + ' folds: each fold holds out about 1/' + value + ' of the training rows. 5 is the usual choice; 10 suits small datasets if time allows.'; }
+    },
+    TrainPct: {
+      what: 'The share of rows used to fit the model. The three percentages must add up to 100.',
+      choices: function () { return '60 / 20 / 20 is a sound default. More training rows give a better model; more test rows give a more trustworthy score. With fewer than about 300 rows, keep at least 50–60 rows in test; with many thousands, 70 / 15 / 15 or 80 / 10 / 10 is fine.'; }
+    },
+    ValidationPct: {
+      what: 'The share of rows used to choose model settings (for example during tuning). The three percentages must add up to 100.',
+      choices: function () { return 'Validation rows are never used to fit the model, so the validation score is an honest guide when comparing settings and models.'; }
+    },
+    TestPct: {
+      what: 'The share of rows kept aside for the final, independent check. The three percentages must add up to 100.',
+      choices: function () { return 'Test rows are used once, at the end. Too few and the test score is mostly noise; aim for at least 50–60 rows.'; }
+    },
+    sourceColumn: { what: 'The column that says which group each row belongs to — for example rig, batch, specimen or simulation run. All rows of a group stay on the same side of the split.' },
+    regimeColumn: { what: 'The column that defines the operating regime of each row, such as flow regime or load case.' },
+    regimeMode: {
+      what: 'How regimes are used in the split.',
+      choices: {
+        heldout: 'Whole regimes are held out for testing: a strict check that the model works in a regime it never saw.',
+        proportional: 'Each regime is split in the same proportions, so every regime appears in training, validation and test.'
+      }
+    },
+    timeColumn: { what: 'The column that gives the time or order of each row; earlier rows are used for training.' },
+    timeDirection: {
+      what: 'Which end of the time column counts as the past.',
+      choices: { ascending: 'Earliest or lowest values are the past and train the model.', descending: 'Latest or highest values are treated as the past; use only if the column counts backwards.' }
+    },
+    enableUncertainty: {
+      what: 'Adds a range around each prediction, not just a single value. The method depends on the model and is named in the results.',
+      choices: { 'true': 'On: predictions come with intervals, and Evaluate results shows how often they contained the true value.', 'false': 'Off: point predictions only. Training is faster.' }
+    },
+    intervalLevel: {
+      what: 'How often each interval is meant to contain the true value. In Evaluate results, check that the achieved coverage on the Test row is close to this value.',
+      choices: {
+        '0.8': '80%: narrow ranges, wrong about 1 time in 5 — for rough screening.',
+        '0.9': '90%: a common engineering compromise between width and reliability.',
+        '0.95': '95%: the usual default; wrong about 1 time in 20.',
+        '0.99': '99%: very wide ranges, and they need plenty of data to be reliable.'
+      }
+    },
+    bootstrapSamples: {
+      what: 'Ridge regression only: how many refits are used to estimate its prediction intervals.',
+      choices: function (value) { return value + ' refits: more give smoother intervals but take longer. 30 is enough while exploring; 100 for a final model.'; }
+    }
+  };
+
+  function fieldKey(control) {
+    var id = control && control.id;
+    if (!id) return null;
+    if (FIELD_HELP[id]) return id;
+    var match = /(TrainPct|ValidationPct|TestPct)$/.exec(id);
+    return match ? match[1] : null;
+  }
+
+  function showFieldHelp(control) {
+    var key = fieldKey(control);
+    if (!key) return;
+    var spec = FIELD_HELP[key];
+    var group = control.closest('.form-grid') || control.closest('label');
+    if (!group) return;
+    var slot = group.nextElementSibling && group.nextElementSibling.classList.contains('field-help') ? group.nextElementSibling : null;
+    if (!slot) {
+      slot = document.createElement('div');
+      slot.className = 'field-help';
+      slot.setAttribute('aria-live', 'polite');
+      group.insertAdjacentElement('afterend', slot);
+    }
+    document.querySelectorAll('#step-split .field-help').forEach(function (other) { if (other !== slot) other.hidden = true; });
+    var value = control.type === 'checkbox' ? String(control.checked) : control.value;
+    var choice = typeof spec.choices === 'function' ? spec.choices(value) : (spec.choices ? spec.choices[value] : null);
+    var label = control.tagName === 'SELECT' && control.options[control.selectedIndex] ? control.options[control.selectedIndex].text
+      : control.type === 'checkbox' ? (control.checked ? 'on' : 'off') : value;
+    slot.textContent = '';
+    var what = document.createElement('p');
+    what.textContent = spec.what;
+    slot.appendChild(what);
+    if (choice) {
+      var p = document.createElement('p');
+      p.className = 'prep-choice';
+      var lead = document.createElement('strong');
+      lead.textContent = 'Your choice — ' + label + ': ';
+      p.appendChild(lead);
+      p.appendChild(document.createTextNode(choice));
+      slot.appendChild(p);
+    }
+    slot.hidden = false;
+  }
+
+  function wireFieldHelp() {
+    var stage = el('step-split');
+    if (!stage) return;
+    // Delegated, so it also covers the split controls the app re-renders per strategy.
+    stage.addEventListener('focusin', function (event) { showFieldHelp(event.target); });
+    stage.addEventListener('change', function (event) { showFieldHelp(event.target); });
+    stage.addEventListener('input', function (event) { if (event.target.type === 'number') showFieldHelp(event.target); });
+    var intro = document.createElement('p');
+    intro.className = 'fine-print field-help-intro';
+    intro.textContent = 'Click any setting to see what it means and what to enter.';
+    var firstGrid = stage.querySelector('.form-grid');
+    if (firstGrid) firstGrid.insertAdjacentElement('beforebegin', intro);
+  }
+
   function init() {
     wirePrep();
     wireEvaluate();
     wireModelChoice();
+    buildStageSteps();
+    wireFieldHelp();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

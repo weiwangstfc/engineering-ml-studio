@@ -641,3 +641,26 @@ details.eval-section[open] .eval-summary-title::after, details.eval-section[open
 .prep-figure-tables caption { font-weight: 700; font-size: .78rem; text-align: left; padding-bottom: .2rem; }
 .prep-figure-tables th, .prep-figure-tables td { padding: .2rem .45rem; text-align: center; position: static; }
 .prep-figure-arrow { font-size: 1.2rem; color: var(--muted); }
+
+/* Every Project stage: a compact, clickable strip of the steps in this stage. */
+.stage-steps { list-style: none; display: flex; flex-wrap: wrap; align-items: stretch; gap: .4rem; margin: 0 0 1rem; padding: 0; counter-reset: none; }
+.stage-steps li { display: flex; align-items: center; gap: .4rem; }
+.stage-steps li + li::before { content: "→"; color: var(--muted); font-size: .95rem; }
+.stage-step { display: inline-flex; align-items: center; gap: .45rem; padding: .35rem .7rem .35rem .4rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--text); font-size: .82rem; font-weight: 600; text-align: left; }
+.stage-step:hover, .stage-step:focus-visible { border-color: var(--primary); background: var(--accent); }
+.stage-step-num { display: inline-grid; place-items: center; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: var(--primary); color: #fff; font-size: .72rem; flex: 0 0 auto; }
+.stage-step-optional { color: var(--muted); font-weight: 400; font-size: .74rem; }
+.step-target-flash { animation: step-target-flash 1.6s ease; }
+@keyframes step-target-flash { 0%, 40% { box-shadow: 0 0 0 3px var(--primary); } 100% { box-shadow: 0 0 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) { .step-target-flash { animation: none; outline: 3px solid var(--primary); } }
+@media (max-width: 760px) {
+  .stage-steps { flex-direction: column; align-items: stretch; }
+  .stage-steps li + li::before { content: "↓"; padding-left: .7rem; }
+  .stage-steps li { flex-direction: column; align-items: stretch; }
+}
+
+/* Stage 4B: explanation of the setting being edited, shown under its group. */
+.field-help-intro { margin: .2rem 0 .6rem; }
+.field-help { margin: .6rem 0 .2rem; padding: .65rem .85rem; border-left: 3px solid var(--primary); border-radius: 6px; background: var(--surface-soft); font-size: .86rem; line-height: 1.5; max-width: 80ch; }
+.field-help p { margin: 0 0 .35rem; }
+.field-help p:last-child { margin-bottom: 0; }

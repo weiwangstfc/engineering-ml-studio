@@ -733,6 +733,42 @@ test.describe('Project mode — model choice guidance (step 3)', () => {
   });
 });
 
+test.describe('Project mode — step strips and validation help (step 5)', () => {
+  test('T1. every stage lists its steps, and a step takes you to its control', async ({ page }) => {
+    await fullWorkflow(page);
+    for (const id of PANEL_IDS) {
+      const steps = page.locator('#' + id + ' .stage-steps .stage-step');
+      expect(await steps.count(), id + ' has a step strip').toBeGreaterThanOrEqual(3);
+    }
+    await goToStage(page, 'step-features');
+    await page.locator('#step-features .stage-step', { hasText: 'Choose the quantity to predict' }).click();
+    await expect(page.locator('#targetColumn')).toBeFocused();
+    await goToStage(page, 'step-diagnostics');
+    await expect(page.locator('#evalErrors')).toHaveJSProperty('open', false);
+    await page.locator('#step-diagnostics .stage-step', { hasText: 'Check the errors' }).click();
+    await expect(page.locator('#evalErrors')).toHaveJSProperty('open', true);
+  });
+
+  test('T2. validation settings explain themselves and the chosen value', async ({ page }) => {
+    await fullWorkflow(page);
+    await goToStage(page, 'step-split');
+    await expect(page.locator('#step-split .field-help-intro')).toContainText('Click any setting');
+    await page.locator('#splitStrategy').focus();
+    const visibleHelp = page.locator('#step-split .field-help:visible');
+    await expect(visibleHelp).toHaveCount(1);
+    await expect(visibleHelp).toContainText('Your choice — Naive random split');
+    // Re-rendered split controls are covered too.
+    await page.locator('#randomTrainPct').focus();
+    await expect(visibleHelp).toHaveCount(1);
+    await expect(visibleHelp).toContainText('add up to 100');
+    await page.locator('#intervalLevel').focus();
+    await expect(visibleHelp).toContainText('Your choice — 95%');
+    await page.selectOption('#intervalLevel', '0.8');
+    await expect(visibleHelp).toContainText('Your choice — 80%');
+    await page.selectOption('#intervalLevel', '0.95');
+  });
+});
+
 test.describe('Project mode — responsive layout and accessibility', () => {
   async function layout(page) {
     return page.evaluate(() => {

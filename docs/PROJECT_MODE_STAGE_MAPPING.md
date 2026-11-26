@@ -44,7 +44,7 @@ panel may still be hidden, `showStage` calls `Plotly.Plots.resize` on the
 revealed panel's `.plot` elements.
 
 **Cache-busting.** Both stylesheet links carry a version query
-(`./css/app.css?v=1.0.11`, `./css/explore.css?v=1.0.11`) so stylesheet edits are
+(`./css/app.css?v=…`, `./css/explore.css?v=…`; bump both on every stylesheet change) so stylesheet edits are
 never masked by a stale browser cache.
 
 ## Six user-facing stages → eight internal panels
@@ -272,3 +272,26 @@ collapsed by default and expandable on demand (native, keyboard-accessible).
 *Engineering ML Studio is a redevelopment of **Local Regression Studio** by
 **Yu Duan** (MIT licence). New contributions are © UKRI under the same MIT terms
 and do not alter the original work's copyright or attribution.*
+
+## Guidance layer (`js/project-guidance.js`)
+
+Added in response to review by Wei Wang (2026-11). A presentation-only module, loaded after
+`project-shell.js`, that explains the Project-mode settings in plain engineering language. It reads
+control values and a few counts from `LocalRegressionApp.state` (rows, selected inputs, column types)
+to describe them; it never changes a setting or a model choice and never computes a result. The two
+pieces of guidance that need the data — the target-transformation hint (stage 2) and the
+"does this setting apply to your inputs?" notes (stage 3) — live in `js/app.js` beside the code they
+describe, and are equally read-only.
+
+| Stage | Guidance |
+| --- | --- |
+| Every stage | A clickable step strip under the stage guidance (`.stage-steps`); each step scrolls to, and highlights, the control it names. |
+| 1 Load data | Other ways to start grouped by who needs them ("Continue earlier work" / "For operators"), each with its purpose and file type. |
+| 2 Inputs and target | Two numbered sections (target; input variables). Target-transformation explainer plus a data-based hint. "Filter columns" (was "Feature search"); the duplicate "Select all eligible" button was removed. |
+| 3 Prepare data | One column of settings grouped by input type; click a setting for what it does and what the chosen value means; relevance notes; illustrations for scaling and encoding. |
+| 4 Choose models | Plain-language cards with family tags; the eight other models grouped by family; a "Which model when?" table; a data-based starting suggestion that never selects a model; a link to the baseline comparison tool. |
+| 4 Validation and train | Click any setting for what it means and what to enter, including the per-strategy split fields. |
+| 5 Evaluate results | Seven numbered sections; only "How good is the model?" is always shown. "Save and export" is open; governance is closed. Every plot has a "Good: …" caption. |
+
+All control IDs, values, defaults, the training pipeline and the saved-project and export schemas are
+unchanged. New text is English-only until the translation pass.
