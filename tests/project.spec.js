@@ -427,6 +427,8 @@ test.describe('Project mode — application shell (top bar, rail, workspace)', (
     const helpText = page.locator('#predictionIntervalHelpText');
 
     await expect(help).toHaveCount(1);
+    // The interval explanation lives in the "Uncertainty" section of Evaluate results.
+    await page.locator('#evalUncertainty > summary').click();
     await expect(help).toHaveJSProperty('open', false);
 
     await help.locator('summary').click();
@@ -589,6 +591,56 @@ test.describe('Project mode — stage 2 and 3 layout (review feedback)', () => {
     // Guidance never changes a setting.
     await expect(page.locator('#numericMissing')).toHaveValue('mean');
     await expect(page.locator('#categoricalEncoding')).toHaveValue('onehot');
+  });
+});
+
+test.describe('Project mode — Evaluate results grouping (step 2)', () => {
+  test('V1. results lead, details are grouped and closed, and the page stays compact', async ({ page }) => {
+    await fullWorkflow(page);
+    await goToStage(page, 'step-diagnostics');
+    const headline = page.locator('#evalSummary');
+    await expect(headline).toBeVisible();
+    await expect(headline.locator('#metricsTable tbody tr').first()).toBeVisible();
+    await expect(headline.locator('#plotActualPredicted .main-svg').first()).toBeVisible();
+    await expect(headline.locator('#plotActualPredictedFeature .main-svg').first()).toBeVisible();
+    for (const id of ['evalErrors', 'evalUncertainty', 'evalLearned', 'evalCompare', 'evalGovernance']) {
+      await expect(page.locator('#' + id), id + ' starts closed').toHaveJSProperty('open', false);
+    }
+    // Saving is an everyday action, so it is open and outside governance.
+    await expect(page.locator('#evalSave')).toHaveJSProperty('open', true);
+    await expect(page.locator('#evalSave #downloadProjectBtn')).toBeVisible();
+    await expect(page.locator('#evalGovernance #downloadProjectBtn')).toHaveCount(0);
+    // It was ~8,000 px as one long report.
+    const height = await page.locator('#step-diagnostics').evaluate(el => el.getBoundingClientRect().height);
+    expect(height).toBeLessThan(3200);
+  });
+
+  // Guards what the user sees. Plotly's responsive mode already redraws on open; the
+  // explicit resize in project-guidance.js is a safety net, so this test passes either way.
+  test('V2. opening a section draws its plots at full width', async ({ page }) => {
+    await fullWorkflow(page);
+    await goToStage(page, 'step-diagnostics');
+    await page.locator('#evalErrors > summary').click();
+    const plot = page.locator('#plotResidualPredicted');
+    await expect(plot.locator('.main-svg').first()).toBeVisible();
+    const card = await page.locator('#plotResidualPredicted').evaluate(el => el.closest('.chart-card').getBoundingClientRect().width);
+    await expect.poll(async () => plot.locator('.main-svg').first().evaluate(svg => svg.getBoundingClientRect().width))
+      .toBeGreaterThan(card * 0.8);
+  });
+
+  test('V3. the comparison section opens once there are two experiments', async ({ page }) => {
+    await fullWorkflow(page);
+    await goToStage(page, 'step-diagnostics');
+    await expect(page.locator('#evalCompare')).toHaveJSProperty('open', false);
+    await expect(page.locator('#evalCompareCount')).toContainText('Train another model');
+    await goToStage(page, 'step-model');
+    await page.locator('#step-model input[name="modelType"][value="forest"]').check();
+    await goToStage(page, 'step-split');
+    await page.click('#trainBtn');
+    await expect.poll(() => page.evaluate(() => window.LocalRegressionApp.state.experiments.length), { timeout: 60000 }).toBe(2);
+    await goToStage(page, 'step-diagnostics');
+    await expect(page.locator('#evalCompareCount')).toContainText('2 experiments saved');
+    await expect(page.locator('#evalCompare')).toHaveJSProperty('open', true);
   });
 });
 

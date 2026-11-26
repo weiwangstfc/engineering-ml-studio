@@ -593,3 +593,22 @@ body.prediction-only #approvedPackageLabel { color: #fff; background: var(--prim
   .prep-option-main, .prep-option-main > label:not(.prep-check) { grid-template-columns: minmax(0, 1fr); }
   .feature-filter input { width: 100%; }
 }
+
+/* Stage 5: Evaluate results grouped into numbered sections. Section 1 is always
+   visible; the rest open on demand so the stage no longer reads as one long report. */
+.eval-section { margin-top: 1rem; border: 1px solid var(--line); border-radius: 12px; padding: .4rem 1rem; background: var(--surface); }
+.eval-section[open] { padding-bottom: 1rem; }
+.eval-headline { padding: .9rem 1rem 1rem; }
+.eval-headline h3 { display: flex; align-items: center; gap: .5rem; margin: 0 0 .25rem; font-size: 1.05rem; }
+.eval-headline > .fine-print { margin: 0 0 .5rem; max-width: 80ch; }
+details.eval-section > summary { cursor: pointer; display: flex; flex-direction: column; gap: .2rem; padding: .5rem 0; list-style: none; }
+details.eval-section > summary::-webkit-details-marker { display: none; }
+.eval-summary-title { display: flex; align-items: center; gap: .5rem; font-weight: 700; font-size: 1.02rem; }
+.eval-summary-title::after, .governance-summary-title::after { content: "▸"; margin-left: auto; color: var(--muted); transition: transform .15s ease; }
+details.eval-section[open] .eval-summary-title::after, details.eval-section[open] .governance-summary-title::after { transform: rotate(90deg); }
+.governance-summary-title { display: flex; align-items: center; gap: .5rem; }
+.eval-summary-hint { padding-left: 2.1rem; font-weight: 400; font-size: .84rem; color: var(--muted); }
+.eval-num { display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--primary); color: #fff; font-size: .8rem; font-weight: 700; flex: 0 0 auto; }
+.eval-intro { margin: .2rem 0 0; max-width: 80ch; }
+.chart-caption { margin: .1rem .2rem .3rem; color: var(--muted); font-size: .8rem; line-height: 1.4; }
+#evalGovernance.governance-details { background: var(--surface-soft); }

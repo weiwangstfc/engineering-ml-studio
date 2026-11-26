@@ -144,8 +144,51 @@
     });
   }
 
+  // --- Stage 5: Evaluate results -------------------------------------------------
+  // The stage is grouped into collapsible sections. Plots drawn while a section was
+  // closed have no size, so redraw them at full width when the section opens.
+  function resizePlotsIn(root) {
+    if (!global.Plotly || !global.Plotly.Plots || !root) return;
+    root.querySelectorAll('.js-plotly-plot').forEach(function (plot) {
+      try { global.Plotly.Plots.resize(plot); } catch (_) { /* a plot not yet drawn */ }
+    });
+  }
+
+  // Say how many experiments there are, and open the comparison section the first
+  // time there is something to compare. Reads the rendered table only.
+  var compareAutoOpened = false;
+  function updateCompareSection() {
+    var section = el('evalCompare'), note = el('evalCompareCount'), table = el('comparisonTable');
+    if (!section || !note || !table) return;
+    // Saved experiments come from the app's own state; the table may list fewer,
+    // because by default it shows only experiments comparable with the active one.
+    var app = global.LocalRegressionApp;
+    var count = app && app.state && Array.isArray(app.state.experiments) ? app.state.experiments.length : 0;
+    var listed = table.querySelectorAll('tbody tr').length;
+    if (count >= 2) {
+      note.textContent = count + ' experiments saved' +
+        (listed < count ? ' (' + listed + ' directly comparable with the active one)' : '') +
+        '. Sort, chart and choose the model to carry forward.';
+      if (!compareAutoOpened) { compareAutoOpened = true; section.open = true; }
+    } else {
+      note.textContent = 'Train another model, or use “Compare several baseline models” in stage 4, to compare.';
+    }
+  }
+
+  function wireEvaluate() {
+    document.querySelectorAll('#step-diagnostics details.eval-section').forEach(function (section) {
+      section.addEventListener('toggle', function () { if (section.open) resizePlotsIn(section); });
+    });
+    var table = el('comparisonTable');
+    if (table && global.MutationObserver) {
+      new MutationObserver(updateCompareSection).observe(table, { childList: true, subtree: true });
+    }
+    updateCompareSection();
+  }
+
   function init() {
     wirePrep();
+    wireEvaluate();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

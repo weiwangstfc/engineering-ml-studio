@@ -822,7 +822,63 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <p><strong>Why it matters:</strong> headline accuracy can hide problems — bias in part of the range, poor coverage of the prediction intervals, or weak performance for a particular group.</p>
           <p><strong>Look for:</strong> points scattered close to the diagonal in <em>Actual vs predicted</em>, residuals with no obvious pattern, and interval coverage close to the level you requested.</p>
         </details>
-        <div id="experimentSummary" class="experiment-summary hidden" aria-live="polite"></div>
+        <section class="eval-section eval-headline" id="evalSummary" aria-labelledby="evalSummaryHeading">
+          <h3 id="evalSummaryHeading"><span class="eval-num">1</span> How good is the model?</h3>
+          <p class="fine-print">Judge the model mainly on the <strong>Test</strong> row of the table: data it never saw while training or choosing settings. A training error much lower than the test error is a sign of overfitting.</p>
+        <div id="metricsTableWrap" class="table-wrap metrics-table-wrap"><table id="metricsTable"></table></div>
+        <div id="cvSummary" class="info-box hidden"></div>
+        <div class="diagnostic-controls">
+          <h3>Diagnostic plot settings</h3>
+          <div class="form-grid three">
+            <label>Dataset shown in plots<select id="diagnosticDataset"><option value="test">Test</option><option value="validation">Validation</option><option value="training">Training</option></select></label>
+            <label>Input feature for residual plot<select id="diagnosticFeature"></select></label>
+            <label>Source column for grouped diagnostics<select id="diagnosticSource"><option value="">No source grouping</option></select></label>
+          </div>
+          <label class="toggle-card">
+            <input id="showDiagnosticUncertainty" type="checkbox" checked>
+            <span><strong>Show uncertainty intervals in plots</strong><small>This controls only the displayed uncertainty bands and error bars. It does not change the fitted model or uncertainty metrics.</small></span>
+          </label>
+        </div>
+          <div class="charts-grid">
+          <article class="chart-card"><div class="chart-title"><h3>Actual vs predicted</h3><button data-plot="actualPredicted" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: points close to the dashed diagonal across the whole range.</p><div id="plotActualPredicted" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Actual and predicted vs input feature</h3><button data-plot="actualPredictedFeature" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: the predictions follow the measured trend against this input.</p><div id="plotActualPredictedFeature" class="plot"></div></article>
+          </div>
+        </section>
+        <details class="eval-section" id="evalErrors">
+          <summary><span class="eval-summary-title"><span class="eval-num">2</span> Check the errors</span><span class="eval-summary-hint">Where and how the model is wrong: residual plots, each with what good looks like.</span></summary>
+          <p class="fine-print eval-intro">A residual is measured minus predicted. Patterns in the residuals show what the model has missed; good residuals look like random scatter around zero.</p>
+          <div class="charts-grid">
+          <article class="chart-card"><div class="chart-title"><h3>Residuals vs predicted</h3><button data-plot="residualPredicted" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: a shapeless band around zero. A curve means a missed trend; a funnel means errors that grow with the size of the value.</p><div id="plotResidualPredicted" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Residual distribution</h3><button data-plot="residualHistogram" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: roughly symmetric around zero. A long tail means a few large misses worth investigating.</p><div id="plotResidualHistogram" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Residuals vs input feature</h3><button data-plot="residualFeature" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: no pattern. A curve means the model misses how this input acts.</p><div id="plotResidualFeature" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Residual Q–Q plot</h3><button data-plot="qq" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: points close to the line. Mainly matters for interval methods that assume normally distributed errors.</p><div id="plotQQ" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Residuals by source</h3><button data-plot="residualSource" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: a similar spread for every group. One group far off means the model does not transfer to it.</p><div id="plotResidualSource" class="plot"></div></article>
+          </div>
+        </details>
+        <details class="eval-section" id="evalUncertainty">
+          <summary><span class="eval-summary-title"><span class="eval-num">3</span> Uncertainty</span><span class="eval-summary-hint">How wide the prediction intervals are, and where the model is least certain.</span></summary>
+          <details class="prediction-interval-help" id="predictionIntervalHelp">
+            <summary>What does a prediction interval mean?</summary>
+            <p id="predictionIntervalHelpText">
+              A prediction interval gives a range of plausible values for an individual prediction.
+              For example, a 90% prediction interval is designed to contain the actual value
+              for approximately 90% of comparable future observations, under the method's
+              assumptions. A wider interval indicates greater predictive uncertainty.
+            </p>
+          </details>
+          <div class="charts-grid">
+          <article class="chart-card"><div class="chart-title"><h3>Interval width vs prediction</h3><button data-plot="intervalWidth" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Shows where the model is least certain. Wider intervals in part of the range point to sparse or noisy data there.</p><div id="plotIntervalWidth" class="plot"></div></article>
+          </div>
+        </details>
+        <details class="eval-section" id="evalLearned">
+          <summary><span class="eval-summary-title"><span class="eval-num">4</span> What the model learned</span><span class="eval-summary-hint">Which inputs it relied on, and how training progressed.</span></summary>
+          <div class="charts-grid">
+          <article class="chart-card"><div class="chart-title"><h3>Feature importance</h3><button data-plot="importance" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Which inputs the model relied on. This describes the model, not proof of physical cause and effect.</p><div id="plotImportance" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Training and optimisation history</h3><button data-plot="trainingHistory" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Iterative models only: the loss should fall and then flatten.</p><div id="plotTrainingHistory" class="plot"></div></article>
+          </div>
+        </details>
+        <details class="eval-section" id="evalCompare">
+          <summary><span class="eval-summary-title"><span class="eval-num">5</span> Compare experiments</span><span class="eval-summary-hint"><span id="evalCompareCount">Train another model, or use “Compare several baseline models” in stage 4, to compare.</span></span></summary>
         <section id="comparisonWorkspace" class="subpanel comparison-workspace hidden" aria-live="polite">
           <div class="panel-heading compact-heading">
             <div><h3>Model comparison workspace</h3><p class="fine-print">Experiments marked comparable use the same dataset fingerprint, target, features, preprocessing, split membership, target transformation and interval level.</p></div>
@@ -842,43 +898,26 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           </div>
           <article class="chart-card comparison-chart-card"><div class="chart-title"><h3 id="comparisonChartTitle">Selected comparison metric by model</h3><button data-plot="comparisonRmse" class="text-button export-plot" type="button">PNG</button></div><div id="plotComparisonRmse" class="plot comparison-plot"></div></article>
         </section>
-        <div id="metricsTableWrap" class="table-wrap metrics-table-wrap"><table id="metricsTable"></table></div>
-        <div id="cvSummary" class="info-box hidden"></div>
-        <div class="diagnostic-controls">
-          <h3>Diagnostic plot settings</h3>
-          <div class="form-grid three">
-            <label>Dataset shown in plots<select id="diagnosticDataset"><option value="test">Test</option><option value="validation">Validation</option><option value="training">Training</option></select></label>
-            <label>Input feature for residual plot<select id="diagnosticFeature"></select></label>
-            <label>Source column for grouped diagnostics<select id="diagnosticSource"><option value="">No source grouping</option></select></label>
+        </details>
+        <details class="eval-section" id="evalSave" open>
+          <summary><span class="eval-summary-title"><span class="eval-num">6</span> Save and export</span><span class="eval-summary-hint">Save the project to continue later, or download the model, predictions, metrics and plots.</span></summary>
+          <p class="fine-print eval-intro">This experiment’s record: its identifier, the application version and a fingerprint of the dataset it was trained on, kept with every saved file.</p>
+          <div id="experimentSummary" class="experiment-summary hidden" aria-live="polite"></div>
+          <div class="export-group">
+            <div class="action-row wrap">
+              <button id="downloadModelBtn" class="button secondary" type="button">Download model</button>
+              <button id="downloadPredictionsBtn" class="button secondary" type="button">Download split predictions</button>
+              <button id="downloadMetricsBtn" class="button secondary" type="button">Download metrics</button>
+              <button id="downloadExperimentBtn" class="button secondary" type="button">Download experiment record</button>
+              <button id="downloadProjectBtn" class="button secondary" type="button">Save project</button>
+              <button id="downloadAllPlotsBtn" class="button secondary" type="button">Download all plots</button>
+            </div>
+            <p class="fine-print"><strong>The project file does not contain the original CSV.</strong> It contains configuration, fitted model, predictions and diagnostic results.</p>
+          
           </div>
-          <label class="toggle-card">
-            <input id="showDiagnosticUncertainty" type="checkbox" checked>
-            <span><strong>Show uncertainty intervals in plots</strong><small>This controls only the displayed uncertainty bands and error bars. It does not change the fitted model or uncertainty metrics.</small></span>
-          </label>
-          <details class="prediction-interval-help" id="predictionIntervalHelp">
-            <summary>What does a prediction interval mean?</summary>
-            <p id="predictionIntervalHelpText">
-              A prediction interval gives a range of plausible values for an individual prediction.
-              For example, a 90% prediction interval is designed to contain the actual value
-              for approximately 90% of comparable future observations, under the method's
-              assumptions. A wider interval indicates greater predictive uncertainty.
-            </p>
-          </details>
-        </div>
-        <div class="charts-grid">
-          <article class="chart-card"><div class="chart-title"><h3>Actual vs predicted</h3><button data-plot="actualPredicted" class="text-button export-plot" type="button">PNG</button></div><div id="plotActualPredicted" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Actual and predicted vs input feature</h3><button data-plot="actualPredictedFeature" class="text-button export-plot" type="button">PNG</button></div><div id="plotActualPredictedFeature" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Residuals vs predicted</h3><button data-plot="residualPredicted" class="text-button export-plot" type="button">PNG</button></div><div id="plotResidualPredicted" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Residual distribution</h3><button data-plot="residualHistogram" class="text-button export-plot" type="button">PNG</button></div><div id="plotResidualHistogram" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Residual Q–Q plot</h3><button data-plot="qq" class="text-button export-plot" type="button">PNG</button></div><div id="plotQQ" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Residuals vs input feature</h3><button data-plot="residualFeature" class="text-button export-plot" type="button">PNG</button></div><div id="plotResidualFeature" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Residuals by source</h3><button data-plot="residualSource" class="text-button export-plot" type="button">PNG</button></div><div id="plotResidualSource" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Interval width vs prediction</h3><button data-plot="intervalWidth" class="text-button export-plot" type="button">PNG</button></div><div id="plotIntervalWidth" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Training and optimisation history</h3><button data-plot="trainingHistory" class="text-button export-plot" type="button">PNG</button></div><div id="plotTrainingHistory" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Feature importance</h3><button data-plot="importance" class="text-button export-plot" type="button">PNG</button></div><div id="plotImportance" class="plot"></div></article>
-        </div>
-        <details class="governance-details" open>
-          <summary><span class="governance-summary-title">Advanced validation and governance</span><span class="governance-summary-hint">Acceptance criteria, approval decisions, operational schema and downloadable reports. Optional for exploratory work; recommended before any operational use.</span></summary>
+        </details>
+        <details class="governance-details eval-section" id="evalGovernance">
+          <summary><span class="governance-summary-title"><span class="eval-num">7</span> Advanced validation and governance</span><span class="governance-summary-hint">Acceptance criteria, approval decisions, operational schema and downloadable reports. Optional for exploratory work; recommended before any operational use.</span></summary>
         <section id="validationWorkspace" class="subpanel validation-workspace" aria-live="polite">
           <div class="panel-heading compact-heading">
             <div><h3>Validation and acceptance</h3><p class="fine-print">Acceptance criteria apply to the currently active experiment unless you explicitly apply them to all comparable experiments. Blank numeric fields are not evaluated. Acceptance is a user decision, not an automatic certification.</p></div>
@@ -966,18 +1005,6 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
               <button id="downloadApprovalRecordBtn" class="button secondary" type="button">Download approval record</button>
               <button id="downloadApprovalHistoryBtn" class="button secondary" type="button">Download approval history CSV</button>
             </div>
-          </div>
-          <div class="export-group">
-            <h4>Model, project and result exports</h4>
-            <div class="action-row wrap">
-              <button id="downloadModelBtn" class="button secondary" type="button">Download model</button>
-              <button id="downloadPredictionsBtn" class="button secondary" type="button">Download split predictions</button>
-              <button id="downloadMetricsBtn" class="button secondary" type="button">Download metrics</button>
-              <button id="downloadExperimentBtn" class="button secondary" type="button">Download experiment record</button>
-              <button id="downloadProjectBtn" class="button secondary" type="button">Save project</button>
-              <button id="downloadAllPlotsBtn" class="button secondary" type="button">Download all plots</button>
-            </div>
-            <p class="fine-print"><strong>The project file does not contain the original CSV.</strong> It contains configuration, fitted model, predictions and diagnostic results.</p>
           </div>
           <div class="export-group">
             <h4>Operational release</h4>
