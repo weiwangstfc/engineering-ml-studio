@@ -463,7 +463,179 @@
     if (firstGrid) firstGrid.insertAdjacentElement('beforebegin', intro);
   }
 
+  // --- Research support: small datasets ------------------------------------------
+  // With few rows, a single test split is mostly noise. Say so where the split is
+  // chosen, offer cross-validation (through its own checkbox), and remind the user
+  // in Evaluate results when the test set is small.
+  var SMALL_DATA_ROWS = 300, SMALL_TEST_ROWS = 50;
+
+  function appState() { var app = global.LocalRegressionApp; return app && app.state; }
+
+  function updateSmallDataAdvice() {
+    var box = el('smallDataAdvice'), text = el('smallDataAdviceText'), cvButton = el('smallDataEnableCvBtn');
+    var state = appState();
+    if (!box || !text || !state || !Array.isArray(state.rows) || !state.rows.length) { if (box) box.classList.add('hidden'); return; }
+    var n = state.rows.length;
+    var strategy = el('splitStrategy') ? el('splitStrategy').value : 'random';
+    var pctField = el(strategy + 'TestPct');
+    var pct = pctField ? Number(pctField.value) : NaN;
+    var testRows = isFinite(pct) ? Math.round(n * pct / 100) : null;
+    if (n >= SMALL_DATA_ROWS && (testRows === null || testRows >= SMALL_TEST_ROWS)) { box.classList.add('hidden'); return; }
+    var message = 'Small dataset: ' + n.toLocaleString('en') + ' rows' +
+      (testRows !== null ? ', so the test set will hold about ' + testRows + ' rows' : '') + '. ' +
+      'With this few, scores change noticeably when the split changes, and differences of a few percent between models may be just noise. ' +
+      'Turn on k-fold cross-validation: every training row takes a turn in validation, which gives a steadier comparison. ' +
+      'Compare models mainly on the cross-validation average, and keep the test set as the final check.';
+    if (n < 30) message += ' With fewer than 30 rows, a simple model such as linear regression is usually the safest choice.';
+    text.textContent = message;
+    var cv = el('enableCV');
+    if (cvButton) cvButton.hidden = !cv || cv.checked;
+    box.classList.remove('hidden');
+  }
+
+  function updateSmallTestNote() {
+    var note = el('evalSmallTestNote'), state = appState();
+    var a = state && state.artifact;
+    var n = a && a.evaluation && a.evaluation.test && a.evaluation.test.pointMetrics ? a.evaluation.test.pointMetrics.n : null;
+    if (!note) return;
+    if (!n || n >= SMALL_TEST_ROWS) { note.classList.add('hidden'); return; }
+    note.textContent = 'Only ' + n + ' rows are in the test set, so treat small differences between models as noise' +
+      (a.evaluation.crossValidation ? ' and lean on the cross-validation result.' : '. Cross-validation (stage 4) gives a steadier comparison.');
+    note.classList.remove('hidden');
+  }
+
+  // --- Research support: methods and reproducibility summary ----------------------
+  var SPLIT_NAMES = { random: 'random', source: 'source-grouped', regime: 'regime-aware', time: 'time-based' };
+  var TRANSFORM_NAMES = { log: 'natural-logarithm', log10: 'base-10 logarithm', sqrt: 'square-root', boxcox: 'Box–Cox', yeojohnson: 'Yeo–Johnson' };
+  var PREP_PHRASES = {
+    numericMissing: { mean: 'missing numeric values were replaced with the training mean', median: 'missing numeric values were replaced with the training median', zero: 'missing numeric values were replaced with zero', drop: 'rows with missing numeric values were removed' },
+    numericScaling: { standard: 'numeric inputs were standardised', minmax: 'numeric inputs were min–max scaled', none: 'numeric inputs were not scaled' },
+    categoricalEncoding: { onehot: 'categorical inputs were one-hot encoded', ordinal: 'categorical inputs were ordinal-encoded', exclude: 'categorical inputs were excluded' }
+  };
+  var TUNING_NAMES = { grid: 'grid search', random: 'random search', lhs: 'Latin hypercube sampling' };
+
+  function sig(value) {
+    if (!isFinite(value)) return 'n/a';
+    var a = Math.abs(value);
+    return a !== 0 && (a >= 1e6 || a < 1e-3) ? value.toExponential(3) : Number(value.toPrecision(4)).toLocaleString('en');
+  }
+
+  function methodsSummary(a) {
+    var def = global.LRSPlatform && global.LRSPlatform.getModelDefinition ? global.LRSPlatform.getModelDefinition(a.modelType) : null;
+    var model = def && def.label ? def.label : a.modelType;
+    var d = a.dataset || {}, fp = d.fingerprint && d.fingerprint.value ? d.fingerprint.value.slice(0, 16) + '…' : 'not recorded';
+    var features = Array.isArray(a.selectedFeatures) ? a.selectedFeatures : [];
+    var tt = a.targetTransform && a.targetTransform.type && a.targetTransform.type !== 'none'
+      ? ' (modelled on a ' + (TRANSFORM_NAMES[a.targetTransform.type] || a.targetTransform.type) + ' scale and converted back)' : '';
+    var cfg = (a.preprocessor && a.preprocessor.config) || {};
+    // Describe only the preparation steps that actually applied to these inputs: a methods
+    // paragraph must not report encoding categories that did not exist, or filling gaps that
+    // were not there. Missing-value counts come from the loaded data when it is available.
+    var fitted = (a.preprocessor && Array.isArray(a.preprocessor.features)) ? a.preprocessor.features : [];
+    var hasNumeric = fitted.some(function (f) { return f.type === 'numeric'; });
+    var hasCategorical = fitted.some(function (f) { return f.type === 'categorical'; }) || cfg.categoricalEncoding === 'exclude';
+    var state = appState(), profiles = state && state.profiles;
+    var numericMissing = profiles ? features.filter(function (name) { var p = profiles[name]; return p && p.type === 'numeric' && p.missing > 0; }).length : null;
+    var prep = [];
+    if (hasNumeric && numericMissing !== 0 && PREP_PHRASES.numericMissing[cfg.numericMissing]) {
+      prep.push((numericMissing === null ? 'any ' : '') + PREP_PHRASES.numericMissing[cfg.numericMissing]);
+    }
+    if (hasNumeric && PREP_PHRASES.numericScaling[cfg.numericScaling]) prep.push(PREP_PHRASES.numericScaling[cfg.numericScaling]);
+    if (hasCategorical && PREP_PHRASES.categoricalEncoding[cfg.categoricalEncoding]) prep.push(PREP_PHRASES.categoricalEncoding[cfg.categoricalEncoding]);
+    var split = a.splitConfig || {}, sizes = a.splitSummary || {};
+    var params = a.modelParameters && typeof a.modelParameters === 'object'
+      ? Object.keys(a.modelParameters).filter(function (k) { var v = a.modelParameters[k]; return k.charAt(0) !== '_' && (typeof v === 'number' || typeof v === 'string' || typeof v === 'boolean'); })
+          .map(function (k) { return k + ' = ' + a.modelParameters[k]; }) : [];
+    var tuning = a.tuning && a.tuning.mode && a.tuning.mode !== 'manual'
+      ? ', with settings chosen by ' + (TUNING_NAMES[a.tuning.mode] || a.tuning.mode) + ' over ' + (a.tuning.candidateCount || (a.tuning.trials && a.tuning.trials.length) || 'several') + ' candidates compared on the validation rows' : '';
+    var ev = a.evaluation || {}, test = ev.test || {}, pm = test.pointMetrics || {}, um = test.uncertaintyMetrics || {};
+    var cv = ev.crossValidation;
+    var u = a.uncertainty || {};
+    var lines = [];
+    lines.push('Modelling was carried out in Engineering ML Studio (application version ' + (a.appVersion || 'unknown') + '), which runs entirely in the web browser. ' +
+      'The dataset (' + (d.fileName || 'unnamed file') + '; ' + (d.rowCount || '?') + ' rows, ' + (d.columnCount || '?') + ' columns; SHA-256 fingerprint ' + fp + ') ' +
+      'was used to predict ' + a.target + tt + ' from ' + features.length + ' input variable' + (features.length === 1 ? '' : 's') + ': ' + features.join(', ') + '.');
+    if (prep.length) lines.push('Preprocessing was fitted on the training rows only: ' + prep.join('; ') + '.');
+    lines.push('The data were divided by a ' + (SPLIT_NAMES[split.strategy] || split.strategy || '') + ' split (random seed ' + split.seed + ') into ' +
+      sizes.training + ' training, ' + sizes.validation + ' validation and ' + sizes.test + ' test rows' +
+      (cv && cv.folds && cv.average ? '; ' + cv.folds + '-fold cross-validation on the training rows gave a mean RMSE of ' + sig(cv.average.rmse) + ' and a mean R² of ' + sig(cv.average.r2) : '') + '.');
+    lines.push('A ' + model.charAt(0).toLowerCase() + model.slice(1) + ' model was trained' + (params.length ? ' (' + params.join(', ') + ')' : ' with the default settings') + tuning + '.');
+    if (u.enabled) lines.push(Math.round((u.level || 0) * 100) + '% prediction intervals were estimated using: ' + (u.method || 'the model’s interval method') + '.');
+    lines.push('On the held-out test rows, RMSE = ' + sig(pm.rmse) + ', MAE = ' + sig(pm.mae) + ' and R² = ' + sig(pm.r2) +
+      (u.enabled && isFinite(um.coverage) ? '; the intervals contained ' + Math.round(um.coverage * 100) + '% of the test values against the ' + Math.round((u.level || 0) * 100) + '% requested' : '') + '.');
+    lines.push('Experiment ' + (a.experimentId || 'unknown') + ', created ' + (a.createdAt ? a.createdAt.slice(0, 10) : 'unknown') + '.');
+    return lines.join(' ');
+  }
+
+  var summarisedExperiment = null;
+  function updateMethodsSummary() {
+    var area = el('methodsSummaryText'), state = appState();
+    var a = state && state.artifact;
+    if (!area || !a || !a.evaluation) return;
+    // Regenerate only for a new experiment, so the user's edits are not overwritten.
+    if (a.experimentId && a.experimentId === summarisedExperiment) return;
+    summarisedExperiment = a.experimentId || null;
+    area.value = methodsSummary(a);
+  }
+
+  function copyMethodsSummary() {
+    var area = el('methodsSummaryText'), status = el('copyMethodsStatus');
+    if (!area) return;
+    var done = function () { if (status) status.textContent = 'Copied.'; };
+    if (global.navigator && global.navigator.clipboard && global.navigator.clipboard.writeText) {
+      global.navigator.clipboard.writeText(area.value).then(done, function () { area.select(); document.execCommand('copy'); done(); });
+    } else { area.select(); document.execCommand('copy'); done(); }
+  }
+
+  // --- Operational use: approval and governance only when asked for --------------
+  var operationalUse = false;
+  function updateOperationalGate() {
+    var gate = el('operationalUseGate'), governance = el('evalGovernance'), state = appState();
+    if (!gate || !governance) return;
+    var a = state && state.artifact;
+    var hasRecords = Boolean(a && a.approval && Array.isArray(a.approval.history) && a.approval.history.length) ||
+      Boolean(state && state.approvedPackage) || document.body.classList.contains('prediction-only');
+    if (hasRecords) operationalUse = true;
+    gate.hidden = operationalUse;
+    governance.classList.toggle('ops-hidden', !operationalUse);
+  }
+
+  function wireResearchSupport() {
+    var split = el('step-split');
+    if (split) {
+      split.addEventListener('change', updateSmallDataAdvice);
+      split.addEventListener('input', updateSmallDataAdvice);
+      if (global.MutationObserver) new MutationObserver(function () {
+        if (split.classList.contains('is-active-panel')) updateSmallDataAdvice();
+      }).observe(split, { attributes: true, attributeFilter: ['class'] });
+    }
+    var cvButton = el('smallDataEnableCvBtn');
+    if (cvButton) cvButton.addEventListener('click', function () {
+      var cv = el('enableCV');
+      if (cv && !cv.checked) cv.click();
+      updateSmallDataAdvice();
+    });
+    var table = el('metricsTable');
+    var refresh = function () { updateSmallTestNote(); updateMethodsSummary(); updateOperationalGate(); };
+    if (table && global.MutationObserver) new MutationObserver(refresh).observe(table, { childList: true, subtree: true });
+    var copy = el('copyMethodsSummaryBtn');
+    if (copy) copy.addEventListener('click', copyMethodsSummary);
+    var enable = el('enableOperationalUseBtn');
+    if (enable) enable.addEventListener('click', function () {
+      operationalUse = true;
+      updateOperationalGate();
+      var governance = el('evalGovernance');
+      if (governance) { governance.open = true; governance.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+    var diagnostics = el('step-diagnostics');
+    if (diagnostics && global.MutationObserver) new MutationObserver(function () {
+      if (diagnostics.classList.contains('is-active-panel')) refresh();
+    }).observe(diagnostics, { attributes: true, attributeFilter: ['class'] });
+    updateOperationalGate();
+  }
+
   function init() {
+    wireResearchSupport();
     wirePrep();
     wireEvaluate();
     wireModelChoice();
@@ -475,6 +647,7 @@
   else init();
 
   global.EMSProjectGuidance = Object.freeze({
+    methodsSummary: methodsSummary,
     prepHelp: PREP_HELP,
     renderPrepHelp: renderPrepHelp,
     updateModelSuggestion: updateModelSuggestion

@@ -295,3 +295,18 @@ describe, and are equally read-only.
 
 All control IDs, values, defaults, the training pipeline and the saved-project and export schemas are
 unchanged. New text is English-only until the translation pass.
+
+### Research support (stage B of the user-perspective review, 2026-11)
+
+- **Small datasets.** Below 300 rows, or when the test set would hold fewer than 50 rows, stage 4 explains that single-split
+  scores are noise-dominated and offers to turn on cross-validation (through its own checkbox); Evaluate results notes a small
+  test set beside the metrics table.
+- **Methods and reproducibility summary** (Evaluate results → Save and export): an editable paragraph with data, fingerprint,
+  preparation (only the steps that applied), split and seed, model and settings, interval method, test metrics and coverage,
+  and the experiment ID, regenerated for each new experiment, with a Copy button.
+- **Operational use.** The approval, acceptance and reporting section (section 7) is hidden behind "Show approval and
+  governance tools" unless a project already holds approval records, a package is loaded, or prediction-only mode is on.
+  Monitoring stays visible: checking a model against later measurements is useful for research too.
+- **Glossary.** A dialog with 28 terms, reachable from the top navigation and Project's top bar, giving synonyms where the
+  tool uses two words for one thing.
+

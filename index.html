@@ -11,9 +11,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
   <title>Engineering ML Studio — browser-only machine learning for engineers</title>
   <!-- Must run before anything paints, and before any other script. -->
-  <script src="./js/frame-guard.js?v=1.0.20"></script>
-  <link rel="stylesheet" href="./css/app.css?v=1.0.20">
-  <link rel="stylesheet" href="./css/explore.css?v=1.0.20">
+  <script src="./js/frame-guard.js?v=1.0.21"></script>
+  <link rel="stylesheet" href="./css/app.css?v=1.0.21">
+  <link rel="stylesheet" href="./css/explore.css?v=1.0.21">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
@@ -28,6 +28,7 @@
       <li><a href="#learn" data-mode="learn" data-nav="learn">Learn</a></li>
       <li><a href="#about" data-mode="about" data-nav="about">About</a></li>
     </ul>
+    <button class="nav-glossary" type="button" data-open-glossary>Glossary</button>
     <span id="modeIndicator" class="mode-indicator" aria-live="polite"></span>
   </nav>
   <!-- Shown only when a non-English language is active: the guided Engineering ML Studio
@@ -569,6 +570,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
       <button id="topbarSaveBtn" class="topbar-action" type="button">Save project</button>
       <button id="topbarOpenBtn" class="topbar-action" type="button">Open project</button>
       <button id="privacyInfoBtn" class="topbar-action" type="button">Privacy</button>
+      <button class="topbar-action glossary-open" type="button" data-open-glossary>Glossary</button>
       <a id="topbarHelpLink" class="topbar-action" href="./docs/html/user-guide.html" target="_blank" rel="noopener" title="Opens the user guide">Help</a>
       <details class="local-processing">
         <summary><span class="local-dot" aria-hidden="true"></span>Local processing</summary>
@@ -924,6 +926,10 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <label id="foldsLabel" class="hidden">Number of folds<input id="cvFolds" type="number" min="3" max="10" value="5"></label>
         </div>
         <div id="splitControls" class="subpanel"></div>
+        <div id="smallDataAdvice" class="small-data-advice hidden" aria-live="polite">
+          <p id="smallDataAdviceText"></p>
+          <button id="smallDataEnableCvBtn" class="button secondary" type="button">Turn on cross-validation</button>
+        </div>
         <div class="subpanel">
           <h3 class="step-heading"><span class="step-badge">2</span> Prediction uncertainty</h3>
           <div class="form-grid three">
@@ -1007,6 +1013,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <h3 id="evalSummaryHeading"><span class="eval-num">1</span> How good is the model?</h3>
           <p class="fine-print">Judge the model mainly on the <strong>Test</strong> row of the table: data it never saw while training or choosing settings. A training error much lower than the test error is a sign of overfitting.</p>
         <div id="metricsTableWrap" class="table-wrap metrics-table-wrap"><table id="metricsTable"></table></div>
+        <p id="evalSmallTestNote" class="small-data-advice hidden"></p>
         <div id="cvSummary" class="info-box hidden"></div>
         <div class="diagnostic-controls">
           <h3>Diagnostic plot settings</h3>
@@ -1084,6 +1091,12 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <summary><span class="eval-summary-title"><span class="eval-num">6</span> Save and export</span><span class="eval-summary-hint">Save the project to continue later, or download the model, predictions, metrics and plots.</span></summary>
           <p class="fine-print eval-intro">This experiment’s record: its identifier, the application version and a fingerprint of the dataset it was trained on, kept with every saved file.</p>
           <div id="experimentSummary" class="experiment-summary hidden" aria-live="polite"></div>
+          <div class="methods-summary">
+            <h4>Methods and reproducibility summary</h4>
+            <p class="fine-print">A plain-language record of what was done — data, preparation, split, seed, model, intervals and test results — to paste into a report or paper. Check and edit it before use; it is regenerated for each new experiment.</p>
+            <textarea id="methodsSummaryText" rows="9" aria-label="Methods and reproducibility summary"></textarea>
+            <div class="action-row compact"><button id="copyMethodsSummaryBtn" class="button secondary" type="button">Copy summary</button><span id="copyMethodsStatus" class="fine-print" aria-live="polite"></span></div>
+          </div>
           <div class="export-group">
             <div class="action-row wrap">
               <button id="downloadModelBtn" class="button secondary" type="button">Download model</button>
@@ -1097,7 +1110,13 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           
           </div>
         </details>
-        <details class="governance-details eval-section" id="evalGovernance">
+        <div id="operationalUseGate" class="eval-section operational-gate">
+          <p><strong>Using this model operationally?</strong> Acceptance criteria, approval records, validation reports, operator
+            packages and their governance are for models released into regulated or routine use. Most research and learning
+            work does not need them.</p>
+          <button id="enableOperationalUseBtn" class="button secondary" type="button">Show approval and governance tools</button>
+        </div>
+        <details class="governance-details eval-section ops-hidden" id="evalGovernance">
           <summary><span class="governance-summary-title"><span class="eval-num">7</span> Advanced validation and governance</span><span class="governance-summary-hint">Acceptance criteria, approval decisions, operational schema and downloadable reports. Optional for exploratory work; recommended before any operational use.</span></summary>
         <section id="validationWorkspace" class="subpanel validation-workspace" aria-live="polite">
           <div class="panel-heading compact-heading">
@@ -1343,10 +1362,49 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
     <p><strong>Severity:</strong> critical findings can invalidate fitting or interpretation; warnings need review; information items explain workflow state. These checks do not verify units, scientific plausibility, sampling representativeness, causal validity, or every form of target leakage.</p>
     <form method="dialog"><button class="button primary">Close</button></form>
   </dialog>
-  <script src="./js/build-config.js?v=1.0.20"></script>
-  <script src="./js/i18n.js?v=1.0.20"></script>
+  <dialog id="glossaryDialog" class="glossary-dialog" aria-labelledby="glossaryHeading">
+    <div class="glossary-head">
+      <h2 id="glossaryHeading">Glossary</h2>
+      <button class="text-button" type="button" data-close-glossary>Close</button>
+    </div>
+    <p class="fine-print">Plain-language definitions of the terms used in this tool. Where the tool uses two words for the same thing, both are given.</p>
+    <label class="glossary-search">Find a term<input id="glossarySearch" type="search" placeholder="For example overfitting"></label>
+    <dl id="glossaryList" class="glossary-list">
+        <div class="glossary-entry"><dt>Coverage</dt><dd>How often the prediction intervals actually contained the true value. It should be close to the level requested.</dd></div>
+        <div class="glossary-entry"><dt>Cross-validation</dt><dd>Re-splitting the training rows several times so that each row takes a turn in validation. It gives a steadier score than a single split, which matters most for small datasets.</dd></div>
+        <div class="glossary-entry"><dt>Data leakage</dt><dd>Information from outside the training rows — for example a quantity measured after the event, or near-duplicate rows on both sides of the split — that makes a model look better than it will really be.</dd></div>
+        <div class="glossary-entry"><dt>Decision tree, random forest, gradient boosting</dt><dd>Models built from yes/no splits on the inputs. A forest averages many trees; gradient boosting builds small trees that each correct the last.</dd></div>
+        <div class="glossary-entry"><dt>Extrapolation</dt><dd>Predicting for inputs outside the range the model was trained on. Results there can be unreliable.</dd></div>
+        <div class="glossary-entry"><dt>Feature importance</dt><dd>How much the fitted model relied on each input. It describes the model, not proof of physical cause and effect.</dd></div>
+        <div class="glossary-entry"><dt>Hyperparameter</dt><dd>A setting chosen before training, such as a tree’s depth or a network’s size, as opposed to what the model learns from the data.</dd></div>
+        <div class="glossary-entry"><dt>Identifier column</dt><dd>A column that labels rows (sample ID, run number) rather than measuring anything. It is kept for traceability but excluded from the inputs, because a model could memorise it instead of learning the physics.</dd></div>
+        <div class="glossary-entry"><dt>Input variable</dt><dd>A measured condition the model uses to make a prediction, such as pipe diameter or temperature. Also called a <em>feature</em> or <em>input</em>.</dd></div>
+        <div class="glossary-entry"><dt>Linear regression</dt><dd>A model that predicts with one weighted sum of the inputs: easy to explain, and the baseline other models should beat.</dd></div>
+        <div class="glossary-entry"><dt>MAE</dt><dd>Mean absolute error: the average size of the errors, ignoring whether predictions were too high or too low. It is never larger than RMSE.</dd></div>
+        <div class="glossary-entry"><dt>Neural network</dt><dd>Layers of weighted sums with non-linear steps between them. Very flexible, but needs more data and care than the other models.</dd></div>
+        <div class="glossary-entry"><dt>Noise floor</dt><dd>The scatter in the measurements themselves. No model can predict it, so it limits how accurate any model can be.</dd></div>
+        <div class="glossary-entry"><dt>One-hot encoding</dt><dd>Turning a text category into 0/1 columns, one per category, so no false order is implied.</dd></div>
+        <div class="glossary-entry"><dt>Overfitting</dt><dd>Fitting quirks and noise in the training rows that do not carry over to new data. The sign is a test error much larger than the training error.</dd></div>
+        <div class="glossary-entry"><dt>Prediction interval</dt><dd>A range around a prediction that is meant to contain the true value a stated share of the time, for example 95%.</dd></div>
+        <div class="glossary-entry"><dt>Random seed</dt><dd>A number that fixes the random shuffle, so the same seed always gives the same split and the same results.</dd></div>
+        <div class="glossary-entry"><dt>Regression</dt><dd>Predicting a number on a continuous scale. This tool does regression only; predicting a category is classification.</dd></div>
+        <div class="glossary-entry"><dt>Residual</dt><dd>Measured value minus predicted value for one row. Good residuals look like random scatter around zero.</dd></div>
+        <div class="glossary-entry"><dt>RMSE</dt><dd>Root-mean-square error: a typical prediction error in the target’s own units, with large errors weighted heavily.</dd></div>
+        <div class="glossary-entry"><dt>R²</dt><dd>The share of the variation in the target that the model explains, compared with always predicting the average. 1 is perfect; 0 is no better than the average.</dd></div>
+        <div class="glossary-entry"><dt>Standardisation</dt><dd>Rescaling each input to an average of 0 and a standard deviation of 1, so inputs in different units are comparable. Learned from the training rows only.</dd></div>
+        <div class="glossary-entry"><dt>Target</dt><dd>The one quantity the model predicts, such as pressure drop or yield strength. Also called the <em>quantity to predict</em> or <em>output</em>.</dd></div>
+        <div class="glossary-entry"><dt>Target transformation</dt><dd>Modelling the target on another scale, such as its logarithm, and converting predictions back. Useful when the target spans orders of magnitude.</dd></div>
+        <div class="glossary-entry"><dt>Test set</dt><dd>Rows kept aside until the end for one independent check. The test score is the honest estimate of how the model will do on new data.</dd></div>
+        <div class="glossary-entry"><dt>Training set</dt><dd>The rows the model learns from.</dd></div>
+        <div class="glossary-entry"><dt>Underfitting</dt><dd>A model too simple to follow the real relationship, so it is inaccurate on both training and test data.</dd></div>
+        <div class="glossary-entry"><dt>Validation set</dt><dd>Rows held back from training and used to choose model settings and to compare models.</dd></div>
+    </dl>
+    <p id="glossaryEmpty" class="fine-print" hidden>No term matches.</p>
+  </dialog>
+  <script src="./js/build-config.js?v=1.0.21"></script>
+  <script src="./js/i18n.js?v=1.0.21"></script>
   <!-- Asset version: bump every ?v= on this page whenever any CSS or JS file changes.
        bootstrap.js passes its own ?v= on to every first-party script it loads. -->
-  <script src="./js/bootstrap.js?v=1.0.20"></script>
+  <script src="./js/bootstrap.js?v=1.0.21"></script>
 </body>
 </html>
