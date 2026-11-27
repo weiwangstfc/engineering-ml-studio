@@ -140,6 +140,16 @@
   };
   Object.keys(approvalTranslations).forEach(language => Object.assign(translations[language], approvalTranslations[language]));
 
+  // Engineering ML Studio: the notice shown while its guided pages remain English-only.
+  // Mode names stay in English because the navigation labels are not translated yet.
+  const emsNoticeTranslations = {
+    'zh-CN': {'Translation note: the guided Engineering ML Studio pages (Home, Explore, Learn and the Project-mode guidance) are currently available in English only. The modelling workspace itself is translated.':'翻译说明：Engineering ML Studio 的引导页面（Home、Explore、Learn 以及 Project 模式中的引导说明）目前仅提供英文版。建模工作区本身已翻译。','Dismiss':'关闭'},
+    'es': {'Translation note: the guided Engineering ML Studio pages (Home, Explore, Learn and the Project-mode guidance) are currently available in English only. The modelling workspace itself is translated.':'Nota sobre la traducción: las páginas guiadas de Engineering ML Studio (Home, Explore, Learn y la ayuda del modo Project) por ahora solo están disponibles en inglés. El espacio de modelado en sí está traducido.','Dismiss':'Cerrar'},
+    'fr': {'Translation note: the guided Engineering ML Studio pages (Home, Explore, Learn and the Project-mode guidance) are currently available in English only. The modelling workspace itself is translated.':'Note de traduction : les pages guidées d’Engineering ML Studio (Home, Explore, Learn et l’aide du mode Project) ne sont pour l’instant disponibles qu’en anglais. L’espace de modélisation lui-même est traduit.','Dismiss':'Fermer'},
+    'de': {'Translation note: the guided Engineering ML Studio pages (Home, Explore, Learn and the Project-mode guidance) are currently available in English only. The modelling workspace itself is translated.':'Hinweis zur Übersetzung: Die geführten Seiten von Engineering ML Studio (Home, Explore, Learn und die Hilfetexte im Project-Modus) sind derzeit nur auf Englisch verfügbar. Der Modellierungsbereich selbst ist übersetzt.','Dismiss':'Schließen'}
+  };
+  Object.keys(emsNoticeTranslations).forEach(language => Object.assign(translations[language], emsNoticeTranslations[language]));
+
   const expandedModelTranslations = {
     'zh-CN': {
       'Elastic net':'弹性网络回归','Combined L1 and L2 shrinkage for sparse, correlated linear models.':'结合 L1 和 L2 收缩，适用于稀疏且相关的线性特征。',

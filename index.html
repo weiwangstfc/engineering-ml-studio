@@ -11,9 +11,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
   <title>Engineering ML Studio — browser-only machine learning for engineers</title>
   <!-- Must run before anything paints, and before any other script. -->
-  <script src="./js/frame-guard.js?v=1.0.17"></script>
-  <link rel="stylesheet" href="./css/app.css?v=1.0.17">
-  <link rel="stylesheet" href="./css/explore.css?v=1.0.17">
+  <script src="./js/frame-guard.js?v=1.0.18"></script>
+  <link rel="stylesheet" href="./css/app.css?v=1.0.18">
+  <link rel="stylesheet" href="./css/explore.css?v=1.0.18">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
@@ -30,6 +30,12 @@
     </ul>
     <span id="modeIndicator" class="mode-indicator" aria-live="polite"></span>
   </nav>
+  <!-- Shown only when a non-English language is active: the guided Engineering ML Studio
+       content has not been translated yet (see WORKPLAN D6). -->
+  <div id="languageNotice" class="language-notice" role="note" hidden>
+    <p>Translation note: the guided Engineering ML Studio pages (Home, Explore, Learn and the Project-mode guidance) are currently available in English only. The modelling workspace itself is translated.</p>
+    <button id="languageNoticeDismiss" class="text-button" type="button">Dismiss</button>
+  </div>
 
   <div id="modeMain">
 
@@ -1213,10 +1219,10 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
     <p><strong>Severity:</strong> critical findings can invalidate fitting or interpretation; warnings need review; information items explain workflow state. These checks do not verify units, scientific plausibility, sampling representativeness, causal validity, or every form of target leakage.</p>
     <form method="dialog"><button class="button primary">Close</button></form>
   </dialog>
-  <script src="./js/build-config.js?v=1.0.17"></script>
-  <script src="./js/i18n.js?v=1.0.17"></script>
+  <script src="./js/build-config.js?v=1.0.18"></script>
+  <script src="./js/i18n.js?v=1.0.18"></script>
   <!-- Asset version: bump every ?v= on this page whenever any CSS or JS file changes.
        bootstrap.js passes its own ?v= on to every first-party script it loads. -->
-  <script src="./js/bootstrap.js?v=1.0.17"></script>
+  <script src="./js/bootstrap.js?v=1.0.18"></script>
 </body>
 </html>

@@ -140,7 +140,24 @@
     show(mode, { fromNav: true });
   }
 
+  // While the guided pages are English-only, say so whenever another language is active.
+  // The notice text itself is translated through the i18n dictionary.
+  var dismissedFor = null;
+  function updateLanguageNotice() {
+    var notice = el('languageNotice');
+    if (!notice) return;
+    var locale = global.LRSI18n && global.LRSI18n.locale ? global.LRSI18n.locale : 'en';
+    notice.hidden = /^en\b/i.test(locale) || dismissedFor === locale;
+  }
+
   function init() {
+    updateLanguageNotice();
+    global.addEventListener('lrs-language-change', function () { dismissedFor = null; updateLanguageNotice(); });
+    var dismiss = el('languageNoticeDismiss');
+    if (dismiss) dismiss.addEventListener('click', function () {
+      dismissedFor = global.LRSI18n ? global.LRSI18n.locale : null;
+      updateLanguageNotice();
+    });
     document.addEventListener('click', onModeClick);
     // Handle both hash changes and history traversal between pushState entries.
     function onLocationChange() {

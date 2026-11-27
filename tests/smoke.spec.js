@@ -252,5 +252,26 @@ test.describe('Engineering ML Studio — baseline browser application', () => {
     const unversioned = scripts.filter(u => u.searchParams.get('v') !== version).map(u => u.pathname);
     expect(unversioned, 'scripts without the current asset version').toEqual([]);
   });
+
+  test('a notice says the guided pages are English-only whenever another language is active', async ({ page }) => {
+    await page.goto('/?localOnly=1');
+    await page.waitForFunction(() => !!(window.LRSI18n && window.EMSModes));
+    const notice = page.locator('#languageNotice');
+    await page.evaluate(() => window.LRSI18n.setLanguage('en'));
+    await expect(notice).toBeHidden();
+    await page.evaluate(() => window.LRSI18n.setLanguage('es'));
+    await expect(notice).toBeVisible();
+    await expect(notice).toContainText('solo están disponibles en inglés');
+    // Visible in Project mode too, where the primary navigation is replaced by the app bar.
+    await page.evaluate(() => window.EMSModes.show('project'));
+    await expect(notice).toBeVisible();
+    await page.locator('#languageNoticeDismiss').click();
+    await expect(notice).toBeHidden();
+    await page.evaluate(() => window.LRSI18n.setLanguage('de'));
+    await expect(notice).toBeVisible();
+    await expect(notice).toContainText('nur auf Englisch');
+    await page.evaluate(() => window.LRSI18n.setLanguage('en'));
+    await expect(notice).toBeHidden();
+  });
 });
 

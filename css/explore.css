@@ -286,3 +286,8 @@
 .explore-metrics-explainer dt { font-weight: 700; margin-top: .4rem; }
 .explore-metrics-explainer dd { margin: 0; color: var(--muted); line-height: 1.5; }
 .explore-trend-note { display: block; margin-top: .3rem; color: var(--muted); }
+
+/* Shown while a non-English language is active and the guided pages are English-only. */
+.language-notice { display: flex; align-items: center; gap: 1rem; padding: .5rem clamp(1rem, 4vw, 2.5rem); background: var(--warning-bg); border-bottom: 1px solid var(--warning-line); font-size: .85rem; line-height: 1.45; }
+.language-notice[hidden] { display: none; }
+.language-notice p { margin: 0; flex: 1 1 auto; }
