@@ -279,3 +279,10 @@
   .explore-steps { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
   .explore-step { white-space: nowrap; }
 }
+
+/* Stage 3: brief definitions where the metric names first appear. */
+.explore-metrics-explainer { margin: .6rem 0 1rem; }
+.explore-metrics-explainer dl { margin: .5rem 0 0; display: grid; gap: .2rem; max-width: 80ch; }
+.explore-metrics-explainer dt { font-weight: 700; margin-top: .4rem; }
+.explore-metrics-explainer dd { margin: 0; color: var(--muted); line-height: 1.5; }
+.explore-trend-note { display: block; margin-top: .3rem; color: var(--muted); }

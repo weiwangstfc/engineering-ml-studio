@@ -553,6 +553,26 @@ test.describe('Engineering ML Studio — Phase 1 landing + problem-led Explore',
     await expect(page.locator('#exploreSteps .explore-step')).toHaveCount(4);
   });
 
+  test('B1. metric names are explained where they first appear, with the same words as stage 4', async ({ page }) => {
+    await page.goto('/?localOnly=1');
+    await appReady(page);
+    await enterExplore(page);
+    // Stage 1 says the expected trend will be checked later.
+    await expect(page.locator('#exploreProblem .explore-trend-note')).toContainText('stage 4');
+    await train(page, 'simple', 1);
+    const explainer = page.locator('#exploreMetricsExplainer');
+    await expect(explainer).toBeVisible();
+    await expect(explainer).toHaveJSProperty('open', false);
+    await explainer.locator('summary').click();
+    await expect(explainer.locator('dt')).toContainText(['Test RMSE', 'Test R²', 'Training RMSE versus test RMSE']);
+    const stage3Rmse = (await explainer.locator('dt:has-text("Test RMSE") + dd').first().textContent()).trim();
+    expect(stage3Rmse).toContain('kPa');
+    await page.click('#exploreToStage4');
+    const card = page.locator('#exploreInterpretation .explore-insight', { hasText: 'How large are the typical errors?' });
+    const stage4Rmse = (await card.locator('details.explore-explainer p').textContent()).trim();
+    expect(stage3Rmse).toBe(stage4Rmse);
+  });
+
   test('E1. returning to Explore through the navigation keeps the selected example in the URL', async ({ page }) => {
     await page.goto('/?localOnly=1#explore/cooling');
     await appReady(page);

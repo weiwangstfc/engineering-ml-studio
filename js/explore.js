@@ -455,7 +455,8 @@
     }).join('');
 
     var trendBlock = ex.trendText
-      ? '<div class="info-box compact-box"><strong>Expected trend:</strong> ' + escapeHtml(ex.trendText) + '</div>'
+      ? '<div class="info-box compact-box"><strong>Expected trend:</strong> ' + escapeHtml(ex.trendText) +
+        ' <span class="explore-trend-note">In stage 4 you will check whether the trained model actually follows these trends.</span></div>'
       : '';
 
     var schematic = SCHEMATICS[ex.key] ? '<div class="explore-schematic-wrap">' + SCHEMATICS[ex.key] + '</div>' : '';
@@ -839,7 +840,25 @@
     table.innerHTML = '<thead><tr><th>Approach</th><th>Test RMSE' + unitSuffix + '</th>' +
       '<th>Test R²</th><th>Training RMSE' + unitSuffix + '</th></tr></thead><tbody>' + body + '</tbody>';
     if (wrap) wrap.classList.remove('is-hidden');
+    renderMetricsExplainer();
   }
+  // Where the metric names first appear (the stage 3 table), explain them briefly with the
+  // same definitions stage 4 uses. Closed by default; the numbers stay in view.
+  function renderMetricsExplainer() {
+    var box = el('exploreMetricsExplainer'), list = el('exploreMetricsDefinitions');
+    if (!box || !list) return;
+    var ex = exampleByKey(state.exampleKey);
+    var defs = metricDefinitions(ex.targetLabel, currentUnit());
+    var rows = [
+      ['Test RMSE', defs.rmse],
+      ['Test R²', defs.r2],
+      ['Training RMSE versus test RMSE', defs.gap]
+    ];
+    list.innerHTML = rows.map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>'; }).join('') +
+      '<dt>Next</dt><dd>Stage 4 explains what your own numbers mean in engineering terms.</dd>';
+    box.classList.remove('is-hidden');
+  }
+
   // B2: a deliberate overfitting demonstration.
   //
   // The same existing model (a Decision Tree) is fitted at every depth in
@@ -1094,6 +1113,29 @@
     return { level: 'low', text: 'Training and test errors are similar, which suggests the model generalises reasonably to unseen rows. Note that a low training error on its own is never enough — the test error is what shows real performance.' };
   }
 
+  // One source for the metric definitions, used both where the terms first appear (the
+  // stage 3 comparison table) and in the stage 4 interpretation, so they cannot drift apart.
+  function metricDefinitions(target, unit) {
+    var t = escapeHtml(target);
+    return {
+      r2: 'R² compares the model’s errors with the errors you would make by always predicting the average ' + t +
+        '. A value of 1 is perfect; 0 means no better than predicting the average; a negative value is worse. ' +
+        'Because it has no units, R² lets you compare very different problems — but it cannot tell you whether the errors are ' +
+        'small enough for your engineering purpose. That is what RMSE and MAE are for.',
+      rmse: 'RMSE (root-mean-square error) squares each prediction error, averages them, and takes the square root, so it is in the units of ' +
+        t + (unit ? ' (' + escapeHtml(unit) + ')' : '') + '. ' +
+        'Squaring means large errors count for much more than small ones: a few big misses raise RMSE sharply. ' +
+        'Read it as “a typical error, with big misses weighted heavily”.',
+      mae: 'MAE (mean absolute error) is the average size of the errors, ignoring whether each prediction was too high or too low. ' +
+        'Unlike RMSE it does not give extra weight to large errors, so it is never larger than RMSE. Comparing the two is useful: ' +
+        'when RMSE is much larger than MAE, a handful of big misses dominate — worth finding out which rows they are.',
+      gap: 'The training error is measured on rows the model learned from, so it is optimistic. The test error is measured on rows ' +
+        'held back from training, so it is an honest estimate of performance on new data. A test error much larger than the training ' +
+        'error means the model has learned quirks of its training rows that do not carry over — that is overfitting. ' +
+        'A small gap is normal; the size of the gap is what matters.'
+    };
+  }
+
   function renderInterpretation(modelType) {
     var host = el('exploreInterpretation');
     if (!host) return;
@@ -1118,6 +1160,7 @@
     // "what does this mean?" definition sits in a dismissible disclosure beneath it,
     // closed by default, so the explanation is there for those who want it without
     // hiding the result itself. Presentation only: no metric is recomputed.
+    var defs = metricDefinitions(target, unit);
     var nTest = res.counts.test;
 
     cards.push({
@@ -1127,20 +1170,14 @@
            escapeHtml(target) + ' — a ' + r2Quality(testR2) + ' fit.')
         : ('On the ' + nTest + ' test rows the fit is ' + r2Quality(testR2) + ': worse than simply predicting the average ' +
            escapeHtml(target) + ' every time.')),
-      explain: 'R² compares the model’s errors with the errors you would make by always predicting the average ' +
-        escapeHtml(target) + '. A value of 1 is perfect; 0 means no better than predicting the average; a negative value is worse. ' +
-        'Because it has no units, R² lets you compare very different problems — but it cannot tell you whether the errors are ' +
-        'small enough for your engineering purpose. That is what RMSE and MAE are for.'
+      explain: defs.r2
     });
 
     cards.push({
       title: 'How large are the typical errors? (RMSE ≈ ' + fmtU(testRmse) + ')',
       body: 'On the test rows the RMSE is ' + fmtU(testRmse) + '. On the training rows the model has already seen, the training RMSE was ' +
         fmtU(trainRmse) + '.',
-      explain: 'RMSE (root-mean-square error) squares each prediction error, averages them, and takes the square root, so it is in the units of ' +
-        escapeHtml(target) + (unit ? ' (' + escapeHtml(unit) + ')' : '') + '. ' +
-        'Squaring means large errors count for much more than small ones: a few big misses raise RMSE sharply. ' +
-        'Read it as “a typical error, with big misses weighted heavily”.'
+      explain: defs.rmse
     });
 
     var ratio = (isFinite(testRmse) && isFinite(testMae) && testMae > 0) ? testRmse / testMae : NaN;
@@ -1151,9 +1188,7 @@
           ? (' Here RMSE is ' + ratio.toFixed(2) + ' times MAE' +
              (ratio > 1.4 ? ', so a few large errors account for much of the RMSE.' : ', so the errors are fairly evenly sized.'))
           : ''),
-      explain: 'MAE (mean absolute error) is the average size of the errors, ignoring whether each prediction was too high or too low. ' +
-        'Unlike RMSE it does not give extra weight to large errors, so it is never larger than RMSE. Comparing the two is useful: ' +
-        'when RMSE is much larger than MAE, a handful of big misses dominate — worth finding out which rows they are.'
+      explain: defs.mae
     });
 
     if (of) {
@@ -1165,10 +1200,7 @@
           ', compared with a training RMSE of ' + fmtU(trainRmse) +
           ': the test error is ' + fmtU(Math.abs(rmseGap)) +
           (rmseGap >= 0 ? ' higher' : ' lower') + ' than the training error.',
-        explain: 'The training error is measured on rows the model learned from, so it is optimistic. The test error is measured on rows ' +
-          'held back from training, so it is an honest estimate of performance on new data. A test error much larger than the training ' +
-          'error means the model has learned quirks of its training rows that do not carry over — that is overfitting. ' +
-          'A small gap is normal; the size of the gap is what matters.',
+        explain: defs.gap,
         level: of.level
       });
     }
@@ -1509,6 +1541,7 @@
     var overfitPanel = el('exploreOverfitDemo');
     if (overfitPanel) overfitPanel.classList.add('is-hidden');
     var wrap = el('exploreComparisonWrap'); if (wrap) wrap.classList.add('is-hidden');
+    var metricsExplainer = el('exploreMetricsExplainer'); if (metricsExplainer) { metricsExplainer.classList.add('is-hidden'); metricsExplainer.open = false; }
     var focus = el('exploreFocusWrap'); if (focus) focus.classList.add('is-hidden');
     var card = el('explorePlotCard'); if (card) card.classList.add('is-hidden');
     var lossCard = el('exploreLossCard'); if (lossCard) { lossCard.classList.add('is-hidden'); lossCard.open = false; }
