@@ -101,6 +101,8 @@
       await loadScript('./js/ml-core.js', 'MLCore', 15000);
       await loadScript('./js/advanced-core.js', 'AdvancedML', 15000);
       await loadScript('./js/modelling-core.js', 'ExpandedModelling', 15000);
+      // Polynomial response surface (added 2026-11-27, WORKPLAN §8 Decided).
+      await loadScript('./js/response-surface-core.js', 'ResponseSurface', 15000);
       await loadScript('./js/platform-core.js', 'LRSPlatform', 15000);
       await loadScript('./js/worker-client.js', 'LRSWorkerClient', 15000);
       await loadScript('./js/comparison-core.js', 'LRSComparison', 15000);

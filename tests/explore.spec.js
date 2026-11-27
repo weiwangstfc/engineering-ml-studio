@@ -584,7 +584,7 @@ test.describe('Engineering ML Studio — Phase 1 landing + problem-led Explore',
     await expect(page).toHaveURL(/#learn$/);
     await expect(page.locator('#learnBeyond')).toBeInViewport();
     await expect(page.locator('#view-learn')).toContainText('Classification');
-    await expect(page.locator('#view-learn')).toContainText('Polynomial / response-surface');
+    await expect(page.locator('#view-learn')).toContainText('Polynomial response surfaces are now included in Project mode');
   });
 
   test('L2. Learn links both notebooks and a template that loads in Project mode', async ({ page, request }) => {

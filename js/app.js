@@ -83,7 +83,7 @@
     ['numericMissing','numericScaling','categoricalMissing','categoricalEncoding','maxCategories','dropFirstCategory'].forEach(id => els[id].addEventListener('change', estimatePreprocessing));
     document.querySelectorAll('input[name="modelType"]').forEach(input => input.addEventListener('change', () => {
       const type = getModelType();
-      if (['linear','ridge','elasticnet','robust','quantile'].includes(type)) els.dropFirstCategory.checked = true;
+      if (['linear','polynomial','ridge','elasticnet','robust','quantile'].includes(type)) els.dropFirstCategory.checked = true;
       else els.dropFirstCategory.checked = false;
       renderModelParams(); updateUncertaintyControls(); estimatePreprocessing();
     }));
@@ -902,6 +902,11 @@
     els.searchTrialsLabel.classList.toggle('hidden', tuning === 'manual' || tuning === 'grid' || type === 'linear');
     let manual = '', ranges = '';
     if (type === 'linear') manual = '<p class="fine-print">Linear regression has no model hyperparameters.</p>';
+    if (type === 'polynomial') {
+      manual = `<div class="form-grid three">${selectField('polyDegree','Polynomial degree','2',[['2','2 — quadratic (squares)'],['3','3 — also cubes']])}${selectField('polyInteractions','Interaction terms (x_i · x_j)','true',[['true','Include'],['false','Leave out']])}</div>
+        <p class="fine-print">Terms grow quickly: 5 inputs give 20 quadratic terms with interactions, 10 inputs give 65. At least two training rows per term are required.</p>`;
+      if (tuning !== 'manual') ranges = `<div class="tuning-range-list">${rangeRow('degree','Polynomial degree',2,3,2,'linear','integer')}</div>`;
+    }
     if (type === 'ridge') {
       manual = `<div class="form-grid three">${numericField('lambda','Ridge strength (lambda)',1,0,null,'any')}</div>`;
       if (tuning !== 'manual') ranges = `<div class="tuning-range-list">${rangeRow('lambda','Ridge strength',0.001,100,8,'log','continuous')}</div>`;
@@ -1015,6 +1020,7 @@
   function getModelParameters() {
     const type = getModelType();
     if (type === 'linear') return {};
+    if (type === 'polynomial') return { degree:Number($('polyDegree').value) === 3 ? 3 : 2, interactions:$('polyInteractions').value !== 'false' };
     if (type === 'ridge') return { lambda: Number($('lambda').value) || 1 };
     if (type === 'elasticnet') return { lambda:Number.isFinite(Number($('elasticLambda').value)) ? Number($('elasticLambda').value) : 0.1, l1Ratio:Number($('elasticL1Ratio').value), maxIterations:Number($('elasticIterations').value)||500, tolerance:Number($('elasticTolerance').value)||1e-6 };
     if (type === 'robust') return { huberDelta:Number($('robustDelta').value)||1.345, maxIterations:Number($('robustIterations').value)||80, tolerance:Number($('robustTolerance').value)||1e-6, ridge:Number.isFinite(Number($('robustRidge').value)) ? Number($('robustRidge').value) : 1e-8 };
@@ -1048,7 +1054,7 @@
 
   function getTuningConfig() {
     const type = getModelType(), mode = els.tuningMode.value, ranges = {};
-    let names = type === 'ridge' ? ['lambda'] : type === 'elasticnet' ? ['lambda','l1Ratio'] : type === 'robust' ? ['huberDelta','ridge'] : type === 'tree' ? ['maxDepth','minLeaf'] : type === 'forest' ? ['nTrees','maxDepth','minLeaf','sampleRate'] : type === 'gboost' ? ['nEstimators','learningRate','maxDepth','minLeaf','sampleRate'] : type === 'knn' ? ['k'] : type === 'quantile' ? ['learningRate','l2'] : type === 'ann' ? ['hidden1','hidden2','hidden3','learningRate','dropout','l2'] : [];
+    let names = type === 'polynomial' ? ['degree'] : type === 'ridge' ? ['lambda'] : type === 'elasticnet' ? ['lambda','l1Ratio'] : type === 'robust' ? ['huberDelta','ridge'] : type === 'tree' ? ['maxDepth','minLeaf'] : type === 'forest' ? ['nTrees','maxDepth','minLeaf','sampleRate'] : type === 'gboost' ? ['nEstimators','learningRate','maxDepth','minLeaf','sampleRate'] : type === 'knn' ? ['k'] : type === 'quantile' ? ['learningRate','l2'] : type === 'ann' ? ['hidden1','hidden2','hidden3','learningRate','dropout','l2'] : [];
     if (type === 'gp') {
       const kernel = $('gpKernel') ? $('gpKernel').value : 'rbf';
       names = ['signalVariance','noiseStd'];
@@ -2003,6 +2009,7 @@
       distancePower:'knnDistancePower',maxRows:'knnMaxRows',quantile:'quantileCentral'
     };
     if (a.modelType === 'ridge') parameterIdMap.lambda='lambda';
+    if (a.modelType === 'polynomial') { parameterIdMap.degree='polyDegree'; parameterIdMap.interactions='polyInteractions'; }
     if (a.modelType === 'elasticnet') { parameterIdMap.lambda='elasticLambda'; parameterIdMap.maxIterations='elasticIterations'; parameterIdMap.tolerance='elasticTolerance'; }
     if (a.modelType === 'robust') { parameterIdMap.maxIterations='robustIterations'; parameterIdMap.tolerance='robustTolerance'; parameterIdMap.ridge='robustRidge'; }
     if (a.modelType === 'gboost') { parameterIdMap.learningRate='gbLearningRate'; parameterIdMap.maxDepth='gbMaxDepth'; parameterIdMap.minLeaf='gbMinLeaf'; parameterIdMap.sampleRate='gbSampleRate'; parameterIdMap.maxThresholds='gbThresholds'; }

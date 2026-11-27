@@ -310,3 +310,9 @@ unchanged. New text is English-only until the translation pass.
 - **Glossary.** A dialog with 28 terms, reachable from the top navigation and Project's top bar, giving synonyms where the
   tool uses two words for one thing.
 
+### Polynomial response surface (2026-11-27)
+
+A twelfth model, decided by Wei Wang: `polynomial`, in the renamed **Equation-based family** of stage 4, the baseline
+comparison tool and the "Which model when?" table; the starting suggestion offers it for small all-numeric problems with few
+inputs. Settings: degree (2 or 3) and interaction terms, both tunable. See WORKPLAN §8 "Decided".
+

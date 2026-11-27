@@ -327,6 +327,7 @@ A single engineer, roughly one quarter. Adjust once A1 reveals the real pace.
 
 ### Decided
 
+- **2026-11-27 — Polynomial response surface added** (exception to guardrail 1, like D3). The twelfth model, `polynomial` (`js/response-surface-core.js`): degree 2 or 3, optional interactions, least-squares fit with exact analytical prediction intervals; no power terms for 0/1 columns, constant terms dropped, and a refusal below two training rows per term. The original eleven model IDs, the pipeline order and the schemas are unchanged; saved projects and packages keep working, and a polynomial model saves and reloads like any other.
 - **2026-11-27 — D6: translation deferred.** Translating only the newest guidance text would have produced a mixed-language interface, so the guided pages stay English-only, with a notice when another language is active, until the whole layer is translated and reviewed (D6).
 - **2026-09-24 — A2: tensile testing of structural steel** is the mechanics dataset. Hall–Petch plus
   solid-solution strengthening; yield strength as the target.

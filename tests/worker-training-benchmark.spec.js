@@ -22,6 +22,7 @@ const MODE = process.env.EMS_TRAINING_BENCHMARK || 'off';
 
 const ALL_MODELS = [
   'linear',
+  'polynomial',
   'ridge',
   'elasticnet',
   'robust',
@@ -160,6 +161,11 @@ async function prepareData(page, rows) {
 async function getModelParameters(_page, modelType) {
   const defaults = {
     linear: {},
+
+    polynomial: {
+      degree: 2,
+      interactions: true
+    },
 
     ridge: {
       lambda: 1

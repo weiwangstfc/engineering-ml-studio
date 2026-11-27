@@ -27,9 +27,10 @@ const PANEL_IDS = [
   'step-split', 'step-diagnostics', 'step-predict', 'step-monitor'
 ];
 
-// The eleven model radio values that MUST NOT change (order-independent).
+// The model radio values that MUST NOT change (order-independent). The original eleven
+// are frozen; 'polynomial' was added by decision of Wei Wang on 2026-11-27 (WORKPLAN §8).
 const MODEL_VALUES = [
-  'linear', 'ridge', 'elasticnet', 'robust', 'tree', 'forest',
+  'linear', 'polynomial', 'ridge', 'elasticnet', 'robust', 'tree', 'forest',
   'gboost', 'knn', 'quantile', 'gp', 'ann'
 ];
 
@@ -676,19 +677,19 @@ test.describe('Project mode — model choice guidance (step 3)', () => {
     await ready(page);
     await enterProjectMode(page);
     const cards = page.locator('#step-model .model-card');
-    await expect(cards).toHaveCount(11);
-    for (let i = 0; i < 11; i++) {
+    await expect(cards).toHaveCount(MODEL_VALUES.length);
+    for (let i = 0; i < MODEL_VALUES.length; i++) {
       await expect(cards.nth(i).locator('.model-family-chip')).toHaveCount(1);
       await expect(cards.nth(i).locator('small').first()).not.toBeEmpty();
     }
     const family = async title => page.locator('#step-model .model-family', { has: page.locator('.model-family-title', { hasText: title }) })
       .locator('input[name="modelType"]').evaluateAll(els => els.map(e => e.value).sort());
-    expect(await family('Straight-line family')).toEqual(['elasticnet', 'quantile', 'ridge', 'robust']);
+    expect(await family('Equation-based family')).toEqual(['elasticnet', 'polynomial', 'quantile', 'ridge', 'robust']);
     expect(await family('Tree-based family')).toEqual(['tree']);
     expect(await family('Similarity-based family')).toEqual(['gp', 'knn']);
     expect(await family('Neural network')).toEqual(['ann']);
     await expect(page.locator('#modelChoiceGuide')).toHaveJSProperty('open', false);
-    await expect(page.locator('#modelChoiceGuide tbody tr')).toHaveCount(7);
+    await expect(page.locator('#modelChoiceGuide tbody tr')).toHaveCount(8);
   });
 
   test('M2. the starting suggestion follows the data and never picks a model', async ({ page }) => {
@@ -881,6 +882,86 @@ test.describe('Project mode — research support (stage B)', () => {
   });
 });
 
+test.describe('Polynomial response surface (added 2026-11-27)', () => {
+  test('P1. it recovers a known quadratic, calibrates its intervals and refuses too few rows', async ({ page }) => {
+    await ready(page);
+    const r = await page.evaluate(async () => {
+      const ML = window.MLCore, rng = ML.mulberry32(7);
+      const gen = (n, noise) => { const X = [], y = []; for (let i = 0; i < n; i++) { const a = rng() * 2 - 1, b = rng() * 2 - 1;
+        X.push([a, b]); y.push(1 + 2 * a + 3 * a * a - a * b + 0.5 * b + noise * (rng() + rng() + rng() - 1.5) * 2); } return { X, y }; };
+      const clean = gen(200, 0);
+      const exact = await ML.trainModel('polynomial', clean.X, clean.y, {}, 1);
+      const linear = await ML.trainModel('linear', clean.X, clean.y, {}, 1);
+      const noisy = gen(400, 0.3), fresh = gen(2000, 0.3);
+      const fitted = await ML.trainModel('polynomial', noisy.X, noisy.y, {}, 1);
+      const iv = ML.predictWithIntervals(fitted, fresh.X, 0.95);
+      let covered = 0; fresh.y.forEach((v, i) => { if (v >= iv.lower[i] && v <= iv.upper[i]) covered++; });
+      let guard = ''; try { await ML.trainModel('polynomial', noisy.X.slice(0, 10), noisy.y.slice(0, 10), {}, 1); } catch (e) { guard = e.message; }
+      return { r2: ML.metrics(clean.y, ML.predict(exact, clean.X)).r2, linearR2: ML.metrics(clean.y, ML.predict(linear, clean.X)).r2,
+        b0: exact.base.intercept, coef: Object.fromEntries(exact.terms.map((t, i) => [t.join(''), exact.base.coefficients[i]])),
+        coverage: covered / fresh.y.length, method: iv.method, guard };
+    });
+    expect(r.r2).toBeGreaterThan(0.999999);
+    expect(r.linearR2).toBeLessThan(0.8);
+    expect(r.b0).toBeCloseTo(1, 6);
+    expect(r.coef['0']).toBeCloseTo(2, 6);
+    expect(r.coef['00']).toBeCloseTo(3, 6);
+    expect(r.coef['01']).toBeCloseTo(-1, 6);
+    expect(r.coef['1']).toBeCloseTo(0.5, 6);
+    expect(r.coverage).toBeGreaterThan(0.92);
+    expect(r.coverage).toBeLessThan(0.98);
+    expect(r.method).toBe('Analytical polynomial-regression prediction interval');
+    expect(r.guard).toContain('needs at least 12 training rows');
+  });
+
+  test('P2. 0/1 columns get no power terms, and constant products are dropped', async ({ page }) => {
+    await ready(page);
+    const terms = await page.evaluate(async () => {
+      const ML = window.MLCore, rng = ML.mulberry32(3), X = [], y = [];
+      for (let i = 0; i < 300; i++) { const a = rng() * 2 - 1, c = Math.floor(rng() * 3);
+        X.push([a, c === 1 ? 1 : 0, c === 2 ? 1 : 0]); y.push(2 + a + a * a + 1.5 * (c === 1) + 0.05 * (rng() - 0.5)); }
+      const m = await ML.trainModel('polynomial', X, y, {}, 1);
+      return { terms: m.terms.map(t => t.join('')), stabilised: m.stabilised };
+    });
+    expect(terms.terms.sort()).toEqual(['0', '00', '01', '02', '1', '2']);
+    expect(terms.stabilised).toBe(false);
+  });
+
+  test('P3. in Project mode it beats a straight line on curved data and survives save and reload', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await page.setInputFiles('#csvFile', path.join(__dirname, '..', 'examples', 'steel_tensile_strength_sample.csv'));
+    await expect(page.locator('#targetColumn option', { hasText: 'yield_strength_mpa' })).toHaveCount(1);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', 'yield_strength_mpa');
+    await page.click('#autoFeaturesBtn');
+    const r2 = {};
+    for (const type of ['linear', 'polynomial']) {
+      await goToStage(page, 'step-model');
+      await page.evaluate(t => { const r = document.querySelector(`input[name="modelType"][value="${t}"]`); r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); }, type);
+      if (type === 'polynomial') {
+        await page.locator('#step-model details.advanced-settings summary').click();
+        await expect(page.locator('#polyDegree')).toHaveValue('2');
+        await expect(page.locator('#polyInteractions')).toHaveValue('true');
+      }
+      await goToStage(page, 'step-split');
+      await page.click('#trainBtn');
+      await expect.poll(() => page.evaluate(() => window.LocalRegressionApp.state.artifact && window.LocalRegressionApp.state.artifact.modelType), { timeout: 60000 }).toBe(type);
+      r2[type] = await page.evaluate(() => window.LocalRegressionApp.state.artifact.evaluation.test.pointMetrics.r2);
+    }
+    expect(r2.polynomial).toBeGreaterThan(r2.linear + 0.1);
+    const saved = await page.evaluate(() => {
+      const a = window.LocalRegressionApp.state.artifact, X = [[0, 0, 0, 0, 0, 0], [1, -1, 0.5, 2, -0.5, 0.1]];
+      return { json: JSON.stringify(a), pred: window.MLCore.predict(a.model, X) };
+    });
+    await goToStage(page, 'step-upload');
+    await page.setInputFiles('#modelFile', { name: 'steel.mlmodel.json', mimeType: 'application/json', buffer: Buffer.from(saved.json) });
+    await expect(page.locator('#alertRegion')).toContainText('Fitted model loaded');
+    const reloaded = await page.evaluate(() => window.MLCore.predict(window.LocalRegressionApp.state.artifact.model, [[0, 0, 0, 0, 0, 0], [1, -1, 0.5, 2, -0.5, 0.1]]));
+    expect(reloaded).toEqual(saved.pred);
+  });
+});
+
 test.describe('Project mode — responsive layout and accessibility', () => {
   async function layout(page) {
     return page.evaluate(() => {
@@ -1005,11 +1086,11 @@ test.describe('Project mode — regression guards (presentation only)', () => {
     await expect(page.locator('#downloadModelBtn')).toBeEnabled();
   });
 
-  test('R4. the comparison preset table still documents all eleven model families', async ({ page }) => {
+  test('R4. the comparison preset table documents every model', async ({ page }) => {
     await ready(page);
     await enterProjectMode(page);
     const rows = page.locator('#comparisonPresetTable tbody tr');
-    await expect(rows).toHaveCount(11);
+    await expect(rows).toHaveCount(MODEL_VALUES.length);
   });
 
   test('R5. the train action still reads "Train and evaluate"', async ({ page }) => {
