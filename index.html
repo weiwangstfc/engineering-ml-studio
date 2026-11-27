@@ -11,9 +11,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
   <title>Engineering ML Studio — browser-only machine learning for engineers</title>
   <!-- Must run before anything paints, and before any other script. -->
-  <script src="./js/frame-guard.js?v=1.0.21"></script>
-  <link rel="stylesheet" href="./css/app.css?v=1.0.21">
-  <link rel="stylesheet" href="./css/explore.css?v=1.0.21">
+  <script src="./js/frame-guard.js?v=1.0.22"></script>
+  <link rel="stylesheet" href="./css/app.css?v=1.0.22">
+  <link rel="stylesheet" href="./css/explore.css?v=1.0.22">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
@@ -679,6 +679,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
         </div>
         <p class="fine-print training-only">Offline mode reloads the app without attempting any CDN request. In either mode, CSV data is never sent to a CDN.</p>
         <div id="datasetSummary" class="summary-grid hidden"></div>
+        <div id="fileCheck" class="file-check training-only" hidden aria-live="polite"></div>
         <div id="previewWrap" class="table-wrap hidden"><table id="previewTable"></table></div>
         <div class="stage-nav"><button class="button secondary stage-continue" type="button" data-target="step-features">Continue to inputs and target</button></div>
       </section>
@@ -1401,10 +1402,10 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
     </dl>
     <p id="glossaryEmpty" class="fine-print" hidden>No term matches.</p>
   </dialog>
-  <script src="./js/build-config.js?v=1.0.21"></script>
-  <script src="./js/i18n.js?v=1.0.21"></script>
+  <script src="./js/build-config.js?v=1.0.22"></script>
+  <script src="./js/i18n.js?v=1.0.22"></script>
   <!-- Asset version: bump every ?v= on this page whenever any CSS or JS file changes.
        bootstrap.js passes its own ?v= on to every first-party script it loads. -->
-  <script src="./js/bootstrap.js?v=1.0.21"></script>
+  <script src="./js/bootstrap.js?v=1.0.22"></script>
 </body>
 </html>

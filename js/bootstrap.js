@@ -117,6 +117,8 @@
       await loadScript('./js/project-shell.js', 'EMSProjectShell', 15000);
       // Presentation-only explanations for the Project-mode settings.
       await loadScript('./js/project-guidance.js', 'EMSProjectGuidance', 15000);
+      // Read-only file check after upload: explains layout problems (WORKPLAN C1).
+      await loadScript('./js/file-check.js', 'EMSFileCheck', 15000);
     } catch (error) {
       const region = document.getElementById('alertRegion');
       if (region) region.innerHTML = `<div class="alert error"><strong>Application startup failed.</strong><br>${escapeHtml(error.message)}</div>`;

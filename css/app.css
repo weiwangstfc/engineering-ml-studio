@@ -675,3 +675,19 @@ button.topbar-action { font: inherit; cursor: pointer; }
 .glossary-entry dt { font-weight: 700; }
 .glossary-entry dd { margin: .1rem 0 0; color: var(--muted); line-height: 1.5; font-size: .9rem; }
 .glossary-entry[hidden] { display: none; }
+
+/* Stage 1: file check after upload (WORKPLAN C1). */
+.file-check { margin-top: 1rem; padding: .8rem 1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.file-check[hidden] { display: none; }
+.file-check h3 { margin: 0 0 .5rem; font-size: 1rem; }
+.file-check-ok { margin: 0; color: var(--success); font-weight: 600; }
+.file-check-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
+.file-check-item { padding: .6rem .8rem; border-left: 4px solid var(--line); border-radius: 6px; background: var(--surface-soft); font-size: .86rem; line-height: 1.5; }
+.file-check-item p { margin: 0 0 .25rem; }
+.file-check-title { font-weight: 700; }
+.file-check-chip { display: inline-block; padding: 0 .45rem; border-radius: 999px; font-size: .74rem; font-weight: 700; vertical-align: 1px; }
+.file-check-critical { border-left-color: var(--danger); background: #fff6f6; }
+.file-check-critical .file-check-chip { background: var(--danger); color: #fff; }
+.file-check-warning { border-left-color: var(--warning-line); background: var(--warning-bg); }
+.file-check-warning .file-check-chip { background: var(--warning-line); color: var(--text); }
+.file-check-info .file-check-chip { background: var(--accent); color: var(--primary); }
