@@ -511,6 +511,68 @@ test.describe('Engineering ML Studio — Phase 1 landing + problem-led Explore',
     expect(labels.size).toBe(5);
   });
 
+  test('R1. the progress rail stays in view, its steps navigate, and stage 4 waits for training', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/?localOnly=1#explore/steel');
+    await appReady(page);
+    const step = n => page.locator(`#exploreSteps .explore-step[data-stage="${n}"]`);
+    await expect(page.locator('#exploreRailExample')).toHaveText('Steel yield strength');
+    // Stage 4 is locked until a model is trained, exactly like the Next button.
+    await expect(step(4)).toBeDisabled();
+    await step(2).click();
+    await expect(page.locator('#explore-stage-2')).toBeVisible();
+    await expect(step(2)).toHaveAttribute('aria-current', 'step');
+    await page.locator('input[name="exploreApproach"][value="compare"]').check();
+    await expect(page.locator('#exploreRailApproach')).toHaveText('Compare approaches');
+    await step(3).click();
+    await page.click('#exploreTrainBtn');
+    await expect(page.locator('#exploreOverfitDemo')).toBeVisible({ timeout: 60000 });
+    await expect(step(4)).toBeEnabled();
+    // Deep in a long stage, the rail is still on screen beside the content.
+    await page.locator('#exploreOverfitDemo').scrollIntoViewIfNeeded();
+    await page.mouse.wheel(0, 800);
+    const rail = await page.locator('.explore-rail').boundingBox();
+    expect(rail.y).toBeGreaterThanOrEqual(0);
+    expect(rail.y).toBeLessThan(200);
+    const main = await page.locator('.explore-main').boundingBox();
+    expect(rail.x + rail.width).toBeLessThanOrEqual(main.x);
+    // Jump straight back to stage 1, then forward to 4.
+    await step(1).click();
+    await expect(page.locator('#explore-stage-1')).toBeVisible();
+    await step(4).click();
+    await expect(page.locator('#explore-stage-4')).toBeVisible();
+  });
+
+  test('R2. on narrower screens the steps become a strip above the content', async ({ page }) => {
+    await page.setViewportSize({ width: 1000, height: 800 });
+    await page.goto('/?localOnly=1#explore');
+    await appReady(page);
+    const rail = await page.locator('.explore-rail').boundingBox();
+    const main = await page.locator('.explore-main').boundingBox();
+    expect(rail.y + rail.height).toBeLessThanOrEqual(main.y + 1);
+    await expect(page.locator('#exploreSteps .explore-step')).toHaveCount(4);
+  });
+
+  test('B1. metric names are explained where they first appear, with the same words as stage 4', async ({ page }) => {
+    await page.goto('/?localOnly=1');
+    await appReady(page);
+    await enterExplore(page);
+    // Stage 1 says the expected trend will be checked later.
+    await expect(page.locator('#exploreProblem .explore-trend-note')).toContainText('stage 4');
+    await train(page, 'simple', 1);
+    const explainer = page.locator('#exploreMetricsExplainer');
+    await expect(explainer).toBeVisible();
+    await expect(explainer).toHaveJSProperty('open', false);
+    await explainer.locator('summary').click();
+    await expect(explainer.locator('dt')).toContainText(['Test RMSE', 'Test R²', 'Training RMSE versus test RMSE']);
+    const stage3Rmse = (await explainer.locator('dt:has-text("Test RMSE") + dd').first().textContent()).trim();
+    expect(stage3Rmse).toContain('kPa');
+    await page.click('#exploreToStage4');
+    const card = page.locator('#exploreInterpretation .explore-insight', { hasText: 'How large are the typical errors?' });
+    const stage4Rmse = (await card.locator('details.explore-explainer p').textContent()).trim();
+    expect(stage3Rmse).toBe(stage4Rmse);
+  });
+
   test('E1. returning to Explore through the navigation keeps the selected example in the URL', async ({ page }) => {
     await page.goto('/?localOnly=1#explore/cooling');
     await appReady(page);

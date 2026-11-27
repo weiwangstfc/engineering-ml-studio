@@ -202,6 +202,7 @@ than any bundled example.*
 | **D3b** | **Implement worker-based training**, per the D3a proposal. Non-negotiable gate: a test that trains every model on a fixed seed both ways and asserts **bit-identical** metrics and predictions — write that test *first*, against the current main-thread path, so it is proven meaningful before anything moves. Migrate model by model, each behind its own commit, so any regression bisects cleanly. **Watch the timeout:** `WorkerClient.request()` defaults to 15 s and rejects with "Worker operation timed out"; training must pass a much larger value or opt out, or large jobs will fail spuriously. Keep the existing graceful degradation — if the worker is unavailable, `failureReason` is set and training must still work on the main thread. No algorithm, model ID or schema changes. | 5–8 d, **confirm from D3a** |
 | **D4** | **Cross-browser testing.** `playwright.config.js` runs chromium only. Add Firefox and WebKit, fix what falls out. Engineers at large firms are often on locked-down browsers. | 2–3 d |
 | **D5** | **Empty and error states.** Every mode should say something useful when it has nothing to show, and every failure should say what to do next. Overlaps D3b, which introduces a training progress state — sequence them together. | 2 d |
+| **D6** | **Translate the Engineering ML Studio layer** (deferred by Wei Wang, 2026-11-27). The language selector offers Chinese, Spanish, French and German, but only the screens inherited from Local Regression Studio are translated: with Spanish selected, 0 of 24 Home texts, 0 of 53 Explore texts and 27 of 65 Project stage-1 texts change (measured 2026-11-27). Home, Explore (including the five example narratives), the Project stage names and guidance (`js/project-guidance.js`), Learn and About are English-only; a notice says so when another language is active. Two prerequisites: (i) Explore builds many sentences from fragments and numbers, which the whole-text-node dictionary in `js/i18n.js` cannot translate, so those must become templates first; (ii) **native-speaker review before any translated text is used in a course** — machine translation of technical teaching text is not good enough on its own. Remove the notice when done. | 3–4 d + review |
 
 **D3 groundwork already established** (verified 2026-09-24 — this is why the estimate is 5–8 d, not the
 two-to-three weeks a "move training to a worker" task usually implies):
@@ -323,6 +324,7 @@ A single engineer, roughly one quarter. Adjust once A1 reveals the real pace.
 
 ### Decided
 
+- **2026-11-27 — D6: translation deferred.** Translating only the newest guidance text would have produced a mixed-language interface, so the guided pages stay English-only, with a notice when another language is active, until the whole layer is translated and reviewed (D6).
 - **2026-09-24 — A2: tensile testing of structural steel** is the mechanics dataset. Hall–Petch plus
   solid-solution strengthening; yield strength as the target.
 - **2026-09-24 — D3 approved.** Training moves off the main thread: spike (D3a) then implementation

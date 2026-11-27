@@ -11,9 +11,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
   <title>Engineering ML Studio — browser-only machine learning for engineers</title>
   <!-- Must run before anything paints, and before any other script. -->
-  <script src="./js/frame-guard.js"></script>
-  <link rel="stylesheet" href="./css/app.css?v=1.0.13">
-  <link rel="stylesheet" href="./css/explore.css?v=1.0.13">
+  <script src="./js/frame-guard.js?v=1.0.18"></script>
+  <link rel="stylesheet" href="./css/app.css?v=1.0.18">
+  <link rel="stylesheet" href="./css/explore.css?v=1.0.18">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
@@ -30,6 +30,12 @@
     </ul>
     <span id="modeIndicator" class="mode-indicator" aria-live="polite"></span>
   </nav>
+  <!-- Shown only when a non-English language is active: the guided Engineering ML Studio
+       content has not been translated yet (see WORKPLAN D6). -->
+  <div id="languageNotice" class="language-notice" role="note" hidden>
+    <p>Translation note: the guided Engineering ML Studio pages (Home, Explore, Learn and the Project-mode guidance) are currently available in English only. The modelling workspace itself is translated.</p>
+    <button id="languageNoticeDismiss" class="text-button" type="button">Dismiss</button>
+  </div>
 
   <div id="modeMain">
 
@@ -81,18 +87,26 @@
 
   <!-- ===================== EXPLORE MODE ===================== -->
   <section id="view-explore" class="view is-hidden" aria-labelledby="exploreHeading" tabindex="-1">
-    <div class="explore-shell">
+    <div class="explore-shell explore-layout">
+      <aside class="explore-rail">
+        <nav aria-label="Explore progress">
+          <ol class="explore-steps" id="exploreSteps">
+            <li data-stage="1" class="is-current"><button type="button" class="explore-step" data-stage="1"><span>1</span> Understand the problem</button></li>
+            <li data-stage="2"><button type="button" class="explore-step" data-stage="2"><span>2</span> Choose an approach</button></li>
+            <li data-stage="3"><button type="button" class="explore-step" data-stage="3"><span>3</span> Train and compare predictions</button></li>
+            <li data-stage="4"><button type="button" class="explore-step" data-stage="4"><span>4</span> Interpret the engineering meaning</button></li>
+          </ol>
+        </nav>
+        <dl class="explore-rail-summary">
+          <dt>Example</dt><dd id="exploreRailExample">Pressure drop in a pipe</dd>
+          <dt>Approach</dt><dd id="exploreRailApproach">Simple trend</dd>
+        </dl>
+      </aside>
+      <div class="explore-main">
       <header class="explore-header">
         <p class="eyebrow"><span id="exploreEyebrowKind">Guided engineering example</span> &middot; Explore mode</p>
         <h1 id="exploreHeading">Predict pressure drop in a pipe</h1>
-        <ol class="explore-steps" id="exploreSteps" aria-label="Explore progress">
-          <li data-stage="1" class="is-current"><span>1</span> Understand the problem</li>
-          <li data-stage="2"><span>2</span> Choose an approach</li>
-          <li data-stage="3"><span>3</span> Train and compare predictions</li>
-          <li data-stage="4"><span>4</span> Interpret the engineering meaning</li>
-        </ol>
       </header>
-
       <!-- Stage 1: understand the problem -->
       <section class="explore-stage" id="explore-stage-1" aria-labelledby="exploreStage1Heading">
         <h2 id="exploreStage1Heading" class="explore-stage-title">Understand the problem: pressure drop in a pipe</h2>
@@ -234,6 +248,10 @@
         <div class="table-wrap explore-results-table is-hidden" id="exploreComparisonWrap">
           <table id="exploreComparison"></table>
         </div>
+        <details class="explore-explainer explore-metrics-explainer is-hidden" id="exploreMetricsExplainer">
+          <summary>What do these columns mean?</summary>
+          <dl id="exploreMetricsDefinitions"></dl>
+        </details>
         <!-- B2: overfitting teaching demonstration -->
         <section class="is-hidden" id="exploreOverfitDemo"
           aria-labelledby="exploreOverfitHeading">
@@ -320,6 +338,7 @@
             title="Opens Project mode with this dataset, target, inputs and model already chosen. Nothing is trained until you say so.">Continue in Project mode</button>
         </div>
       </section>
+      </div>
     </div>
   </section>
 
@@ -514,11 +533,33 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <span>Recommended: up to 50,000 rows and 50 original columns</span>
           <button id="chooseCsvBtn" class="button primary" type="button">Choose CSV</button>
         </div>
+        <!-- Other ways to start. Each option says what it is for and which file it takes,
+             grouped by who needs it, so a new user is not faced with four unexplained buttons. -->
+        <div class="start-options">
+          <section class="start-group training-only" aria-labelledby="startContinueHeading">
+            <h3 id="startContinueHeading">Continue earlier work</h3>
+            <div class="start-option">
+              <label class="file-button button secondary">Open project<input id="projectFile" type="file" accept=".mlproject,.json,application/json" hidden></label>
+              <p><span class="start-file-type">.mlproject</span> Restores the experiments, settings and approval records you saved with <em>Save project</em>. The CSV is not stored in the file, so load it again to retrain.</p>
+            </div>
+            <div class="start-option">
+              <label class="file-button button secondary">Load fitted model<input id="modelFile" type="file" accept=".mlmodel,.json,application/json" hidden></label>
+              <p><span class="start-file-type">.mlmodel</span> Reuses one trained model you downloaded earlier: review its saved results and predict new data without retraining.</p>
+            </div>
+          </section>
+          <section class="start-group" aria-labelledby="startOperatorHeading">
+            <h3 id="startOperatorHeading">For operators using an approved model</h3>
+            <div class="start-option">
+              <label id="approvedPackageLabel" class="file-button button secondary">Load approved prediction package<input id="approvedPackageFile" type="file" accept=".mlpredict,.json,application/json" hidden></label>
+              <p><span class="start-file-type">.mlpredict</span> A model that has been reviewed and approved for routine use. Its integrity, approval status and review date are checked before it can predict.</p>
+            </div>
+            <div class="start-option">
+              <button id="predictionOnlyModeBtn" class="button secondary" type="button">Prediction-only mode</button>
+              <p>Hides model training and shows only what an operator needs: load an approved package, upload new inputs, download the predictions.</p>
+            </div>
+          </section>
+        </div>
         <div class="action-row compact wrap">
-          <label class="file-button button secondary training-only">Open project<input id="projectFile" type="file" accept=".mlproject,.json,application/json" hidden></label>
-          <label class="file-button button secondary training-only">Load fitted model<input id="modelFile" type="file" accept=".mlmodel,.json,application/json" hidden></label>
-          <label class="file-button button primary">Load approved prediction package<input id="approvedPackageFile" type="file" accept=".mlpredict,.json,application/json" hidden></label>
-          <button id="predictionOnlyModeBtn" class="button secondary" type="button">Prediction-only mode</button>
           <label class="toggle-inline training-only"><input id="forceOfflineMode" type="checkbox"> Use offline mode — local libraries only</label>
         </div>
         <p class="fine-print training-only">Offline mode reloads the app without attempting any CDN request. In either mode, CSV data is never sent to a CDN.</p>
@@ -530,7 +571,6 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
       <section id="step-features" class="panel training-only locked" aria-disabled="true">
         <div class="panel-heading">
           <div><span class="step-kicker">Stage 2 of 6</span><h2>Choose inputs and quantity to predict</h2></div>
-          <button id="autoFeaturesBtn" class="button secondary" type="button">Detect input variables automatically</button>
         </div>
         <details class="stage-guidance">
           <summary>Stage guidance</summary>
@@ -538,8 +578,11 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <p><strong>Why it matters:</strong> the model can only learn from the input variables you provide.</p>
           <p><strong>Look for:</strong> avoid including identifiers, duplicated quantities, or information that would not be available when making a future prediction.</p>
         </details>
-        <div class="form-grid three">
-          <label>Quantity to predict <span class="term-note">(target)</span><select id="targetColumn"><option value="">Choose target…</option></select></label>
+        <section class="feature-section" aria-labelledby="targetSectionHeading">
+          <h3 id="targetSectionHeading"><span class="feature-section-num">1</span> Quantity to predict <span class="term-note">(target)</span></h3>
+          <p class="fine-print">The one measured quantity you want the model to predict — for example pressure drop or yield strength. Every other column can be used as an input.</p>
+          <div class="form-grid two">
+          <label><span>Quantity to predict <span class="term-note">(target)</span></span><select id="targetColumn"><option value="">Choose target…</option></select></label>
           <label>Target transformation
             <select id="targetTransform">
               <option value="none">None</option>
@@ -550,15 +593,32 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
               <option value="yeojohnson">Yeo–Johnson</option>
             </select>
           </label>
-          <label>Feature search<input id="featureSearch" type="search" placeholder="Filter columns"></label>
-        </div>
+          </div>
         <div id="targetTransformHelp" class="info-box compact-box">Predictions and uncertainty bounds are converted back to the original target scale.</div>
-        <div class="feature-toolbar">
-          <button id="selectAllFeatures" class="text-button" type="button">Select all eligible</button>
-          <button id="clearFeatures" class="text-button" type="button">Clear selection</button>
-          <span id="featureCount">0 selected</span>
-        </div>
+        <p id="targetTransformHint" class="target-transform-hint hidden" aria-live="polite"></p>
+        <details class="field-explainer" id="targetTransformExplainer">
+          <summary>Why transform the target, and when?</summary>
+          <p>A transformation changes the scale the model learns on; results are always converted back, so you still see predictions in the original units.</p>
+          <ul>
+            <li><strong>Consider one</strong> when the quantity you predict spans orders of magnitude (for example heat loss from a few watts to tens of kilowatts), is strongly skewed with a long tail of large values, or has errors that grow with its size. Without it, a few very large values dominate training and small values are fitted poorly.</li>
+            <li><strong>Why a logarithm helps</strong>: it compresses the range, and it turns a multiplicative relationship such as Q = h · A · ΔT into an additive one, which straight-line models can learn.</li>
+            <li><strong>Which one</strong>: Natural logarithm for strictly positive quantities; Square root for counts or mildly skewed non-negative values; Yeo–Johnson if the target can be zero or negative; Box–Cox and Yeo–Johnson estimate the strength of the transformation from the training data.</li>
+            <li><strong>When not to</strong>: if the target is roughly symmetric and spans a modest range, None is the right choice — a transformation then adds complexity for no gain.</li>
+            <li><strong>Check rather than guess</strong>: train once with and once without, then compare validation RMSE in Evaluate results.</li>
+          </ul>
+        </details>
+        </section>
+        <section class="feature-section" aria-labelledby="inputsSectionHeading">
+          <h3 id="inputsSectionHeading"><span class="feature-section-num">2</span> Input variables <span class="term-note">(features)</span></h3>
+          <p class="fine-print">The measured conditions the model uses to predict the target. <strong>Suggested input variables</strong> are every column except the target and columns that look like identifiers (row numbers, sample IDs): an identifier lets a model memorise rows instead of learning the engineering relationship. Untick anything that would not be known when you make a future prediction.</p>
+          <div class="feature-toolbar">
+            <button id="autoFeaturesBtn" class="button secondary" type="button">Select suggested input variables</button>
+            <button id="clearFeatures" class="text-button" type="button">Clear selection</button>
+            <label class="feature-filter">Filter columns<input id="featureSearch" type="search" placeholder="Type part of a column name"></label>
+            <span id="featureCount">0 selected</span>
+          </div>
         <div id="featureList" class="feature-list"></div>
+        </section>
         <section class="subpanel data-quality-workspace" aria-live="polite">
           <div class="panel-heading compact-heading">
             <div><h3>Data-quality assistant <button id="dataQualityHelpBtn" class="help-button" type="button" aria-label="What does the data-quality assistant check?">?</button></h3><p class="fine-print">Automated checks update with the selected target and features. They identify common risks but do not replace scientific or domain review.</p></div>
@@ -578,21 +638,64 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <p><strong>Look for:</strong> the recommended starting point below is a reasonable default for many datasets — adjust it only if you have a specific reason.</p>
         </details>
         <div class="recommendation-note info-box compact-box"><strong>Recommended starting point:</strong> replace missing numeric values with the mean, standardise numeric inputs (fitted on training data only), and treat missing categories as their own “Missing” level. These defaults are already selected. They are a sensible starting point, not always the best choice for every dataset.</div>
-        <div class="form-grid three">
-          <label>Numeric missing values
-            <select id="numericMissing"><option value="mean">Replace with mean</option><option value="median">Replace with median</option><option value="zero">Replace with zero</option><option value="drop">Drop affected rows</option></select>
-          </label>
-          <label>Numeric scaling fitted on training data
-            <select id="numericScaling"><option value="standard">Standardise</option><option value="minmax">Min–max scale</option><option value="none">No scaling</option></select>
-          </label>
-          <label>Categorical missing values
-            <select id="categoricalMissing"><option value="missing">Use “Missing” category</option><option value="mode">Replace with most frequent</option><option value="drop">Drop affected rows</option></select>
-          </label>
-          <label>Categorical encoding
-            <select id="categoricalEncoding"><option value="onehot">One-hot encoding</option><option value="ordinal">Ordinal integer encoding</option><option value="exclude">Exclude categorical columns</option></select>
-          </label>
-          <label>Maximum categories per column<input id="maxCategories" type="number" min="2" max="200" value="50"></label>
-          <label class="toggle-card"><input id="dropFirstCategory" type="checkbox" checked><span><strong>Remove one reference category from each categorical feature</strong><small>Recommended for linear and ridge regression to avoid redundant one-hot columns. Usually unnecessary for tree models.</small></span></label>
+        <p class="fine-print prep-intro">Each setting is learned from the training rows only and then applied unchanged to validation, test and future data. Click a setting, or <em>What does this mean?</em>, to see what each choice does and when to change it.</p>
+        <div class="prep-list">
+          <section class="prep-group" id="prepGroupNumeric" aria-labelledby="prepNumericHeading">
+            <div class="prep-group-heading"><h3 id="prepNumericHeading">Numeric inputs</h3><p class="prep-relevance" id="prepNumericRelevance"></p></div>
+            <div class="prep-option" data-prep-option="numericMissing">
+              <div class="prep-option-main">
+                <label>Numeric missing values
+                  <select id="numericMissing"><option value="mean">Replace with mean</option><option value="median">Replace with median</option><option value="zero">Replace with zero</option><option value="drop">Drop affected rows</option></select>
+                </label>
+                <button class="prep-help-toggle" type="button" aria-expanded="false" aria-controls="prepHelp-numericMissing">What does this mean?</button>
+              </div>
+              <div class="prep-option-help" id="prepHelp-numericMissing" hidden></div>
+            </div>
+            <div class="prep-option" data-prep-option="numericScaling">
+              <div class="prep-option-main">
+                <label>Numeric scaling
+                  <select id="numericScaling"><option value="standard">Standardise</option><option value="minmax">Min–max scale</option><option value="none">No scaling</option></select>
+                </label>
+                <button class="prep-help-toggle" type="button" aria-expanded="false" aria-controls="prepHelp-numericScaling">What does this mean?</button>
+              </div>
+              <div class="prep-option-help" id="prepHelp-numericScaling" hidden></div>
+            </div>
+          </section>
+          <section class="prep-group" id="prepGroupCategorical" aria-labelledby="prepCategoricalHeading">
+            <div class="prep-group-heading"><h3 id="prepCategoricalHeading">Categorical (text) inputs</h3><p class="prep-relevance" id="prepCategoricalRelevance"></p></div>
+            <div class="prep-option" data-prep-option="categoricalMissing">
+              <div class="prep-option-main">
+                <label>Categorical missing values
+                  <select id="categoricalMissing"><option value="missing">Use “Missing” category</option><option value="mode">Replace with most frequent</option><option value="drop">Drop affected rows</option></select>
+                </label>
+                <button class="prep-help-toggle" type="button" aria-expanded="false" aria-controls="prepHelp-categoricalMissing">What does this mean?</button>
+              </div>
+              <div class="prep-option-help" id="prepHelp-categoricalMissing" hidden></div>
+            </div>
+            <div class="prep-option" data-prep-option="categoricalEncoding">
+              <div class="prep-option-main">
+                <label>Categorical encoding
+                  <select id="categoricalEncoding"><option value="onehot">One-hot encoding</option><option value="ordinal">Ordinal integer encoding</option><option value="exclude">Exclude categorical columns</option></select>
+                </label>
+                <button class="prep-help-toggle" type="button" aria-expanded="false" aria-controls="prepHelp-categoricalEncoding">What does this mean?</button>
+              </div>
+              <div class="prep-option-help" id="prepHelp-categoricalEncoding" hidden></div>
+            </div>
+            <div class="prep-option" data-prep-option="maxCategories">
+              <div class="prep-option-main">
+                <label>Maximum categories per column<input id="maxCategories" type="number" min="2" max="200" value="50"></label>
+                <button class="prep-help-toggle" type="button" aria-expanded="false" aria-controls="prepHelp-maxCategories">What does this mean?</button>
+              </div>
+              <div class="prep-option-help" id="prepHelp-maxCategories" hidden></div>
+            </div>
+            <div class="prep-option" data-prep-option="dropFirstCategory">
+              <div class="prep-option-main">
+                <label class="prep-check"><input id="dropFirstCategory" type="checkbox" checked><span>Remove one reference category from each categorical feature</span></label>
+                <button class="prep-help-toggle" type="button" aria-expanded="false" aria-controls="prepHelp-dropFirstCategory">What does this mean?</button>
+              </div>
+              <div class="prep-option-help" id="prepHelp-dropFirstCategory" hidden></div>
+            </div>
+          </section>
         </div>
         <div id="preprocessEstimate" class="info-box">Select a target and at least one feature to estimate the processed feature count.</div>
         <div class="stage-nav"><button class="button secondary stage-continue" type="button" data-target="step-model">Continue to model selection</button></div>
@@ -606,26 +709,71 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <p><strong>Why it matters:</strong> a more complex model is not automatically more accurate or more suitable for engineering use.</p>
           <p><strong>Look for:</strong> begin simple, then compare against a flexible model to see whether the extra complexity is justified.</p>
         </details>
+        <aside id="modelSuggestion" class="model-suggestion hidden" aria-live="polite">
+          <h3>A starting point for your data</h3>
+          <p id="modelSuggestionData" class="model-suggestion-data"></p>
+          <ol id="modelSuggestionList" class="model-suggestion-list"></ol>
+          <p id="modelSuggestionLimits" class="fine-print"></p>
+          <p class="model-suggestion-compare">No rule can tell which model will be best for your data — that is decided by comparing them on validation error.
+            <button id="openBaselineComparisonBtn" class="text-button" type="button">Train several models at once and compare them →</button></p>
+        </aside>
         <div class="model-group">
           <h3 class="model-group-title">Recommended starting models</h3>
           <div class="model-grid">
-            <label class="model-card"><input type="radio" name="modelType" value="linear" checked><span><strong>Linear regression</strong><small>Fast, interpretable baseline with analytical prediction intervals.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="forest"><span><strong>Random forest</strong><small>Tree ensemble with approximate between-tree intervals.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="gboost"><span><strong>Gradient-boosted trees</strong><small>Sequential shallow trees for strong nonlinear tabular prediction.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="linear" checked><span><strong>Linear regression</strong><small>Fits one straight-line (weighted-sum) relationship. Fast, easy to explain, and the baseline every other model should beat.</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> Fast, interpretable baseline with analytical prediction intervals.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="forest"><span><strong>Random forest</strong><small>Averages many decision trees. Captures curved relationships and interactions with little tuning; a strong general-purpose choice.</small><small class="model-meta"><span class="model-family-chip">Tree-based</span> Tree ensemble with approximate between-tree intervals.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="gboost"><span><strong>Gradient-boosted trees</strong><small>Builds small trees one after another, each correcting the last. Often the most accurate on tabular data; needs more rows and care than a forest.</small><small class="model-meta"><span class="model-family-chip">Tree-based</span> Sequential shallow trees for strong nonlinear tabular prediction.</small></span></label>
           </div>
         </div>
         <details class="model-group other-models-group">
-          <summary><span class="model-group-title">Other modelling approaches</span></summary>
-          <div class="model-grid">
-            <label class="model-card"><input type="radio" name="modelType" value="ridge"><span><strong>Ridge regression</strong><small>L2 coefficient shrinkage with bootstrap uncertainty.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="elasticnet"><span><strong>Elastic net</strong><small>Combined L1 and L2 shrinkage for sparse, correlated linear models.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="robust"><span><strong>Huber robust regression</strong><small>Downweights large residuals to reduce outlier influence.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="tree"><span><strong>Decision tree</strong><small>Nonlinear model with approximate leaf-based intervals.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="knn"><span><strong>k-nearest neighbours</strong><small>Local prediction from similar processed training rows.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="quantile"><span><strong>Linear quantile regression</strong><small>Predicts a conditional quantile and fitted lower/upper quantile bounds.</small></span></label>
-            <label class="model-card"><input type="radio" name="modelType" value="gp"><span><strong>Gaussian process</strong><small>Exact or representative-subset GP with native predictive uncertainty.</small></span></label>
-            <label class="model-card model-card-advanced"><input type="radio" name="modelType" value="ann"><span><strong>Artificial neural network <span class="advanced-badge">Advanced</span></strong><small>Flexible feed-forward network. Needs its inputs on a common scale (handled automatically) and more care to train well.</small></span></label>
+          <summary><span class="model-group-title">Other modelling approaches</span><span class="model-group-hint">Eight more models, grouped by family: models in the same family work in a similar way.</span></summary>
+          <div class="model-family">
+            <h4 class="model-family-title">Straight-line family</h4>
+            <p class="model-family-hint">One weighted-sum relationship that is easy to explain. The variants differ in how they handle correlated inputs, outliers and bounds.</p>
+            <div class="model-grid">
+              <label class="model-card"><input type="radio" name="modelType" value="ridge"><span><strong>Ridge regression</strong><small>Linear regression that keeps coefficients small, so it stays stable when inputs are strongly correlated with each other.</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> L2 coefficient shrinkage with bootstrap uncertainty.</small></span></label>
+              <label class="model-card"><input type="radio" name="modelType" value="elasticnet"><span><strong>Elastic net</strong><small>Linear regression that can shrink unhelpful inputs to exactly zero, leaving a simpler model.</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> Combined L1 and L2 shrinkage for sparse, correlated linear models.</small></span></label>
+              <label class="model-card"><input type="radio" name="modelType" value="robust"><span><strong>Huber robust regression</strong><small>Linear regression that is pulled less by a few badly wrong measurements (outliers).</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> Downweights large residuals to reduce outlier influence.</small></span></label>
+              <label class="model-card"><input type="radio" name="modelType" value="quantile"><span><strong>Linear quantile regression</strong><small>Predicts a chosen percentile, such as a lower and an upper bound, instead of only the average.</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> Predicts a conditional quantile and fitted lower/upper quantile bounds.</small></span></label>
+            </div>
           </div>
+          <div class="model-family">
+            <h4 class="model-family-title">Tree-based family</h4>
+            <p class="model-family-hint">Yes/no splits on the inputs. They capture curved relationships and interactions; Random forest and Gradient-boosted trees above are the stronger members.</p>
+            <div class="model-grid">
+              <label class="model-card"><input type="radio" name="modelType" value="tree"><span><strong>Decision tree</strong><small>One readable set of yes/no rules. Easy to inspect, but less accurate and less stable than a forest.</small><small class="model-meta"><span class="model-family-chip">Tree-based</span> Nonlinear model with approximate leaf-based intervals.</small></span></label>
+            </div>
+          </div>
+          <div class="model-family">
+            <h4 class="model-family-title">Similarity-based family</h4>
+            <p class="model-family-hint">Predict from training rows that resemble the new one, or from a smooth surface through them. Best suited to smaller datasets.</p>
+            <div class="model-grid">
+              <label class="model-card"><input type="radio" name="modelType" value="knn"><span><strong>k-nearest neighbours</strong><small>Predicts from the most similar rows in the training data. Simple, but slow on large datasets; up to 25,000 rows.</small><small class="model-meta"><span class="model-family-chip">Similarity-based</span> Local prediction from similar processed training rows.</small></span></label>
+              <label class="model-card"><input type="radio" name="modelType" value="gp"><span><strong>Gaussian process</strong><small>Fits a smooth surface through the data with built-in uncertainty. Excellent for small, smooth datasets such as simulation sweeps; up to 2,000 rows.</small><small class="model-meta"><span class="model-family-chip">Similarity-based</span> Exact or representative-subset GP with native predictive uncertainty.</small></span></label>
+            </div>
+          </div>
+          <div class="model-family">
+            <h4 class="model-family-title">Neural network</h4>
+            <p class="model-family-hint">The most flexible family, and the one that needs the most data and care. Compare it against a tree ensemble before relying on it.</p>
+            <div class="model-grid">
+              <label class="model-card model-card-advanced"><input type="radio" name="modelType" value="ann"><span><strong>Artificial neural network <span class="advanced-badge">Advanced</span></strong><small>Layers of weighted sums that can fit very complex relationships. Needs more data and care than the other models.</small><small class="model-meta"><span class="model-family-chip">Neural network</span> Flexible feed-forward network. Needs its inputs on a common scale (handled automatically) and more care to train well.</small></span></label>
+            </div>
+          </div>
+        </details>
+        <details class="field-explainer model-choice-guide" id="modelChoiceGuide">
+          <summary>Which model when? Choose by what you need</summary>
+          <div class="table-wrap"><table class="model-choice-table">
+            <thead><tr><th>If you need…</th><th>Start with</th><th>Why</th></tr></thead>
+            <tbody>
+              <tr><td>To explain the result to a colleague</td><td>Linear regression (Ridge if inputs are correlated)</td><td>Each input has one coefficient you can read and check against the physics.</td></tr>
+              <tr><td>The best accuracy on curved, interacting relationships</td><td>Gradient-boosted trees or Random forest</td><td>Tree ensembles capture curvature and interactions with little preparation.</td></tr>
+              <tr><td>Robustness to a few bad measurements</td><td>Huber robust regression</td><td>Large errors are down-weighted instead of dominating the fit.</td></tr>
+              <tr><td>A lower and an upper bound, not just the average</td><td>Linear quantile regression</td><td>It fits percentiles of the target directly.</td></tr>
+              <tr><td>Uncertainty on a small, smooth dataset (up to 2,000 rows), such as a simulation sweep</td><td>Gaussian process</td><td>A smooth fit with built-in predictive uncertainty.</td></tr>
+              <tr><td>A simpler model that uses fewer inputs</td><td>Elastic net</td><td>It can shrink unhelpful inputs to zero.</td></tr>
+              <tr><td>To model very complex relationships, with plenty of data</td><td>Neural network (advanced)</td><td>The most flexible model, but it needs data and care; compare it with a forest first.</td></tr>
+            </tbody>
+          </table></div>
         </details>
         <details class="subpanel advanced-settings">
           <summary><span class="advanced-settings-title">Advanced model settings</span><span class="advanced-settings-hint">Tuning method and model-specific settings (including neural-network architecture and training settings)</span></summary>
@@ -738,7 +886,63 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <p><strong>Why it matters:</strong> headline accuracy can hide problems — bias in part of the range, poor coverage of the prediction intervals, or weak performance for a particular group.</p>
           <p><strong>Look for:</strong> points scattered close to the diagonal in <em>Actual vs predicted</em>, residuals with no obvious pattern, and interval coverage close to the level you requested.</p>
         </details>
-        <div id="experimentSummary" class="experiment-summary hidden" aria-live="polite"></div>
+        <section class="eval-section eval-headline" id="evalSummary" aria-labelledby="evalSummaryHeading">
+          <h3 id="evalSummaryHeading"><span class="eval-num">1</span> How good is the model?</h3>
+          <p class="fine-print">Judge the model mainly on the <strong>Test</strong> row of the table: data it never saw while training or choosing settings. A training error much lower than the test error is a sign of overfitting.</p>
+        <div id="metricsTableWrap" class="table-wrap metrics-table-wrap"><table id="metricsTable"></table></div>
+        <div id="cvSummary" class="info-box hidden"></div>
+        <div class="diagnostic-controls">
+          <h3>Diagnostic plot settings</h3>
+          <div class="form-grid three">
+            <label>Dataset shown in plots<select id="diagnosticDataset"><option value="test">Test</option><option value="validation">Validation</option><option value="training">Training</option></select></label>
+            <label>Input feature for residual plot<select id="diagnosticFeature"></select></label>
+            <label>Source column for grouped diagnostics<select id="diagnosticSource"><option value="">No source grouping</option></select></label>
+          </div>
+          <label class="toggle-card">
+            <input id="showDiagnosticUncertainty" type="checkbox" checked>
+            <span><strong>Show uncertainty intervals in plots</strong><small>This controls only the displayed uncertainty bands and error bars. It does not change the fitted model or uncertainty metrics.</small></span>
+          </label>
+        </div>
+          <div class="charts-grid">
+          <article class="chart-card"><div class="chart-title"><h3>Actual vs predicted</h3><button data-plot="actualPredicted" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: points close to the dashed diagonal across the whole range.</p><div id="plotActualPredicted" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Actual and predicted vs input feature</h3><button data-plot="actualPredictedFeature" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: the predictions follow the measured trend against this input.</p><div id="plotActualPredictedFeature" class="plot"></div></article>
+          </div>
+        </section>
+        <details class="eval-section" id="evalErrors">
+          <summary><span class="eval-summary-title"><span class="eval-num">2</span> Check the errors</span><span class="eval-summary-hint">Where and how the model is wrong: residual plots, each with what good looks like.</span></summary>
+          <p class="fine-print eval-intro">A residual is measured minus predicted. Patterns in the residuals show what the model has missed; good residuals look like random scatter around zero.</p>
+          <div class="charts-grid">
+          <article class="chart-card"><div class="chart-title"><h3>Residuals vs predicted</h3><button data-plot="residualPredicted" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: a shapeless band around zero. A curve means a missed trend; a funnel means errors that grow with the size of the value.</p><div id="plotResidualPredicted" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Residual distribution</h3><button data-plot="residualHistogram" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: roughly symmetric around zero. A long tail means a few large misses worth investigating.</p><div id="plotResidualHistogram" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Residuals vs input feature</h3><button data-plot="residualFeature" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: no pattern. A curve means the model misses how this input acts.</p><div id="plotResidualFeature" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Residual Q–Q plot</h3><button data-plot="qq" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: points close to the line. Mainly matters for interval methods that assume normally distributed errors.</p><div id="plotQQ" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Residuals by source</h3><button data-plot="residualSource" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Good: a similar spread for every group. One group far off means the model does not transfer to it.</p><div id="plotResidualSource" class="plot"></div></article>
+          </div>
+        </details>
+        <details class="eval-section" id="evalUncertainty">
+          <summary><span class="eval-summary-title"><span class="eval-num">3</span> Uncertainty</span><span class="eval-summary-hint">How wide the prediction intervals are, and where the model is least certain.</span></summary>
+          <details class="prediction-interval-help" id="predictionIntervalHelp">
+            <summary>What does a prediction interval mean?</summary>
+            <p id="predictionIntervalHelpText">
+              A prediction interval gives a range of plausible values for an individual prediction.
+              For example, a 90% prediction interval is designed to contain the actual value
+              for approximately 90% of comparable future observations, under the method's
+              assumptions. A wider interval indicates greater predictive uncertainty.
+            </p>
+          </details>
+          <div class="charts-grid">
+          <article class="chart-card"><div class="chart-title"><h3>Interval width vs prediction</h3><button data-plot="intervalWidth" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Shows where the model is least certain. Wider intervals in part of the range point to sparse or noisy data there.</p><div id="plotIntervalWidth" class="plot"></div></article>
+          </div>
+        </details>
+        <details class="eval-section" id="evalLearned">
+          <summary><span class="eval-summary-title"><span class="eval-num">4</span> What the model learned</span><span class="eval-summary-hint">Which inputs it relied on, and how training progressed.</span></summary>
+          <div class="charts-grid">
+          <article class="chart-card"><div class="chart-title"><h3>Feature importance</h3><button data-plot="importance" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Which inputs the model relied on. This describes the model, not proof of physical cause and effect.</p><div id="plotImportance" class="plot"></div></article>
+          <article class="chart-card"><div class="chart-title"><h3>Training and optimisation history</h3><button data-plot="trainingHistory" class="text-button export-plot" type="button">PNG</button></div><p class="chart-caption">Iterative models only: the loss should fall and then flatten.</p><div id="plotTrainingHistory" class="plot"></div></article>
+          </div>
+        </details>
+        <details class="eval-section" id="evalCompare">
+          <summary><span class="eval-summary-title"><span class="eval-num">5</span> Compare experiments</span><span class="eval-summary-hint"><span id="evalCompareCount">Train another model, or use “Compare several baseline models” in stage 4, to compare.</span></span></summary>
         <section id="comparisonWorkspace" class="subpanel comparison-workspace hidden" aria-live="polite">
           <div class="panel-heading compact-heading">
             <div><h3>Model comparison workspace</h3><p class="fine-print">Experiments marked comparable use the same dataset fingerprint, target, features, preprocessing, split membership, target transformation and interval level.</p></div>
@@ -758,43 +962,26 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           </div>
           <article class="chart-card comparison-chart-card"><div class="chart-title"><h3 id="comparisonChartTitle">Selected comparison metric by model</h3><button data-plot="comparisonRmse" class="text-button export-plot" type="button">PNG</button></div><div id="plotComparisonRmse" class="plot comparison-plot"></div></article>
         </section>
-        <div id="metricsTableWrap" class="table-wrap metrics-table-wrap"><table id="metricsTable"></table></div>
-        <div id="cvSummary" class="info-box hidden"></div>
-        <div class="diagnostic-controls">
-          <h3>Diagnostic plot settings</h3>
-          <div class="form-grid three">
-            <label>Dataset shown in plots<select id="diagnosticDataset"><option value="test">Test</option><option value="validation">Validation</option><option value="training">Training</option></select></label>
-            <label>Input feature for residual plot<select id="diagnosticFeature"></select></label>
-            <label>Source column for grouped diagnostics<select id="diagnosticSource"><option value="">No source grouping</option></select></label>
+        </details>
+        <details class="eval-section" id="evalSave" open>
+          <summary><span class="eval-summary-title"><span class="eval-num">6</span> Save and export</span><span class="eval-summary-hint">Save the project to continue later, or download the model, predictions, metrics and plots.</span></summary>
+          <p class="fine-print eval-intro">This experiment’s record: its identifier, the application version and a fingerprint of the dataset it was trained on, kept with every saved file.</p>
+          <div id="experimentSummary" class="experiment-summary hidden" aria-live="polite"></div>
+          <div class="export-group">
+            <div class="action-row wrap">
+              <button id="downloadModelBtn" class="button secondary" type="button">Download model</button>
+              <button id="downloadPredictionsBtn" class="button secondary" type="button">Download split predictions</button>
+              <button id="downloadMetricsBtn" class="button secondary" type="button">Download metrics</button>
+              <button id="downloadExperimentBtn" class="button secondary" type="button">Download experiment record</button>
+              <button id="downloadProjectBtn" class="button secondary" type="button">Save project</button>
+              <button id="downloadAllPlotsBtn" class="button secondary" type="button">Download all plots</button>
+            </div>
+            <p class="fine-print"><strong>The project file does not contain the original CSV.</strong> It contains configuration, fitted model, predictions and diagnostic results.</p>
+          
           </div>
-          <label class="toggle-card">
-            <input id="showDiagnosticUncertainty" type="checkbox" checked>
-            <span><strong>Show uncertainty intervals in plots</strong><small>This controls only the displayed uncertainty bands and error bars. It does not change the fitted model or uncertainty metrics.</small></span>
-          </label>
-          <details class="prediction-interval-help" id="predictionIntervalHelp">
-            <summary>What does a prediction interval mean?</summary>
-            <p id="predictionIntervalHelpText">
-              A prediction interval gives a range of plausible values for an individual prediction.
-              For example, a 90% prediction interval is designed to contain the actual value
-              for approximately 90% of comparable future observations, under the method's
-              assumptions. A wider interval indicates greater predictive uncertainty.
-            </p>
-          </details>
-        </div>
-        <div class="charts-grid">
-          <article class="chart-card"><div class="chart-title"><h3>Actual vs predicted</h3><button data-plot="actualPredicted" class="text-button export-plot" type="button">PNG</button></div><div id="plotActualPredicted" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Actual and predicted vs input feature</h3><button data-plot="actualPredictedFeature" class="text-button export-plot" type="button">PNG</button></div><div id="plotActualPredictedFeature" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Residuals vs predicted</h3><button data-plot="residualPredicted" class="text-button export-plot" type="button">PNG</button></div><div id="plotResidualPredicted" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Residual distribution</h3><button data-plot="residualHistogram" class="text-button export-plot" type="button">PNG</button></div><div id="plotResidualHistogram" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Residual Q–Q plot</h3><button data-plot="qq" class="text-button export-plot" type="button">PNG</button></div><div id="plotQQ" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Residuals vs input feature</h3><button data-plot="residualFeature" class="text-button export-plot" type="button">PNG</button></div><div id="plotResidualFeature" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Residuals by source</h3><button data-plot="residualSource" class="text-button export-plot" type="button">PNG</button></div><div id="plotResidualSource" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Interval width vs prediction</h3><button data-plot="intervalWidth" class="text-button export-plot" type="button">PNG</button></div><div id="plotIntervalWidth" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Training and optimisation history</h3><button data-plot="trainingHistory" class="text-button export-plot" type="button">PNG</button></div><div id="plotTrainingHistory" class="plot"></div></article>
-          <article class="chart-card"><div class="chart-title"><h3>Feature importance</h3><button data-plot="importance" class="text-button export-plot" type="button">PNG</button></div><div id="plotImportance" class="plot"></div></article>
-        </div>
-        <details class="governance-details" open>
-          <summary><span class="governance-summary-title">Advanced validation and governance</span><span class="governance-summary-hint">Acceptance criteria, approval decisions, operational schema and downloadable reports. Optional for exploratory work; recommended before any operational use.</span></summary>
+        </details>
+        <details class="governance-details eval-section" id="evalGovernance">
+          <summary><span class="governance-summary-title"><span class="eval-num">7</span> Advanced validation and governance</span><span class="governance-summary-hint">Acceptance criteria, approval decisions, operational schema and downloadable reports. Optional for exploratory work; recommended before any operational use.</span></summary>
         <section id="validationWorkspace" class="subpanel validation-workspace" aria-live="polite">
           <div class="panel-heading compact-heading">
             <div><h3>Validation and acceptance</h3><p class="fine-print">Acceptance criteria apply to the currently active experiment unless you explicitly apply them to all comparable experiments. Blank numeric fields are not evaluated. Acceptance is a user decision, not an automatic certification.</p></div>
@@ -882,18 +1069,6 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
               <button id="downloadApprovalRecordBtn" class="button secondary" type="button">Download approval record</button>
               <button id="downloadApprovalHistoryBtn" class="button secondary" type="button">Download approval history CSV</button>
             </div>
-          </div>
-          <div class="export-group">
-            <h4>Model, project and result exports</h4>
-            <div class="action-row wrap">
-              <button id="downloadModelBtn" class="button secondary" type="button">Download model</button>
-              <button id="downloadPredictionsBtn" class="button secondary" type="button">Download split predictions</button>
-              <button id="downloadMetricsBtn" class="button secondary" type="button">Download metrics</button>
-              <button id="downloadExperimentBtn" class="button secondary" type="button">Download experiment record</button>
-              <button id="downloadProjectBtn" class="button secondary" type="button">Save project</button>
-              <button id="downloadAllPlotsBtn" class="button secondary" type="button">Download all plots</button>
-            </div>
-            <p class="fine-print"><strong>The project file does not contain the original CSV.</strong> It contains configuration, fitted model, predictions and diagnostic results.</p>
           </div>
           <div class="export-group">
             <h4>Operational release</h4>
@@ -1044,8 +1219,10 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
     <p><strong>Severity:</strong> critical findings can invalidate fitting or interpretation; warnings need review; information items explain workflow state. These checks do not verify units, scientific plausibility, sampling representativeness, causal validity, or every form of target leakage.</p>
     <form method="dialog"><button class="button primary">Close</button></form>
   </dialog>
-  <script src="./js/build-config.js"></script>
-  <script src="./js/i18n.js"></script>
-  <script src="./js/bootstrap.js"></script>
+  <script src="./js/build-config.js?v=1.0.18"></script>
+  <script src="./js/i18n.js?v=1.0.18"></script>
+  <!-- Asset version: bump every ?v= on this page whenever any CSS or JS file changes.
+       bootstrap.js passes its own ?v= on to every first-party script it loads. -->
+  <script src="./js/bootstrap.js?v=1.0.18"></script>
 </body>
 </html>

@@ -427,6 +427,8 @@ test.describe('Project mode — application shell (top bar, rail, workspace)', (
     const helpText = page.locator('#predictionIntervalHelpText');
 
     await expect(help).toHaveCount(1);
+    // The interval explanation lives in the "Uncertainty" section of Evaluate results.
+    await page.locator('#evalUncertainty > summary').click();
     await expect(help).toHaveJSProperty('open', false);
 
     await help.locator('summary').click();
@@ -445,6 +447,325 @@ test.describe('Project mode — application shell (top bar, rail, workspace)', (
     await page.locator('#showDiagnosticUncertainty').uncheck();
 
     await expect(helpText).toHaveText(validationExplanation);
+  });
+});
+
+test.describe('Project mode — guidance for new users (step 1)', () => {
+  const COOLING_CSV = path.join(__dirname, '..', 'examples', 'convective_cooling_sample.csv');
+  const STEEL_CSV = path.join(__dirname, '..', 'examples', 'steel_tensile_strength_sample.csv');
+
+  test('G1. each way to start explains what it is for and which file it takes', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    const options = page.locator('#step-upload .start-option');
+    await expect(options).toHaveCount(4);
+    for (const [control, fileType] of [['#projectFile', '.mlproject'], ['#modelFile', '.mlmodel'], ['#approvedPackageFile', '.mlpredict']]) {
+      const option = page.locator('#step-upload .start-option', { has: page.locator(control) });
+      await expect(option.locator('.start-file-type')).toHaveText(fileType);
+      await expect(option.locator('p')).toBeVisible();
+    }
+    await expect(page.locator('#startContinueHeading')).toHaveText('Continue earlier work');
+    await expect(page.locator('#startOperatorHeading')).toContainText('operators');
+    // The operator package is not styled as the main action for a new user...
+    await expect(page.locator('#approvedPackageLabel')).not.toHaveClass(/primary/);
+    const fullBg = await page.locator('#approvedPackageLabel').evaluate(el => getComputedStyle(el).backgroundColor);
+    // ...but it is in prediction-only mode, where it is the main action, and the
+    // "continue earlier work" group (training-only) disappears.
+    await page.click('#predictionOnlyModeBtn');
+    await expect(page.locator('body')).toHaveClass(/prediction-only/);
+    await expect(page.locator('#startContinueHeading')).toBeHidden();
+    const operatorBg = await page.locator('#approvedPackageLabel').evaluate(el => getComputedStyle(el).backgroundColor);
+    expect(operatorBg).not.toBe(fullBg);
+  });
+
+  test('G2. auto-detect refreshes the data-quality assistant', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await loadDataset(page);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', 'price');
+    await page.click('#autoFeaturesBtn');
+    await expect(page.locator('#dataQualityTable')).not.toContainText('No input features selected');
+  });
+
+  test('G3. the column filter is labelled as a filter, not a feature-selection step', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await loadDataset(page);
+    await goToStage(page, 'step-features');
+    await expect(page.locator('label', { has: page.locator('#featureSearch') })).toContainText('Filter columns');
+  });
+
+  test('G4. the target-transformation hint reads the data: log for a wide-range target, none for a compact one', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await page.setInputFiles('#csvFile', COOLING_CSV);
+    await expect(page.locator('#targetColumn option', { hasText: 'heat_dissipation_w' })).toHaveCount(1);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', 'heat_dissipation_w');
+    const hint = page.locator('#targetTransformHint');
+    await expect(hint).toBeVisible();
+    await expect(hint).toContainText('orders of magnitude');
+    await expect(hint).toContainText('Natural logarithm is worth trying');
+    // The hint never changes the user's selection.
+    await expect(page.locator('#targetTransform')).toHaveValue('none');
+
+    await page.setInputFiles('#csvFile', STEEL_CSV);
+    await expect(page.locator('#targetColumn option', { hasText: 'yield_strength_mpa' })).toHaveCount(1);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', 'yield_strength_mpa');
+    await expect(hint).toContainText('None is a sensible choice');
+
+    const explainer = page.locator('#targetTransformExplainer');
+    await expect(explainer).toHaveJSProperty('open', false);
+    await explainer.locator('summary').click();
+    await expect(explainer).toContainText('orders of magnitude');
+  });
+});
+
+test.describe('Project mode — stage 2 and 3 layout (review feedback)', () => {
+  const PIPE_CSV = path.join(__dirname, '..', 'examples', 'pipe_pressure_drop_sample.csv');
+
+  test('S1. stage 2 separates the target from the input variables, with one suggestion button', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await loadDataset(page);
+    await goToStage(page, 'step-features');
+    const target = page.locator('#step-features .feature-section', { has: page.locator('#targetSectionHeading') });
+    const inputs = page.locator('#step-features .feature-section', { has: page.locator('#inputsSectionHeading') });
+    await expect(target.locator('#targetColumn')).toHaveCount(1);
+    await expect(target.locator('#targetTransform')).toHaveCount(1);
+    await expect(inputs.locator('#autoFeaturesBtn')).toHaveCount(1);
+    await expect(inputs.locator('#featureSearch')).toHaveCount(1);
+    await expect(inputs.locator('#featureList')).toHaveCount(1);
+    await expect(inputs).toContainText('identifiers');
+    // The duplicate "Select all eligible" button (same function as auto-detect) is gone.
+    await expect(page.locator('#selectAllFeatures')).toHaveCount(0);
+  });
+
+  test('S2. stage 3 lists every setting in one column and explains the chosen value on demand', async ({ page }) => {
+    await fullWorkflow(page);
+    await goToStage(page, 'step-preprocess');
+    const rows = page.locator('#step-preprocess .prep-option');
+    await expect(rows).toHaveCount(6);
+    const boxes = [];
+    for (let i = 0; i < 6; i++) boxes.push(await rows.nth(i).boundingBox());
+    for (let i = 1; i < 6; i++) {
+      expect(Math.abs(boxes[i].x - boxes[0].x), 'rows share one left edge').toBeLessThan(2);
+      expect(boxes[i].y, 'rows are stacked').toBeGreaterThan(boxes[i - 1].y);
+    }
+    // The reference-category checkbox is an ordinary row in the categorical group.
+    await expect(page.locator('#prepGroupCategorical [data-prep-option="dropFirstCategory"] #dropFirstCategory')).toHaveCount(1);
+
+    const scaling = page.locator('[data-prep-option="numericScaling"]');
+    const help = page.locator('#prepHelp-numericScaling');
+    await expect(help).toBeHidden();
+    await scaling.locator('.prep-help-toggle').click();
+    await expect(help).toBeVisible();
+    await expect(help).toContainText('Your choice — Standardise');
+    await page.selectOption('#numericScaling', 'minmax');
+    await expect(help).toContainText('Your choice — Min–max scale');
+    await page.selectOption('#numericScaling', 'standard');
+
+    // Clicking into another setting opens its explanation and closes the others.
+    await page.locator('#categoricalEncoding').focus();
+    await expect(page.locator('#prepHelp-categoricalEncoding')).toBeVisible();
+    await expect(page.locator('#prepHelp-categoricalEncoding')).toContainText('One-hot encoding');
+    await expect(help).toBeHidden();
+  });
+
+  test('S4. scaling and encoding explanations include an illustration', async ({ page }) => {
+    await fullWorkflow(page);
+    await goToStage(page, 'step-preprocess');
+    await page.locator('#numericScaling').focus();
+    const scalingFigure = page.locator('#prepHelp-numericScaling .prep-figure svg');
+    await expect(scalingFigure).toBeVisible();
+    expect((await scalingFigure.getAttribute('aria-label')).length).toBeGreaterThan(60);
+    await page.locator('#categoricalEncoding').focus();
+    const encoding = page.locator('#prepHelp-categoricalEncoding .prep-figure');
+    await expect(encoding).toBeVisible();
+    await expect(encoding.locator('table')).toHaveCount(3);
+    await expect(encoding).toContainText('material = aluminium');
+    // Settings without an illustration stay text-only.
+    await expect(page.locator('#prepHelp-numericMissing .prep-figure')).toHaveCount(0);
+  });
+
+  test('S3. stage 3 says which settings affect the selected inputs', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await page.setInputFiles('#csvFile', PIPE_CSV);
+    await expect(page.locator('#targetColumn option', { hasText: 'pressure_drop_kpa' })).toHaveCount(1);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', 'pressure_drop_kpa');
+    await page.click('#autoFeaturesBtn');
+    await goToStage(page, 'step-preprocess');
+    await expect(page.locator('#prepCategoricalRelevance')).toContainText('no categorical inputs');
+    await expect(page.locator('#prepGroupCategorical')).toHaveClass(/is-not-applicable/);
+    await expect(page.locator('#prepNumericRelevance')).toContainText('5 numeric inputs, none with missing values');
+    await expect(page.locator('[data-prep-option="numericMissing"]')).toHaveClass(/is-not-applicable/);
+    await expect(page.locator('[data-prep-option="numericScaling"]')).not.toHaveClass(/is-not-applicable/);
+    // Guidance never changes a setting.
+    await expect(page.locator('#numericMissing')).toHaveValue('mean');
+    await expect(page.locator('#categoricalEncoding')).toHaveValue('onehot');
+  });
+});
+
+test.describe('Project mode — Evaluate results grouping (step 2)', () => {
+  test('V1. results lead, details are grouped and closed, and the page stays compact', async ({ page }) => {
+    await fullWorkflow(page);
+    await goToStage(page, 'step-diagnostics');
+    const headline = page.locator('#evalSummary');
+    await expect(headline).toBeVisible();
+    await expect(headline.locator('#metricsTable tbody tr').first()).toBeVisible();
+    await expect(headline.locator('#plotActualPredicted .main-svg').first()).toBeVisible();
+    await expect(headline.locator('#plotActualPredictedFeature .main-svg').first()).toBeVisible();
+    for (const id of ['evalErrors', 'evalUncertainty', 'evalLearned', 'evalCompare', 'evalGovernance']) {
+      await expect(page.locator('#' + id), id + ' starts closed').toHaveJSProperty('open', false);
+    }
+    // Saving is an everyday action, so it is open and outside governance.
+    await expect(page.locator('#evalSave')).toHaveJSProperty('open', true);
+    await expect(page.locator('#evalSave #downloadProjectBtn')).toBeVisible();
+    await expect(page.locator('#evalGovernance #downloadProjectBtn')).toHaveCount(0);
+    // It was ~8,000 px as one long report.
+    const height = await page.locator('#step-diagnostics').evaluate(el => el.getBoundingClientRect().height);
+    expect(height).toBeLessThan(3200);
+  });
+
+  // Guards what the user sees. Plotly's responsive mode already redraws on open; the
+  // explicit resize in project-guidance.js is a safety net, so this test passes either way.
+  test('V2. opening a section draws its plots at full width', async ({ page }) => {
+    await fullWorkflow(page);
+    await goToStage(page, 'step-diagnostics');
+    await page.locator('#evalErrors > summary').click();
+    const plot = page.locator('#plotResidualPredicted');
+    await expect(plot.locator('.main-svg').first()).toBeVisible();
+    const card = await page.locator('#plotResidualPredicted').evaluate(el => el.closest('.chart-card').getBoundingClientRect().width);
+    await expect.poll(async () => plot.locator('.main-svg').first().evaluate(svg => svg.getBoundingClientRect().width))
+      .toBeGreaterThan(card * 0.8);
+  });
+
+  test('V3. the comparison section opens once there are two experiments', async ({ page }) => {
+    await fullWorkflow(page);
+    await goToStage(page, 'step-diagnostics');
+    await expect(page.locator('#evalCompare')).toHaveJSProperty('open', false);
+    await expect(page.locator('#evalCompareCount')).toContainText('Train another model');
+    await goToStage(page, 'step-model');
+    await page.locator('#step-model input[name="modelType"][value="forest"]').check();
+    await goToStage(page, 'step-split');
+    await page.click('#trainBtn');
+    await expect.poll(() => page.evaluate(() => window.LocalRegressionApp.state.experiments.length), { timeout: 60000 }).toBe(2);
+    await goToStage(page, 'step-diagnostics');
+    await expect(page.locator('#evalCompareCount')).toContainText('2 experiments saved');
+    await expect(page.locator('#evalCompare')).toHaveJSProperty('open', true);
+  });
+});
+
+test.describe('Project mode — model choice guidance (step 3)', () => {
+  const STEEL_CSV = path.join(__dirname, '..', 'examples', 'steel_tensile_strength_sample.csv');
+
+  async function toModelStage(page, csv, target) {
+    await page.setInputFiles('#csvFile', csv);
+    await expect(page.locator('#targetColumn option', { hasText: target })).toHaveCount(1);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', target);
+    await page.click('#autoFeaturesBtn');
+    await goToStage(page, 'step-model');
+  }
+
+  test('M1. every model card says what it is in plain language and which family it belongs to', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    const cards = page.locator('#step-model .model-card');
+    await expect(cards).toHaveCount(11);
+    for (let i = 0; i < 11; i++) {
+      await expect(cards.nth(i).locator('.model-family-chip')).toHaveCount(1);
+      await expect(cards.nth(i).locator('small').first()).not.toBeEmpty();
+    }
+    const family = async title => page.locator('#step-model .model-family', { has: page.locator('.model-family-title', { hasText: title }) })
+      .locator('input[name="modelType"]').evaluateAll(els => els.map(e => e.value).sort());
+    expect(await family('Straight-line family')).toEqual(['elasticnet', 'quantile', 'ridge', 'robust']);
+    expect(await family('Tree-based family')).toEqual(['tree']);
+    expect(await family('Similarity-based family')).toEqual(['gp', 'knn']);
+    expect(await family('Neural network')).toEqual(['ann']);
+    await expect(page.locator('#modelChoiceGuide')).toHaveJSProperty('open', false);
+    await expect(page.locator('#modelChoiceGuide tbody tr')).toHaveCount(7);
+  });
+
+  test('M2. the starting suggestion follows the data and never picks a model', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    // 500 rows, six numeric inputs: a Gaussian process is a sensible extra.
+    await toModelStage(page, STEEL_CSV, 'yield_strength_mpa');
+    const box = page.locator('#modelSuggestion');
+    await expect(box).toBeVisible();
+    await expect(page.locator('#modelSuggestionData')).toContainText('500 rows and 6 input variables');
+    await expect(page.locator('#modelSuggestionList li').first()).toContainText('Linear regression');
+    await expect(page.locator('#modelSuggestionList')).toContainText('Gaussian process');
+    await expect(page.locator('#step-model input[name="modelType"][value="linear"]')).toBeChecked();
+
+    // Categorical inputs: no Gaussian-process suggestion.
+    await toModelStage(page, HOUSE_CSV, 'price');
+    await expect(page.locator('#modelSuggestionData')).toContainText('categorical');
+    await expect(page.locator('#modelSuggestionList')).not.toContainText('Gaussian process');
+
+    // Above the Gaussian-process row limit: it is not suggested, and the limit is stated.
+    const header = 'a,b,c,y';
+    const lines = [header];
+    for (let i = 0; i < 2500; i++) lines.push([i % 7, (i * 13) % 11, (i * 7) % 5, i % 17].join(','));
+    await page.setInputFiles('#csvFile', { name: 'big.csv', mimeType: 'text/csv', buffer: Buffer.from(lines.join('\n')) });
+    await expect(page.locator('#targetColumn option', { hasText: /^y$/ })).toHaveCount(1);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', 'y');
+    await page.click('#autoFeaturesBtn');
+    await goToStage(page, 'step-model');
+    await expect(page.locator('#modelSuggestionList')).not.toContainText('Gaussian process');
+    await expect(page.locator('#modelSuggestionLimits')).toContainText('Gaussian process is not available for 2,500 rows');
+  });
+
+  test('M3. "train several models at once" opens the existing baseline comparison tool', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await toModelStage(page, STEEL_CSV, 'yield_strength_mpa');
+    await page.click('#openBaselineComparisonBtn');
+    await expect(page.locator('#step-split')).toBeVisible();
+    await expect(page.locator('#comparisonToolPanel')).toBeVisible();
+    await expect(page.locator('#toggleComparisonToolsBtn')).toHaveAttribute('aria-expanded', 'true');
+  });
+});
+
+test.describe('Project mode — step strips and validation help (step 5)', () => {
+  test('T1. every stage lists its steps, and a step takes you to its control', async ({ page }) => {
+    await fullWorkflow(page);
+    for (const id of PANEL_IDS) {
+      const steps = page.locator('#' + id + ' .stage-steps .stage-step');
+      expect(await steps.count(), id + ' has a step strip').toBeGreaterThanOrEqual(3);
+    }
+    await goToStage(page, 'step-features');
+    await page.locator('#step-features .stage-step', { hasText: 'Choose the quantity to predict' }).click();
+    await expect(page.locator('#targetColumn')).toBeFocused();
+    await goToStage(page, 'step-diagnostics');
+    await expect(page.locator('#evalErrors')).toHaveJSProperty('open', false);
+    await page.locator('#step-diagnostics .stage-step', { hasText: 'Check the errors' }).click();
+    await expect(page.locator('#evalErrors')).toHaveJSProperty('open', true);
+  });
+
+  test('T2. validation settings explain themselves and the chosen value', async ({ page }) => {
+    await fullWorkflow(page);
+    await goToStage(page, 'step-split');
+    await expect(page.locator('#step-split .field-help-intro')).toContainText('Click any setting');
+    await page.locator('#splitStrategy').focus();
+    const visibleHelp = page.locator('#step-split .field-help:visible');
+    await expect(visibleHelp).toHaveCount(1);
+    await expect(visibleHelp).toContainText('Your choice — Naive random split');
+    // Re-rendered split controls are covered too.
+    await page.locator('#randomTrainPct').focus();
+    await expect(visibleHelp).toHaveCount(1);
+    await expect(visibleHelp).toContainText('add up to 100');
+    await page.locator('#intervalLevel').focus();
+    await expect(visibleHelp).toContainText('Your choice — 95%');
+    await page.selectOption('#intervalLevel', '0.8');
+    await expect(visibleHelp).toContainText('Your choice — 80%');
+    await page.selectOption('#intervalLevel', '0.95');
   });
 });
 

@@ -538,3 +538,129 @@ a.stage-row[aria-disabled="true"],a.substage-row[aria-disabled="true"]{cursor:no
   .app-topbar .topbar-action,.local-processing>summary{padding:.3rem .5rem;font-size:.75rem}
   .local-processing-body{width:min(16rem,80vw)}
 }
+
+/* Stage 1: other ways to start, grouped by who needs them (presentation only). */
+.start-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1rem; }
+.start-group { border: 1px solid var(--line); border-radius: 12px; padding: .9rem 1rem; background: var(--surface); }
+.start-group h3 { margin: 0 0 .6rem; font-size: .95rem; }
+.start-option { display: grid; gap: .4rem; justify-items: start; padding: .65rem 0; border-top: 1px solid var(--line); }
+.start-option:first-of-type { border-top: 0; }
+.start-option .button { justify-content: center; text-align: center; font-size: .9rem; }
+.start-option p { margin: 0; font-size: .84rem; line-height: 1.45; color: var(--muted); }
+.start-file-type { display: inline-block; margin-right: .35rem; padding: .05rem .4rem; border-radius: 6px; background: var(--accent); color: var(--primary); font: 600 .75rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+body.prediction-only .start-options { grid-template-columns: minmax(0, 1fr); }
+body.prediction-only #approvedPackageLabel { color: #fff; background: var(--primary); border-color: var(--primary); }
+@media (max-width: 760px) {
+  .start-options { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Stage 2: target-transformation hint and explainer. */
+.target-transform-hint { margin: .6rem 0 0; padding: .6rem .85rem; border-left: 3px solid var(--primary); background: var(--surface-soft); font-size: .86rem; line-height: 1.5; }
+.field-explainer { margin-top: .6rem; font-size: .86rem; }
+.field-explainer summary { cursor: pointer; color: var(--primary); font-weight: 650; }
+.field-explainer ul { margin: .5rem 0 0; padding-left: 1.2rem; display: grid; gap: .35rem; line-height: 1.5; }
+.field-explainer p { margin: .5rem 0 0; line-height: 1.5; }
+
+/* Stage 2: two clearly separated sections — the target, then the input variables. */
+.feature-section { margin-top: 1rem; padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.feature-section h3 { display: flex; align-items: center; gap: .5rem; margin: 0 0 .25rem; font-size: 1rem; }
+.feature-section > .fine-print { margin: 0 0 .75rem; max-width: 80ch; }
+.feature-section-num { display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--primary); color: #fff; font-size: .8rem; flex: 0 0 auto; }
+.feature-section .feature-toolbar { flex-wrap: wrap; gap: .6rem .9rem; }
+.feature-filter { display: flex; align-items: center; gap: .5rem; font-weight: 600; }
+.feature-filter input { width: 14rem; min-height: 36px; }
+
+/* Stage 3: one setting per row, grouped by input type, explanation on demand. */
+.prep-intro { margin: .75rem 0 0; max-width: 80ch; }
+.prep-list { display: grid; gap: 1rem; margin-top: .9rem; }
+.prep-group { border: 1px solid var(--line); border-radius: 12px; padding: .4rem 1rem .6rem; background: var(--surface); transition: opacity .15s ease; }
+.prep-group-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .9rem; padding: .5rem 0 .3rem; }
+.prep-group-heading h3 { margin: 0; font-size: 1rem; }
+.prep-relevance { margin: 0; color: var(--muted); font-size: .82rem; }
+.prep-option { border-top: 1px solid var(--line); padding: .65rem 0; }
+.prep-option-main { display: grid; grid-template-columns: minmax(0, 32rem) auto; align-items: end; gap: .75rem 1rem; }
+.prep-option-main > label:not(.prep-check) { grid-template-columns: minmax(12rem, 1fr) minmax(12rem, 16rem); align-items: center; }
+.prep-check { display: flex !important; align-items: center; gap: .6rem; font-weight: 650; }
+.prep-check input { width: auto; min-height: auto; }
+.prep-help-toggle { border: 0; background: transparent; color: var(--primary); font-weight: 650; font-size: .84rem; padding: .3rem 0; justify-self: start; }
+.prep-option.is-open { background: linear-gradient(90deg, var(--accent), transparent 70%); margin: 0 -1rem; padding: .65rem 1rem; }
+.prep-option-help { margin-top: .5rem; max-width: 80ch; font-size: .86rem; line-height: 1.5; }
+.prep-option-help p { margin: 0 0 .35rem; }
+.prep-choice { padding-left: .7rem; border-left: 3px solid var(--primary); }
+.prep-group.is-not-applicable, .prep-option.is-not-applicable { opacity: .6; }
+.prep-group.is-not-applicable .prep-option.is-open, .prep-option.is-not-applicable.is-open { opacity: 1; }
+@media (max-width: 760px) {
+  .prep-option-main, .prep-option-main > label:not(.prep-check) { grid-template-columns: minmax(0, 1fr); }
+  .feature-filter input { width: 100%; }
+}
+
+/* Stage 5: Evaluate results grouped into numbered sections. Section 1 is always
+   visible; the rest open on demand so the stage no longer reads as one long report. */
+.eval-section { margin-top: 1rem; border: 1px solid var(--line); border-radius: 12px; padding: .4rem 1rem; background: var(--surface); }
+.eval-section[open] { padding-bottom: 1rem; }
+.eval-headline { padding: .9rem 1rem 1rem; }
+.eval-headline h3 { display: flex; align-items: center; gap: .5rem; margin: 0 0 .25rem; font-size: 1.05rem; }
+.eval-headline > .fine-print { margin: 0 0 .5rem; max-width: 80ch; }
+details.eval-section > summary { cursor: pointer; display: flex; flex-direction: column; gap: .2rem; padding: .5rem 0; list-style: none; }
+details.eval-section > summary::-webkit-details-marker { display: none; }
+.eval-summary-title { display: flex; align-items: center; gap: .5rem; font-weight: 700; font-size: 1.02rem; }
+.eval-summary-title::after, .governance-summary-title::after { content: "▸"; margin-left: auto; color: var(--muted); transition: transform .15s ease; }
+details.eval-section[open] .eval-summary-title::after, details.eval-section[open] .governance-summary-title::after { transform: rotate(90deg); }
+.governance-summary-title { display: flex; align-items: center; gap: .5rem; }
+.eval-summary-hint { padding-left: 2.1rem; font-weight: 400; font-size: .84rem; color: var(--muted); }
+.eval-num { display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--primary); color: #fff; font-size: .8rem; font-weight: 700; flex: 0 0 auto; }
+.eval-intro { margin: .2rem 0 0; max-width: 80ch; }
+.chart-caption { margin: .1rem .2rem .3rem; color: var(--muted); font-size: .8rem; line-height: 1.4; }
+#evalGovernance.governance-details { background: var(--surface-soft); }
+
+/* Stage 4: model choice — families, plain-language cards, a data-aware start. */
+.model-suggestion { margin: .2rem 0 1rem; padding: .9rem 1rem; border: 1px solid #b9dce4; border-left: 4px solid var(--primary); border-radius: 10px; background: var(--accent); }
+.model-suggestion h3 { margin: 0 0 .3rem; font-size: 1rem; }
+.model-suggestion-data { margin: 0 0 .4rem; font-size: .86rem; color: var(--muted); }
+.model-suggestion-list { margin: 0 0 .4rem; padding-left: 1.3rem; display: grid; gap: .3rem; font-size: .88rem; line-height: 1.5; }
+.model-suggestion-compare { margin: .3rem 0 0; font-size: .86rem; line-height: 1.5; }
+.model-suggestion .text-button { padding: 0 .2rem; }
+.model-card .model-meta { display: block; margin-top: .25rem; font-size: .76rem; }
+.model-family-chip { display: inline-block; margin-right: .3rem; padding: 0 .4rem; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--primary); font-weight: 650; }
+.model-group-hint { display: block; font-weight: 400; font-size: .82rem; color: var(--muted); margin-top: .15rem; }
+.model-family { margin-top: .9rem; }
+.model-family-title { margin: 0; font-size: .92rem; }
+.model-family-hint { margin: .15rem 0 .5rem; font-size: .82rem; color: var(--muted); max-width: 80ch; }
+.model-choice-guide { margin-top: 1rem; }
+.model-choice-table td, .model-choice-table th { white-space: normal; vertical-align: top; }
+.model-choice-table td:nth-child(2) { font-weight: 650; }
+/* .model-card span{display:grid} (inherited) stretched these tags to full width. */
+.model-card .model-meta .model-family-chip, .model-card strong .advanced-badge { display: inline-block; width: auto; }
+
+/* Stage 3 illustrations inside the setting explanations. */
+.prep-figure { margin: .6rem 0 .2rem; padding: .7rem .8rem; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); max-width: 36rem; }
+.prep-figure svg { width: 100%; height: auto; display: block; }
+.prep-figure figcaption { margin-top: .4rem; font-size: .8rem; color: var(--muted); line-height: 1.45; }
+.prep-figure-tables { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.prep-figure-tables table { width: auto; font-size: .78rem; border: 1px solid var(--line); border-radius: 6px; }
+.prep-figure-tables caption { font-weight: 700; font-size: .78rem; text-align: left; padding-bottom: .2rem; }
+.prep-figure-tables th, .prep-figure-tables td { padding: .2rem .45rem; text-align: center; position: static; }
+.prep-figure-arrow { font-size: 1.2rem; color: var(--muted); }
+
+/* Every Project stage: a compact, clickable strip of the steps in this stage. */
+.stage-steps { list-style: none; display: flex; flex-wrap: wrap; align-items: stretch; gap: .4rem; margin: 0 0 1rem; padding: 0; counter-reset: none; }
+.stage-steps li { display: flex; align-items: center; gap: .4rem; }
+.stage-steps li + li::before { content: "→"; color: var(--muted); font-size: .95rem; }
+.stage-step { display: inline-flex; align-items: center; gap: .45rem; padding: .35rem .7rem .35rem .4rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--text); font-size: .82rem; font-weight: 600; text-align: left; }
+.stage-step:hover, .stage-step:focus-visible { border-color: var(--primary); background: var(--accent); }
+.stage-step-num { display: inline-grid; place-items: center; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: var(--primary); color: #fff; font-size: .72rem; flex: 0 0 auto; }
+.stage-step-optional { color: var(--muted); font-weight: 400; font-size: .74rem; }
+.step-target-flash { animation: step-target-flash 1.6s ease; }
+@keyframes step-target-flash { 0%, 40% { box-shadow: 0 0 0 3px var(--primary); } 100% { box-shadow: 0 0 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) { .step-target-flash { animation: none; outline: 3px solid var(--primary); } }
+@media (max-width: 760px) {
+  .stage-steps { flex-direction: column; align-items: stretch; }
+  .stage-steps li + li::before { content: "↓"; padding-left: .7rem; }
+  .stage-steps li { flex-direction: column; align-items: stretch; }
+}
+
+/* Stage 4B: explanation of the setting being edited, shown under its group. */
+.field-help-intro { margin: .2rem 0 .6rem; }
+.field-help { margin: .6rem 0 .2rem; padding: .65rem .85rem; border-left: 3px solid var(--primary); border-radius: 6px; background: var(--surface-soft); font-size: .86rem; line-height: 1.5; max-width: 80ch; }
+.field-help p { margin: 0 0 .35rem; }
+.field-help p:last-child { margin-bottom: 0; }

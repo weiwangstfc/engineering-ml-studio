@@ -230,6 +230,13 @@ These links make it possible to share a specific Explore activity with another u
 
 ## Accessibility and responsiveness
 
+**Progress rail.** The four stages are listed as buttons in a rail beside the content on screens at
+least 1,100 px wide (as in Project mode), and as a strip above the content on narrower ones. On
+wide and medium screens it stays in view while a long stage is scrolled; on phones (≤ 720 px), where
+the site navigation is already sticky, the strip scrolls with the page and keeps the current step
+in view. Any stage can be revisited; stage 4 is disabled until a model has been trained, the same
+rule as stage 3's "Next" button. The rail also names the selected example and approach.
+
 Semantic HTML (`nav`, `section`, `ol`, headings, `label`led controls), a skip link, keyboard-operable
 navigation and actions, visible focus outlines, `aria-current`/`aria-live` where appropriate, status
 conveyed by text and shape (not colour alone), and a layout that reflows to a narrow/mobile viewport
