@@ -734,19 +734,39 @@ test.describe('Project mode — model choice guidance (step 3)', () => {
 });
 
 test.describe('Project mode — step strips and validation help (step 5)', () => {
-  test('T1. every stage lists its steps, and a step takes you to its control', async ({ page }) => {
+  test('T1. step numbers sit where the work happens, one sequence per stage, no separate strip', async ({ page }) => {
     await fullWorkflow(page);
+    await expect(page.locator('#view-project .stage-steps')).toHaveCount(0);
+    const numbered = { 'step-features': 3, 'step-model': 3, 'step-split': 3, 'step-diagnostics': 7, 'step-predict': 3, 'step-monitor': 3 };
     for (const id of PANEL_IDS) {
-      const steps = page.locator('#' + id + ' .stage-steps .stage-step');
-      expect(await steps.count(), id + ' has a step strip').toBeGreaterThanOrEqual(3);
+      const numbers = await page.locator('#' + id).evaluate(panel =>
+        Array.from(panel.querySelectorAll('.step-badge, .feature-section-num, .eval-num')).map(n => Number(n.textContent.trim())));
+      const expected = Array.from({ length: numbered[id] || 0 }, (_, k) => k + 1);
+      expect(numbers, id + ' uses one sequence 1..n').toEqual(expected);
     }
-    await goToStage(page, 'step-features');
-    await page.locator('#step-features .stage-step', { hasText: 'Choose the quantity to predict' }).click();
-    await expect(page.locator('#targetColumn')).toBeFocused();
-    await goToStage(page, 'step-diagnostics');
-    await expect(page.locator('#evalErrors')).toHaveJSProperty('open', false);
-    await page.locator('#step-diagnostics .stage-step', { hasText: 'Check the errors' }).click();
-    await expect(page.locator('#evalErrors')).toHaveJSProperty('open', true);
+    // Predict reads upload -> check -> download: the download button sits under step 3.
+    const download = await page.locator('#downloadUnknownPredictionsBtn').evaluate(btn => {
+      let node = btn.closest('.action-row').previousElementSibling;
+      return node ? node.textContent.trim() : '';
+    });
+    expect(download).toContain('Download the predicted values');
+  });
+
+  test('T3. Help opens the user guide at the current stage, and that section exists', async ({ page, request }) => {
+    await fullWorkflow(page);
+    const help = page.locator('#topbarHelpLink');
+    const cases = [
+      ['step-preprocess', 'user-guide.html', 'step-3-configure-preprocessing'],
+      ['step-split', 'user-guide.html', 'step-5-split-and-train'],
+      ['step-diagnostics', 'user-guide.html', 'step-6-review-validate-and-approve'],
+      ['step-monitor', 'approval-and-operation.html', 'package-review-and-retirement']
+    ];
+    for (const [panel, file, anchor] of cases) {
+      await goToStage(page, panel);
+      await expect(help).toHaveAttribute('href', `./docs/html/${file}#${anchor}`);
+      const doc = await (await request.get(`/docs/html/${file}`)).text();
+      expect(doc, `${file} has #${anchor}`).toContain(`id="${anchor}"`);
+    }
   });
 
   test('T2. validation settings explain themselves and the chosen value', async ({ page }) => {

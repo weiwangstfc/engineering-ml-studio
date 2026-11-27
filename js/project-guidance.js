@@ -305,106 +305,34 @@
     updateModelSuggestion();
   }
 
-  // --- Every stage: a compact strip of the steps in this stage ---------------------
-  // Each step names the control it refers to; clicking it scrolls there (opening a
-  // closed section first) and briefly highlights it. Navigation only.
-  var STAGE_STEPS = {
-    'step-upload': [
-      ['Load a CSV file, or continue earlier work', '#dropZone'],
-      ['Check the row and column summary', '#datasetSummary'],
-      ['Continue to inputs and target', '#step-upload .stage-continue']
-    ],
-    'step-features': [
-      ['Choose the quantity to predict', '#targetColumn'],
-      ['Decide whether to transform it', '#targetTransform', true],
-      ['Select the input variables', '#autoFeaturesBtn'],
-      ['Review the data-quality findings', '#dataQualitySummary']
-    ],
-    'step-preprocess': [
-      ['Start from the recommended defaults', '#step-preprocess .recommendation-note'],
-      ['Change only the settings that apply to your data', '#prepGroupNumeric'],
-      ['Check the estimated processed features', '#preprocessEstimate']
-    ],
-    'step-model': [
-      ['Read the starting suggestion', '#modelSuggestion'],
-      ['Pick a model — begin with linear regression', '#step-model .model-group'],
-      ['Adjust advanced settings', '#step-model .advanced-settings', true]
-    ],
-    'step-split': [
-      ['Choose how to split the data', '#splitStrategy'],
-      ['Decide on prediction intervals', '#enableUncertainty'],
-      ['Preview the split', '#previewSplitBtn', true],
-      ['Train and evaluate — or compare several models', '#trainBtn']
-    ],
-    'step-diagnostics': [
-      ['Judge the model on the Test row', '#evalSummary'],
-      ['Check the errors for patterns', '#evalErrors'],
-      ['Compare experiments, if you trained several', '#evalCompare', true],
-      ['Save the project', '#evalSave']
-    ],
-    'step-predict': [
-      ['Have a model ready: trained here or an approved package', '#approvedPackageSummary'],
-      ['Upload a CSV of new input conditions', '#predictionFile'],
-      ['Check how many rows are inside the training range', '#predictionSummary'],
-      ['Download the predicted values', '#downloadUnknownPredictionsBtn']
-    ],
-    'step-monitor': [
-      ['Upload results measured in service, with their predictions', '#monitoringFile'],
-      ['Analyse monitoring data', '#analyseMonitoringBtn'],
-      ['Set and evaluate revalidation triggers', '#monitorMaxRmse'],
-      ['Decide whether the model needs revalidating', '#revalidationSummary']
-    ]
+  // --- Help opens at the part of the user guide for the current stage ---------------
+  // The guide still uses the older step numbering, so the link's title names both.
+  var HELP_TARGETS = {
+    'step-upload': ['user-guide.html#step-1-start-and-load-data', 'Step 1 — Start and load data'],
+    'step-features': ['user-guide.html#step-2-select-features-and-transform-the-target', 'Step 2 — Select features and transform the target'],
+    'step-preprocess': ['user-guide.html#step-3-configure-preprocessing', 'Step 3 — Configure preprocessing'],
+    'step-model': ['user-guide.html#step-4-select-a-model-and-tune-hyperparameters', 'Step 4 — Select a model and tune hyperparameters'],
+    'step-split': ['user-guide.html#step-5-split-and-train', 'Step 5 — Split and train'],
+    'step-diagnostics': ['user-guide.html#step-6-review-validate-and-approve', 'Step 6 — Review, validate and approve'],
+    'step-predict': ['user-guide.html#step-7-predict-unknown-data', 'Step 7 — Predict unknown data'],
+    'step-monitor': ['approval-and-operation.html#package-review-and-retirement', 'Package review and retirement']
   };
 
-  function goToStepTarget(selector) {
-    var target = document.querySelector(selector);
-    if (!target) return;
-    if (target.type === 'file' && target.closest('label')) target = target.closest('label');
-    var section = target.closest('details');
-    if (target.tagName === 'DETAILS') target.open = true;
-    else if (section && !section.open && !section.classList.contains('stage-guidance')) section.open = true;
-    if (!target.offsetParent) return; // not shown yet (e.g. appears after a later action)
-    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    target.classList.remove('step-target-flash');
-    void target.offsetWidth;
-    target.classList.add('step-target-flash');
-    if (typeof target.focus === 'function' && /^(SELECT|INPUT|BUTTON|TEXTAREA)$/.test(target.tagName)) target.focus({ preventScroll: true });
+  function updateHelpLink() {
+    var link = el('topbarHelpLink');
+    if (!link) return;
+    var active = document.querySelector('#view-project .panel.is-active-panel');
+    var target = active && HELP_TARGETS[active.id];
+    link.href = './docs/html/' + (target ? target[0] : 'user-guide.html');
+    link.title = target ? 'Opens the user guide at “' + target[1] + '”' : 'Opens the user guide';
   }
 
-  function buildStageSteps() {
-    Object.keys(STAGE_STEPS).forEach(function (panelId) {
-      var panel = el(panelId);
-      if (!panel || panel.querySelector('.stage-steps')) return;
-      var list = document.createElement('ol');
-      list.className = 'stage-steps';
-      list.setAttribute('aria-label', 'Steps in this stage');
-      STAGE_STEPS[panelId].forEach(function (step, index) {
-        var li = document.createElement('li');
-        var button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'stage-step';
-        button.setAttribute('data-step-target', step[1]);
-        var num = document.createElement('span');
-        num.className = 'stage-step-num';
-        num.textContent = String(index + 1);
-        var text = document.createElement('span');
-        text.className = 'stage-step-text';
-        text.textContent = step[0];
-        button.appendChild(num);
-        button.appendChild(text);
-        if (step[2]) {
-          var optional = document.createElement('span');
-          optional.className = 'stage-step-optional';
-          optional.textContent = 'optional';
-          button.appendChild(optional);
-        }
-        button.addEventListener('click', function () { goToStepTarget(step[1]); });
-        li.appendChild(button);
-        list.appendChild(li);
-      });
-      var anchor = panel.querySelector('.stage-guidance') || panel.querySelector('.panel-heading');
-      if (anchor) anchor.insertAdjacentElement('afterend', list);
-    });
+  function wireHelpLink() {
+    var workspace = document.querySelector('#view-project .workspace');
+    if (workspace && global.MutationObserver) {
+      new MutationObserver(updateHelpLink).observe(workspace, { attributes: true, attributeFilter: ['class'], subtree: true });
+    }
+    updateHelpLink();
   }
 
   // --- Stage 4B: what each validation setting means and what to enter ----------------
@@ -539,8 +467,8 @@
     wirePrep();
     wireEvaluate();
     wireModelChoice();
-    buildStageSteps();
     wireFieldHelp();
+    wireHelpLink();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

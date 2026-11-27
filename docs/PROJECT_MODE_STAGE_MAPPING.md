@@ -285,7 +285,7 @@ describe, and are equally read-only.
 
 | Stage | Guidance |
 | --- | --- |
-| Every stage | A clickable step strip under the stage guidance (`.stage-steps`); each step scrolls to, and highlights, the control it names. |
+| Every stage | Step numbers placed where the work happens (`.step-badge`), one sequence per stage; stages 1 and 3 have none, because they are a single action or a set of unordered settings. (A separate step strip at the top was tried and removed: it duplicated links and clashed with the section numbers.) The top-bar **Help** link opens the user guide at the section for the current stage. |
 | 1 Load data | Other ways to start grouped by who needs them ("Continue earlier work" / "For operators"), each with its purpose and file type. |
 | 2 Inputs and target | Two numbered sections (target; input variables). Target-transformation explainer plus a data-based hint. "Filter columns" (was "Feature search"); the duplicate "Select all eligible" button was removed. |
 | 3 Prepare data | One column of settings grouped by input type; click a setting for what it does and what the chosen value means; relevance notes; illustrations for scaling and encoding. |
