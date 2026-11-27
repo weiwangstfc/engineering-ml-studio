@@ -86,21 +86,46 @@
 /* --- Explore mode ------------------------------------------------------------ */
 .explore-header h1 { margin: .25rem 0 1rem; font-size: clamp(1.6rem, 3.5vw, 2.2rem); }
 
-.explore-steps {
-  list-style: none; display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin: 0 0 1.5rem;
-}
-.explore-steps li {
-  display: flex; align-items: center; gap: .5rem;
+/* Explore progress: a left rail on wide screens (like Project mode), a horizontal strip
+   on narrower ones. Either way it stays in view while a long stage is scrolled, and the
+   steps are buttons: any stage reached can be revisited; stage 4 needs a trained model. */
+.explore-layout { max-width: 1240px; }
+.explore-steps { list-style: none; display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin: 0; }
+.explore-steps li { margin: 0; }
+.explore-step {
+  display: flex; align-items: center; gap: .5rem; width: 100%;
   padding: .5rem .85rem; border: 1px solid var(--line); border-radius: 999px;
-  background: var(--surface); color: var(--muted); font-size: .85rem; font-weight: 650;
+  background: var(--surface); color: var(--muted); font-size: .85rem; font-weight: 650; text-align: left;
 }
-.explore-steps li span {
+.explore-step span {
   display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
   background: var(--line); color: var(--text); font-size: .78rem; flex: 0 0 auto;
 }
-.explore-steps li.is-current { border-color: var(--primary); background: var(--accent); color: var(--primary-strong); }
-.explore-steps li.is-current span { background: var(--primary); color: #fff; }
-.explore-steps li.is-done span { background: var(--success); color: #fff; }
+.explore-step:hover:not(:disabled), .explore-step:focus-visible { border-color: var(--primary); color: var(--text); }
+.explore-step:disabled { cursor: not-allowed; opacity: .55; }
+.explore-steps li.is-current .explore-step { border-color: var(--primary); background: var(--accent); color: var(--primary-strong); }
+.explore-steps li.is-current .explore-step span { background: var(--primary); color: #fff; }
+.explore-steps li.is-done .explore-step span { background: var(--success); color: #fff; }
+.explore-rail-summary { margin: 1rem 0 0; font-size: .82rem; line-height: 1.35; }
+.explore-rail-summary dt { color: var(--muted); font-weight: 600; font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; margin-top: .5rem; }
+.explore-rail-summary dd { margin: .1rem 0 0; font-weight: 650; color: var(--text); }
+
+@media (min-width: 1100px) {
+  .explore-layout { display: grid; grid-template-columns: 215px minmax(0, 1fr); gap: 2rem; align-items: start; }
+  .explore-rail { position: sticky; top: calc(var(--top-nav-height, 3.6rem) + 1rem); }
+  .explore-steps { flex-direction: column; flex-wrap: nowrap; gap: .35rem; }
+  .explore-step { border-radius: 10px; }
+}
+@media (max-width: 1099px) {
+  .explore-layout { max-width: 1000px; }
+  .explore-rail {
+    position: sticky; top: var(--top-nav-height, 3.6rem); z-index: 10;
+    margin: 0 calc(-1 * clamp(1rem, 4vw, 2.5rem)) 1rem; padding: .55rem clamp(1rem, 4vw, 2.5rem);
+    background: var(--bg); border-bottom: 1px solid var(--line);
+  }
+  .explore-step { width: auto; padding: .35rem .7rem; font-size: .8rem; }
+  .explore-rail-summary { display: none; }
+}
 
 .explore-stage { margin-bottom: 1rem; }
 .explore-stage-title { margin: 0 0 .5rem; font-size: 1.35rem; }
@@ -246,4 +271,11 @@
   .explore-nav .button { width: 100%; margin-left: 0; }
   .explore-cta { flex-direction: column; align-items: stretch; }
   .explore-cta .button { width: 100%; margin-left: 0; }
+}
+@media (max-width: 720px) {
+  /* On phones the site navigation is already sticky and tall; a second sticky bar would
+     take a quarter of the screen, so the strip scrolls with the page here. */
+  .explore-rail { position: static; }
+  .explore-steps { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
+  .explore-step { white-space: nowrap; }
 }

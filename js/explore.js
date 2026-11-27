@@ -480,6 +480,7 @@
       '<div class="warning-box explore-disclaimer">' + ex.disclaimer + '</div>';
 
     renderExampleSwitch();
+    renderRail();
   }
 
   // The Explore shell (page heading, stage headings, approach and stage guidance)
@@ -808,6 +809,7 @@
       renderEngineering(state.focusModel);
       var next = el('exploreToStage4');
       if (next) next.disabled = false;
+      renderRail();
     }).catch(function (error) {
       setBusy(false, '');
       var status = el('exploreTrainStatus');
@@ -1420,6 +1422,70 @@
       }).join('');
   }
 
+  // --- Progress rail ---------------------------------------------------------------
+  // The four steps are buttons. Stages 1-3 can always be revisited; stage 4 follows the
+  // same rule as the "Next" button on stage 3 (a trained model is needed). The rail also
+  // names the selected example and approach. Presentation only.
+  var APPROACH_LABELS = {
+    simple: 'Simple trend',
+    flexible: 'Tree-based flexible relationship',
+    advanced: 'Neural network',
+    compare: 'Compare approaches'
+  };
+
+  function canInterpret() {
+    var next = el('exploreToStage4');
+    return next ? !next.disabled : trainedTypes().length > 0;
+  }
+
+  function renderRail() {
+    var steps = el('exploreSteps');
+    if (steps) {
+      steps.querySelectorAll('li').forEach(function (li) {
+        var n = Number(li.getAttribute('data-stage'));
+        li.classList.toggle('is-current', n === state.stage);
+        li.classList.toggle('is-done', n < state.stage);
+        var button = li.querySelector('.explore-step');
+        if (!button) return;
+        if (n === state.stage) button.setAttribute('aria-current', 'step');
+        else button.removeAttribute('aria-current');
+        button.disabled = n === 4 && !canInterpret();
+        button.title = button.disabled ? 'Train a model in stage 3 first' : '';
+      });
+      // In the narrow, sideways-scrolling strip keep the current step in view.
+      var current = steps.querySelector('li.is-current .explore-step');
+      if (current && steps.scrollWidth > steps.clientWidth) {
+        var left = current.getBoundingClientRect().left - steps.getBoundingClientRect().left + steps.scrollLeft;
+        steps.scrollLeft = Math.max(0, left - (steps.clientWidth - current.offsetWidth) / 2);
+      }
+    }
+    var example = el('exploreRailExample');
+    if (example) example.textContent = exampleByKey(state.exampleKey).short;
+    var approach = el('exploreRailApproach');
+    if (approach) approach.textContent = APPROACH_LABELS[selectedApproach()] || '';
+  }
+
+  function wireRail() {
+    var steps = el('exploreSteps');
+    if (!steps || steps.getAttribute('data-wired') === 'true') return;
+    steps.setAttribute('data-wired', 'true');
+    steps.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('.explore-step') : null;
+      if (!button || button.disabled) return;
+      goToStage(Number(button.getAttribute('data-stage')));
+    });
+    document.querySelectorAll('input[name="exploreApproach"]').forEach(function (input) {
+      input.addEventListener('change', renderRail);
+    });
+    // Keep the rail clear of the sticky top navigation, whose height varies with wrapping.
+    function measureNav() {
+      var nav = document.querySelector('.top-nav');
+      if (nav) document.documentElement.style.setProperty('--top-nav-height', nav.offsetHeight + 'px');
+    }
+    measureNav();
+    global.addEventListener('resize', measureNav);
+  }
+
   // --- Stage navigation ----------------------------------------------------------
   function goToStage(n) {
     n = Math.max(1, Math.min(4, n));
@@ -1428,14 +1494,7 @@
       var sec = el('explore-stage-' + i);
       if (sec) sec.classList.toggle('is-hidden', i !== n);
     }
-    var steps = el('exploreSteps');
-    if (steps) {
-      steps.querySelectorAll('li').forEach(function (li) {
-        var stage = Number(li.getAttribute('data-stage'));
-        li.classList.toggle('is-current', stage === n);
-        li.classList.toggle('is-done', stage < n);
-      });
-    }
+    renderRail();
     var heading = el('exploreStage' + n + 'Heading');
     if (heading && typeof heading.focus === 'function') {
       heading.setAttribute('tabindex', '-1');
@@ -1454,6 +1513,7 @@
     var card = el('explorePlotCard'); if (card) card.classList.add('is-hidden');
     var lossCard = el('exploreLossCard'); if (lossCard) { lossCard.classList.add('is-hidden'); lossCard.open = false; }
     var next = el('exploreToStage4'); if (next) next.disabled = true;
+    renderRail();
     var interp = el('exploreInterpretation'); if (interp) interp.innerHTML = '';
     var eng = el('exploreEngineering'); if (eng) eng.innerHTML = '';
   }
@@ -1587,6 +1647,8 @@
     state.wired = true;
 
     renderProblem();
+    wireRail();
+    renderRail();
 
     var toStage2 = el('exploreToStage2'); if (toStage2) toStage2.addEventListener('click', function () { goToStage(2); });
     var toStage3 = el('exploreToStage3'); if (toStage3) toStage3.addEventListener('click', function () { updateApproachControls(); goToStage(3); });
