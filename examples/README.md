@@ -9,26 +9,44 @@ The files fall into two groups:
 - **Inherited from Local Regression Studio** (`house_prices_sample.csv`,
   `nonlinear_regression_sample.csv`, `nonlinear_prediction_sample.csv`) — introduced by Yu Duan;
   reusable under the MIT licence (confirmed).
-- **New to Engineering ML Studio** (`pipe_pressure_drop_sample.csv`) — a documented, deterministic,
-  **synthetic physically-informed** dataset created for the problem-led Explore mode, with a committed
-  generator script. See [its own section](#pipe_pressure_drop_samplecsv-new-explore-mode-primary).
+- **New to Engineering ML Studio** (`pipe_pressure_drop_sample.csv`, `convective_cooling_sample.csv`, `steel_tensile_strength_sample.csv`, `orifice_flow_sample.csv`) — documented, deterministic, synthetic engineering datasets created for the problem-led Explore mode, each with a committed generator script. See the individual dataset sections below for details.
 
-> ✅ **Reuse status confirmed.** Yu Duan has confirmed that the **inherited** bundled example datasets
-> may be reused under the **MIT licence** (see [`../LICENSES.txt`](../LICENSES.txt)). They were
-> introduced by Yu Duan as part of the original Local Regression Studio work. The **new**
-> `pipe_pressure_drop_sample.csv` is released under the same MIT terms, with copyright in the new
-> contribution held by UKRI.
+> ✅ **Reuse status confirmed.** Yu Duan has confirmed that the **inherited**
+> bundled example datasets may be reused under the **MIT licence** (see
+> [`../LICENSES.txt`](../LICENSES.txt)). They were introduced by Yu Duan as part
+> of the original Local Regression Studio work.
+>
+> The new Engineering ML Studio datasets—`pipe_pressure_drop_sample.csv`,
+> `convective_cooling_sample.csv`, `steel_tensile_strength_sample.csv`, and
+> `orifice_flow_sample.csv`—are released under the project's Apache-2.0 licence,
+> with copyright in new contributions held by UKRI.
 
 > ℹ️ **Explore-mode change.** The beginner **Explore** mode is now problem-led and uses
 > `pipe_pressure_drop_sample.csv` as its primary example; `nonlinear_regression_sample.csv` is kept as
 > a clearly-labelled secondary "generic nonlinear" demonstration. `house_prices_sample.csv` has been
 > **removed from the Explore path** but the file is **retained** here (unchanged) for Project mode and
 > compatibility.
+## Dataset catalogue
+
+All datasets are intended for machine-learning practice and exploration. **Do not use these datasets for engineering design, safety-critical calculations, material certification, or real-world decisions.** Where a dataset's origin or generation method is uncertain, that uncertainty is stated explicitly.
+
+| Dataset | Purpose and governing relationship | Input ranges | Seed and generation details |
+|---|---|---|---|
+| `house_prices_sample.csv` | Demonstrates tabular regression using property features to predict house prices. Governing equation: **not documented**. | Observed numeric ranges: area 46.3–219.5 m²; bedrooms 1–6; age 0–191 years; target price £182,528.79–£963,444.57. These are observed values, not documented generator ranges. | Seed and generator: **not documented**. The data appears programmatically generated, but it is not confirmed to be entirely synthetic or independent of real market data. Training demonstration only; not for property valuation or other real-world decisions. |
+| `nonlinear_regression_sample.csv` | Demonstrates nonlinear regression. Exact generating function and noise model: **not documented**. | Observed numeric ranges: time 1–360; x1 −3.0–3.0; x2 −1.122292–1.122058; target 0.161784–4.507024. These are observed values, not documented generator ranges. | Seed and generator: **not documented**. Appears generated for demonstration; exact provenance remains unconfirmed. Training only; not for engineering design or real-world decisions. |
+| `nonlinear_prediction_sample.csv` | Companion dataset for demonstrating nonlinear prediction. Exact generating function and noise model: **not documented**. | Observed numeric ranges (not documented generator ranges): time 1–359; x1 −3.0–2.983287; x2 −1.046103–1.122058; target 0.161784–4.431533. | Seed and generator: **not documented**. Appears generated for demonstration; exact provenance remains unconfirmed. Training only; not for engineering design or real-world decisions. |
+| `pipe_pressure_drop_sample.csv` | Pipe-flow pressure drop using Darcy–Weisbach: \(\Delta p=f(L/D)(\rho v^2/2)\), with friction factor calculated using Reynolds number and the documented laminar/Haaland correlations. | Length 2–30 m; diameter 0.02–0.20 m; velocity 0.5–4.0 m/s; density 850–1050 kg/m³; dynamic viscosity \(3\times10^{-4}\)–\(2\times10^{-3}\) Pa·s. | Seed 42; 500 rows by default; multiplicative lognormal noise, \(\sigma=0.05\). Synthetic, physically informed training data only—not experimental or validated design data. |
+| `convective_cooling_sample.csv` | Convective heat dissipation using Newton's law of cooling: \(Q=hA\Delta T\). | Heat-transfer coefficient 5–500 W/(m²·K); area 0.001–0.5 m²; temperature difference 5–100 K. | Seed 42; 500 rows by default; multiplicative lognormal noise, \(\sigma=0.05\). Synthetic, physically informed training data only—not for thermal design. |
+| `steel_tensile_strength_sample.csv` | Synthetic yield-strength demonstration using Hall–Petch strengthening, approximate linear composition terms, and project-defined temperature corrections: \(\sigma_y=\sigma_0+kd^{-1/2}+a_C C+a_{Mn}Mn+a_{Si}Si-0.20(T_{\mathrm{temper}}-400)-0.20(T_{\mathrm{test}}-20)\). The temperature terms are project-defined, simplified effects, not universal material constants. | Carbon 0.02–0.12 wt%; manganese 0.30–1.60 wt%; silicon 0.05–0.50 wt%; grain size 2–50 µm (log-uniform); tempering temperature 200–650 °C; test temperature −20–100 °C. Yield strength about 140–590 MPa. | Seed 42; 500 rows by default; multiplicative lognormal noise, \(\sigma=0.04\). Synthetic training data only—not for structural design, safety-critical use, or material certification. |
+| `orifice_flow_sample.csv` | Simplified orifice-flow relationship: \(Q=C_d A\sqrt{2\Delta p/\rho}\), where \(A=\pi d^2/4\). It does not reproduce the full ISO 5167 calculation. | Pressure difference 1,000–100,000 Pa; diameter 0.005–0.050 m; density 850–1050 kg/m³; discharge coefficient 0.60–0.65. | Seed 42; 500 rows by default; multiplicative lognormal noise, \(\sigma=0.05\). Synthetic training data only—not for real flow-system design. |
+
+For the engineering datasets, the ranges above describe the documented generator inputs. Seeds and noise settings are those documented in the corresponding generator sections. For the inherited datasets, undocumented generation details must be established from reliable provenance before being claimed as fact.
+
 
 ## Summary of provenance (inherited files)
 
-*(Applies to the three inherited files. The new `pipe_pressure_drop_sample.csv` has its own section
-below, with full generator documentation.)*
+*(Applies to the three inherited files. The four new engineering datasets have their own sections
+below, with generator documentation.)*
 
 - **[Confirmed]** All three inherited CSVs were introduced in commit **`11ae72e`** ("app body").
 - **[Confirmed]** Author of the introducing commit: **Yu Duan** — `MarLen <y.duan@imperial.ac.uk>`,
@@ -134,9 +152,128 @@ below, with full generator documentation.)*
 - **Tests:** [`../tests/test_pipe_dataset.py`](../tests/test_pipe_dataset.py) checks the columns/units,
   row count, strictly-positive/finite values, sensible ranges, determinism, and that the committed CSV
   matches a fresh default generation byte-for-byte.
+
 - **Introducing author / copyright:** new Engineering ML Studio contribution (Wei Wang, STFC);
   copyright in this new contribution held by **UKRI**.
-- **Licence:** MIT (the project's existing terms; see [`../LICENSES.txt`](../LICENSES.txt)).
+
+- **Licence:** Apache-2.0 (the project's licence); see the repository licence files.
+
+## `convective_cooling_sample.csv` (new — Explore mode)
+
+- **Location:** `examples/convective_cooling_sample.csv`
+
+- **Rows:** 500 (plus header)
+
+- **Columns (units embedded in the names):** `h_w_m2k`, `area_m2`, `delta_t_k`,
+  `heat_dissipation_w` (target).
+
+- **Purpose:** a synthetic, problem-led **Explore**-mode demonstration — predict heat dissipation from a convective heat-transfer coefficient, heat-transfer surface area, and temperature difference.
+
+- **Status:** **synthetic, documented, physically-informed — a training demonstration only.** It is
+  **not** experimental, validated, safety-grade, or design-quality data, and must not be used for real
+  design decisions.
+
+- **Governing physics:** Newton's law of cooling, `Q = h · A · ΔT`, where `Q` is the heat-transfer rate
+  in watts, `h` is the convective heat-transfer coefficient in W/m²K, `A` is the heat-transfer surface
+  area in m², and `ΔT` is the temperature difference in K.
+
+- **Assumptions / simplifications:** steady-state convective heat transfer; the heat-transfer coefficient
+  is treated as an input; the surface temperature and surrounding-fluid temperature are represented by
+  their temperature difference; radiation, conduction losses through supports, and other secondary effects
+  are not modelled.
+
+- **Sampling ranges:** heat-transfer coefficient 5–500 W/m²K (uniform); surface area 0.001–0.5 m²
+  (uniform); temperature difference 5–100 K (uniform).
+
+- **Noise model:** each heat-dissipation value is multiplied by `exp(N(0, σ))` with σ = 0.05
+  (~5% relative scatter) — multiplicative lognormal noise, so values stay strictly positive.
+
+- **Determinism:** generated with numpy `default_rng(seed)`, default **seed = 42**; the same seed,
+  row count, and numpy version reproduce the same output.
+
+- **Generator (documented, reproducible):**
+  [`../scripts/generate_convective_cooling.py`](../scripts/generate_convective_cooling.py). Regenerate
+  the bundled file with:
+
+  ```bash
+  python3 scripts/generate_convective_cooling.py --rows 500 --seed 42
+  ```
+
+- **Tests:** [`../tests/test_convective_cooling_dataset.py`](../tests/test_convective_cooling_dataset.py) checks the columns/units,
+  row count, strictly-positive/finite values, sensible ranges, determinism, and that the committed CSV
+  matches a fresh default generation byte-for-byte.
+
+- **Introducing author / copyright:** new Engineering ML Studio contribution; copyright in this new
+  contribution held by **UKRI**.
+
+- **Licence:** Apache-2.0 (the project's licence); see the repository licence files.
+
+## `steel_tensile_strength_sample.csv` (new — Explore mode)
+
+- **Location:** `examples/steel_tensile_strength_sample.csv`
+- **Rows:** 500 (plus header)
+- **Columns (units embedded in the names):** `carbon_wt_pct`, `manganese_wt_pct`, `silicon_wt_pct`, `grain_size_um`, `tempering_temperature_c`, `test_temperature_c`, `yield_strength_mpa` (target).
+- **Purpose:** a synthetic, problem-led **Explore**-mode demonstration — predict structural-steel yield strength from chemical composition, grain size, tempering temperature, and tensile-test temperature.
+- **Status:** **synthetic, documented, physically-informed — a training demonstration only.** It is **not** experimental, validated, safety-grade, or design-quality data, and must not be used for structural design, safety-critical qualification, material certification, or real engineering decisions.
+- **Governing physics:** Hall–Petch strengthening combined with approximately linear solid-solution strengthening:
+  `σ_y = σ_0 + k · d^(-1/2) + a_C · C + a_Mn · Mn + a_Si · Si`
+  where grain size contributes nonlinearly through `d^(-1/2)`, while the composition terms are approximately linear.
+- **What it teaches:** the Hall–Petch term is the dominant source of variation (roughly 90% of the noise-free signal variance), and it is curved. A linear model therefore does *acceptably* (test R² about 0.73 in Explore) and flexible models do clearly *better* (about 0.86–0.95) — the library's clearest "why go beyond a straight line?" example. The 4% specimen scatter sets a noise floor (R² about 0.98) that no model can beat. `tests/test_steel_dataset.py` guards both properties so a future coefficient change cannot silently remove the lesson.
+- **Coefficient sources:** `σ_0 = 53.9 MPa`, `a_Mn = 32.3 MPa/wt%`, and `a_Si = 83.2 MPa/wt%` are based on literature values used for simplified structural-steel strengthening relationships. The Pickering relationship gives a Hall–Petch coefficient of `17.4 MPa·√mm`, which is converted here to approximately `550.2 MPa·√µm` to match the grain-size unit used by the generator. The carbon coefficient (`a_C = 500 MPa/wt%`) and the temperature coefficients are project-defined effective coefficients for this synthetic teaching dataset rather than universal literature material constants. The carbon value is deliberately far below the dissolved-carbon solid-solution coefficient (~5000 MPa/wt%): in these steels most carbon is present as pearlite or carbides, not in solution, and using the dissolved value made carbon explain over 90% of the variance and hid the Hall–Petch nonlinearity.
+- **Literature reference:** the generator documents the Pickering (1971)
+  reference and explains which coefficients are literature-based and which are
+  project-defined. See
+  [`../scripts/generate_steel_tensile_strength.py`](../scripts/generate_steel_tensile_strength.py)
+  for the full reference and coefficient details.
+- **Assumptions / simplifications:** grain size is treated as the effective microstructural variable relevant to yielding; carbon, manganese and silicon contributions are approximated as linear; tempering temperature and test temperature are represented using simplified empirical corrections. Phase composition, heat-treatment history, dislocation density, precipitation, texture, strain rate, and other metallurgical effects are not modelled explicitly.
+- **Sampling ranges:** carbon 0.02–0.12 wt% (uniform); manganese 0.30–1.60 wt% (uniform); silicon 0.05–0.50 wt% (uniform); grain size 2–50 µm (log-uniform, so the strongly curved small-grain region of `d^(-1/2)` is well sampled); tempering temperature 200–650 °C (uniform); test temperature −20–100 °C (uniform).
+- **Noise model:** each yield-strength value is multiplied by `exp(N(0, σ))` with `σ = 0.04` (~4% relative scatter) — multiplicative lognormal noise, so values remain strictly positive.
+- **Determinism:** generated with numpy `default_rng(seed)`, default **seed = 42**; the same seed, row count, and numpy version reproduce byte-identical output.
+- **Generator (documented, reproducible):** [`../scripts/generate_steel_tensile_strength.py`](../scripts/generate_steel_tensile_strength.py). Regenerate the bundled file with:
+
+  ```bash
+  python3 scripts/generate_steel_tensile_strength.py --rows 500 --seed 42
+  ```
+- **Tests:** [`../tests/test_steel_dataset.py`](../tests/test_steel_dataset.py) checks the columns/units, row count, strictly-positive/finite values, sensible input ranges, determinism, validation, and that the committed CSV matches a fresh default generation byte-for-byte.
+- **Introducing author / copyright:** new Engineering ML Studio contribution; copyright in this new contribution held by **UKRI**.
+- **Licence:** Apache-2.0 (the project's licence); see the repository licence files.
+
+## `orifice_flow_sample.csv` (new — Explore mode)
+
+* **Location:** `examples/orifice_flow_sample.csv`
+
+* **Rows:** 500 (plus header)
+
+* **Columns (units embedded in the names):** `pressure_difference_pa`, `orifice_diameter_m`, `fluid_density_kg_m3`, `discharge_coefficient`, `flow_rate_m3_s` (target).
+
+* **Purpose:** a synthetic, problem-led **Explore**-mode demonstration — predict volumetric flow rate through a simplified circular orifice from pressure difference, orifice diameter, fluid density, and an effective discharge coefficient.
+
+* **Status:** **synthetic, documented, physically-informed — a training demonstration only.** It is **not** experimental, validated, safety-grade, or design-quality data, and must not be used for real design decisions.
+
+* **Governing physics:** the simplified orifice-flow relationship `Q = C_d · A · sqrt(2 · Δp / ρ)`, where `Q` is volumetric flow rate in m³/s, `C_d` is the discharge coefficient, `A` is the orifice area in m², `Δp` is the pressure difference in Pa, and `ρ` is the fluid density in kg/m³. For a circular orifice, `A = π · d² / 4`.
+
+* **Coefficient/source note:** ISO 5167-2:2022 provides the standardised treatment of measurement using orifice plates in full circular conduits. This dataset uses a deliberately simplified representation and does **not** attempt to reproduce the full ISO 5167 calculation procedure. The discharge-coefficient range is a **project-defined effective range for this synthetic teaching dataset**, rather than a universal literature constant.
+
+* **Assumptions / simplifications:** steady, single-phase, incompressible flow; positive pressure difference representing the pressure drop across the orifice; circular opening; fluid density treated as constant for each generated sample. Compressibility, cavitation, multiphase flow, detailed upstream/downstream geometry, pipe fittings, installation effects, and Reynolds-number-dependent discharge-coefficient behaviour are not modelled explicitly.
+
+* **Sampling ranges:** pressure difference 1,000–100,000 Pa (uniform); orifice diameter 0.005–0.050 m (uniform); fluid density 850–1,050 kg/m³ (uniform); discharge coefficient 0.60–0.65 (uniform). These are **synthetic teaching ranges** and are not claimed to represent all real orifice-flow applications.
+
+* **Noise model:** each flow-rate value is multiplied by `exp(N(0, σ))` with `σ = 0.05` (~5% relative scatter) — multiplicative lognormal noise, so values remain strictly positive.
+
+* **Determinism:** generated with numpy `default_rng(seed)`, default **seed = 42**; the same seed, row count, and parameters reproduce the same generated dataset.
+
+* **Generator (documented, reproducible):** [`../scripts/generate_orifice_flow.py`](../scripts/generate_orifice_flow.py). Regenerate the bundled file with:
+
+  ```bash
+  python3 scripts/generate_orifice_flow.py --rows 500 --seed 42
+  ```
+
+* **Tests:** [`../tests/test_orifice_dataset.py`](../tests/test_orifice_dataset.py) checks the columns/units, row count, strictly-positive/finite values, sensible input ranges, determinism, validation, and that the committed CSV matches a fresh default generation byte-for-byte.
+
+* **Introducing author / copyright:** new Engineering ML Studio contribution; copyright in this new contribution held by **UKRI**.
+
+* **Licence:** Apache-2.0 (the project's licence); see the repository licence files.
+
 
 ---
 

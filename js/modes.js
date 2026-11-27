@@ -18,6 +18,33 @@
 
   function isValid(mode) { return VIEWS.indexOf(mode) !== -1; }
 
+  // These are the only supported nested Explore routes.
+  // Keeping this list here lets the router reject unknown URLs during startup,
+  // before the Explore module has finished loading.
+  var EXPLORE_EXAMPLE_KEYS = ['pipe', 'cooling', 'steel', 'orifice', 'nonlinear'];
+
+  // Convert the current URL hash into a validated top-level route.
+  function routeFromHash() {
+    var raw = (global.location && global.location.hash || '').replace(/^#/, '').trim();
+    var parts = raw.split('/');
+
+    // Ordinary top-level routes, such as #home or #explore.
+    if (parts.length === 1 && isValid(parts[0])) {
+      return { mode: parts[0], exampleKey: null };
+    }
+
+    // Supported deep links, such as #explore/pipe.
+    if (
+      parts.length === 2 &&
+      parts[0] === 'explore' &&
+      EXPLORE_EXAMPLE_KEYS.indexOf(parts[1]) !== -1
+    ) {
+      return { mode: 'explore', exampleKey: parts[1] };
+    }
+
+    // Unknown or malformed routes return to Home.
+    return { mode: 'home', exampleKey: null };
+  }
   var current = null;
 
   function show(mode, options) {
@@ -53,9 +80,27 @@
     }
 
     // Keep the URL hash in sync without adding a second history entry per click.
-    if (global.location && ('#' + mode) !== global.location.hash) {
-      try { global.history.replaceState(null, '', '#' + mode); }
-      catch (_) { global.location.hash = mode; }
+    // Preserve a valid Explore example key when showing the Explore view.
+    var route = routeFromHash();
+    var nextHash = route.mode === mode && route.exampleKey
+      ? '#explore/' + route.exampleKey
+      : '#' + mode;
+
+    // Returning to Explore through the navigation must name the example that is
+    // actually selected, or an instructor copying the address bar would share the
+    // wrong activity. Only on navigation clicks: a typed or traversed '#explore'
+    // still means the default example, as documented. Plain '#explore' remains
+    // the canonical URL for the default (pipe) example.
+    if (mode === 'explore' && options.fromNav && global.EMSExplore && global.EMSExplore.state) {
+      var selected = global.EMSExplore.state.exampleKey;
+      if (selected && selected !== 'pipe' && EXPLORE_EXAMPLE_KEYS.indexOf(selected) !== -1) {
+        nextHash = '#explore/' + selected;
+      }
+    }
+
+    if (global.location && nextHash !== global.location.hash) {
+      try { global.history.replaceState(null, '', nextHash); }
+      catch (_) { global.location.hash = nextHash.slice(1); }
     }
 
     var previous = current;
@@ -79,8 +124,7 @@
   }
 
   function modeFromHash() {
-    var raw = (global.location && global.location.hash || '').replace(/^#/, '').trim();
-    return isValid(raw) ? raw : 'home';
+    return routeFromHash().mode;
   }
 
   function onModeClick(event) {
@@ -93,12 +137,17 @@
     var mode = trigger.getAttribute('data-mode');
     if (!isValid(mode)) return;
     event.preventDefault();
-    show(mode);
+    show(mode, { fromNav: true });
   }
 
   function init() {
     document.addEventListener('click', onModeClick);
-    global.addEventListener('hashchange', function () { show(modeFromHash(), { noFocus: false }); });
+    // Handle both hash changes and history traversal between pushState entries.
+    function onLocationChange() {
+      show(modeFromHash(), { noFocus: false });
+    }
+    global.addEventListener('hashchange', onLocationChange);
+    global.addEventListener('popstate', onLocationChange);
     // Initial view: honour a deep link (e.g. #explore), default to Home.
     show(modeFromHash(), { noFocus: true });
   }
