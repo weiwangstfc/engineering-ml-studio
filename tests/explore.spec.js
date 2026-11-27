@@ -80,7 +80,7 @@ test.describe('Engineering ML Studio — Phase 1 landing + problem-led Explore',
     await expect(page.locator('#view-home .route-grid [data-mode="explore"]')).toBeVisible();
     await expect(page.locator('#view-home .route-grid [data-mode="project"]')).toBeVisible();
     // The "Learn with Python" route is now live (Phase 2) and navigates to Learn mode.
-    await expect(page.locator('#view-home [data-mode="learn"]')).toBeVisible();
+    await expect(page.locator('#view-home button[data-mode="learn"]')).toBeVisible();
   });
 
   test('3. entering Project mode reveals the inherited workflow unchanged', async ({ page }) => {
@@ -573,6 +573,83 @@ test.describe('Engineering ML Studio — Phase 1 landing + problem-led Explore',
     expect(stage3Rmse).toBe(stage4Rmse);
   });
 
+  test('L1. Home says whether the tool fits a problem and links to what to use instead', async ({ page }) => {
+    await page.goto('/?localOnly=1');
+    await appReady(page);
+    const fit = page.locator('#view-home .fit-check');
+    await expect(fit).toContainText('one number');
+    await expect(fit).toContainText('category');
+    await fit.locator('a[data-scroll-to="learnBeyond"]').click();
+    await expect(page.locator('#view-learn')).toBeVisible();
+    await expect(page).toHaveURL(/#learn$/);
+    await expect(page.locator('#learnBeyond')).toBeInViewport();
+    await expect(page.locator('#view-learn')).toContainText('Classification');
+    await expect(page.locator('#view-learn')).toContainText('Polynomial / response-surface');
+  });
+
+  test('L2. Learn links both notebooks and a template that loads in Project mode', async ({ page, request }) => {
+    await page.goto('/?localOnly=1#learn');
+    await appReady(page);
+    for (const nb of ['pipe_pressure_drop.ipynb', 'steel_tensile_strength.ipynb']) {
+      await expect(page.locator(`#view-learn a[href*="colab.research.google.com"][href$="${nb}"]`)).toBeVisible();
+    }
+    await expect(page.locator('#learnPrepare ~ .learn-checklist li')).toHaveCount(8);
+    const template = page.locator('#view-learn a[href="./examples/data_template.csv"]');
+    await expect(template).toBeVisible();
+    expect((await request.get('/examples/data_template.csv')).ok()).toBe(true);
+    // The template is a working file: it loads, and its identifier column is left out of the inputs.
+    await page.locator('.top-nav [data-nav="project"]').click();
+    await page.waitForFunction(() => !!window.EMSProjectShell);
+    await page.setInputFiles('#csvFile', 'examples/data_template.csv');
+    await expect(page.locator('#targetColumn option', { hasText: 'pressure_drop_kpa' })).toHaveCount(1);
+    await page.evaluate(() => window.EMSProjectShell.goToPanel('step-features'));
+    await page.selectOption('#targetColumn', 'pressure_drop_kpa');
+    await page.click('#autoFeaturesBtn');
+    await expect(page.locator('#featureList input[data-feature="sample_id"]')).not.toBeChecked();
+    await expect(page.locator('#featureList input[data-feature="material"]')).toBeChecked();
+  });
+
+  test('L3. the examples form a learning path with a next lesson and the matching notebook', async ({ page }) => {
+    await page.goto('/?localOnly=1#explore/steel');
+    await appReady(page);
+    await expect(page.locator('#exploreProblem .explore-lesson')).toContainText('Lesson 2 of 5');
+    await page.locator('.explore-other-examples summary').click();
+    const order = await page.locator('#exploreExampleSwitch input[name="exploreExample"]').evaluateAll(els => els.map(e => e.value));
+    expect(order).toEqual(['pipe', 'steel', 'cooling', 'orifice', 'nonlinear']);
+    await expect(page.locator('#exploreExampleSwitch label').first()).toContainText('Lesson 1');
+    // Stage 4: next lesson, and "Continue in Python" points at the steel notebook.
+    await page.locator('#exploreSteps .explore-step[data-stage="3"]').click();
+    await page.click('#exploreTrainBtn');
+    await expect(page.locator('#exploreComparison tbody tr')).toHaveCount(1);
+    await page.click('#exploreToStage4');
+    await expect(page.locator('#exploreCodeCtaBtn')).toHaveAttribute('data-scroll-to', 'learnNotebook2');
+    await expect(page.locator('#exploreNextLesson')).toContainText('Convective cooling');
+    await page.click('#exploreNextLessonBtn');
+    await expect(page.locator('#explore-stage-1')).toBeVisible();
+    await expect(page.locator('#exploreHeading')).toContainText('convective heat loss');
+    // Examples without a notebook say so instead of promising one.
+    await page.evaluate(() => window.EMSExplore.selectExample('orifice'));
+    await expect(page.locator('#exploreCodeCtaText')).toContainText('no notebook for this example yet');
+    await page.evaluate(() => window.EMSExplore.selectExample('nonlinear'));
+    await expect(page.locator('#exploreNextLesson')).toBeHidden();
+  });
+
+  test('L4. "predict before you train" appears for comparisons and reflects the guess afterwards', async ({ page }) => {
+    await page.goto('/?localOnly=1#explore/steel');
+    await appReady(page);
+    await page.locator('#exploreSteps .explore-step[data-stage="2"]').click();
+    await expect(page.locator('#explorePredictFirst')).toBeHidden();
+    await page.locator('input[name="exploreApproach"][value="compare"]').check();
+    await page.locator('#exploreSteps .explore-step[data-stage="3"]').click();
+    await expect(page.locator('#explorePredictFirst')).toBeVisible();
+    await page.locator('input[name="explorePredictChoice"][value="linear"]').check();
+    await page.click('#exploreTrainBtn');
+    const reflection = page.locator('#explorePredictReflection');
+    await expect(reflection).toBeVisible({ timeout: 60000 });
+    await expect(reflection).toContainText('You expected Linear Regression');
+    await expect(reflection).toContainText('the best on the test data was');
+  });
+
   test('E1. returning to Explore through the navigation keeps the selected example in the URL', async ({ page }) => {
     await page.goto('/?localOnly=1#explore/cooling');
     await appReady(page);
@@ -639,8 +716,8 @@ test.describe('Engineering ML Studio — Phase 1 landing + problem-led Explore',
     // The synthetic-data caution carries over from Explore.
     await expect(page.locator('#view-learn')).toContainText('synthetic');
     // Both ways to run the notebook are offered, as external links (allowed by CSP).
-    await expect(page.locator('#view-learn a[href*="colab.research.google.com"]')).toBeVisible();
-    await expect(page.locator('#view-learn a[href*="github.com"][href$=".ipynb"]')).toBeVisible();
+    await expect(page.locator('#view-learn a[href*="colab.research.google.com"][href$="pipe_pressure_drop.ipynb"]')).toBeVisible();
+    await expect(page.locator('#view-learn a[href*="github.com"][href$="pipe_pressure_drop.ipynb"]')).toBeVisible();
   });
 
   test('21. the Learn page uses text links, not an external badge image (CSP-safe)', async ({ page }) => {
@@ -673,7 +750,7 @@ test.describe('Engineering ML Studio — Phase 1 landing + problem-led Explore',
   test('23. the landing page "Learn with Python" card navigates to Learn', async ({ page }) => {
     await page.goto('/?localOnly=1');
     await appReady(page);
-    await page.locator('#view-home [data-mode="learn"]').click();
+    await page.locator('#view-home button[data-mode="learn"]').click();
     await expect(page.locator('#view-learn')).toBeVisible();
     await expect(page.locator('#view-home')).toBeHidden();
   });

@@ -287,3 +287,11 @@ below, with generator documentation.)*
   the synthetic construction is reproducible and documented.
 - Continue to avoid describing these datasets as derived from real physical or experimental data
   unless such an origin is ever positively established.
+
+## `data_template.csv` (layout template — not a dataset)
+
+A six-row example of how to lay out your own data for Project mode: one row per measurement, one column per
+variable, units in the column names, a sample identifier, a categorical column (`material`), and one value left
+blank to show how missing data should look. The values are **placeholders**, not measurements; replace them with your
+own data. See "Preparing your own data" in the app's Learn page.
+

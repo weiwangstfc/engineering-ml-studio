@@ -138,6 +138,12 @@
     if (!isValid(mode)) return;
     event.preventDefault();
     show(mode, { fromNav: true });
+    // Optional: open the mode at a particular section (e.g. Learn → "Beyond this tool").
+    var scrollTo = trigger.getAttribute('data-scroll-to');
+    if (scrollTo) {
+      var target = el(scrollTo);
+      if (target) global.setTimeout(function () { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 0);
+    }
   }
 
   // While the guided pages are English-only, say so whenever another language is active.

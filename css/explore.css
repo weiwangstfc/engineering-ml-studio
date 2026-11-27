@@ -291,3 +291,34 @@
 .language-notice { display: flex; align-items: center; gap: 1rem; padding: .5rem clamp(1rem, 4vw, 2.5rem); background: var(--warning-bg); border-bottom: 1px solid var(--warning-line); font-size: .85rem; line-height: 1.45; }
 .language-notice[hidden] { display: none; }
 .language-notice p { margin: 0; flex: 1 1 auto; }
+
+/* Home: is this tool right for my problem? */
+.fit-check { margin-top: 2rem; padding: 1.1rem 1.25rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.fit-check h2 { margin: 0 0 .8rem; font-size: 1.15rem; }
+.fit-check-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+.fit-check-col h3 { margin: 0 0 .4rem; font-size: .95rem; }
+.fit-check-col ul { margin: 0 0 .6rem; padding-left: 1.2rem; display: grid; gap: .3rem; line-height: 1.5; font-size: .92rem; }
+.fit-check-good h3 { color: var(--success); }
+.fit-check-elsewhere h3 { color: var(--primary-strong); }
+.fit-check a { font-weight: 650; color: var(--primary); }
+@media (max-width: 720px) { .fit-check-grid { grid-template-columns: 1fr; } }
+
+/* Learn: sections, contents, checklist and comparison tables. */
+.learn-contents { display: flex; flex-wrap: wrap; gap: .4rem .9rem; margin: .4rem 0 1.4rem; font-size: .9rem; }
+.learn-contents a { color: var(--primary); font-weight: 650; }
+.learn-section-title { margin-top: 2.2rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: 1.2rem; }
+.learn-checklist { display: grid; gap: .4rem; line-height: 1.55; }
+.learn-table td, .learn-table th { white-space: normal; vertical-align: top; }
+.learn-table { max-height: none; }
+
+/* Learning path and "predict before you train". */
+.explore-lesson { margin: 0; font-size: .82rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: .05em; }
+.explore-switch-tag { color: var(--muted); font-size: .74rem; }
+.explore-next-lesson { margin-top: 1rem; padding: .85rem 1rem; border: 1px solid #b9dce4; border-radius: 10px; background: var(--accent); display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; }
+.explore-next-lesson[hidden] { display: none; }
+.explore-predict-first { margin: .8rem 0 0; padding: .7rem 1rem; border: 1px dashed var(--line); border-radius: 10px; }
+.explore-predict-first legend { font-weight: 700; padding: 0 .3rem; }
+.explore-predict-options { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; margin: .3rem 0; }
+.explore-predict-options label { display: flex; align-items: center; gap: .35rem; font-weight: 600; }
+.explore-predict-options input { width: auto; min-height: auto; }
+.explore-predict-reflection { margin: .8rem 0 0; padding: .6rem .9rem; border-left: 3px solid var(--primary); background: var(--surface-soft); font-weight: 600; }
