@@ -58,6 +58,16 @@ npm run serve      # same as: python3 -m http.server 8000
 Any static file server works (e.g. `npx http-server`, `php -S`); Python is used here only because
 it is universally available and requires no installation.
 
+## Asset versions (cache-busting)
+
+Browsers keep CSS and JavaScript in their cache and may reuse an old copy without asking the
+server. Every stylesheet and script in `index.html` therefore carries a version query
+(`?v=1.0.15`), and `js/bootstrap.js` passes its own `?v=` on to every first-party script it loads.
+**Whenever you change any file under `css/` or `js/`, bump every `?v=` in `index.html` to the same
+new value.** Without the bump, returning users can run a mix of old and new code — for example an
+old `bootstrap.js` that never loads a newly added module. A smoke test fails if any first-party
+script is requested without the current version.
+
 ## Recommended classroom setting
 
 For teaching sessions where internet access is unreliable or unavailable, use the local-only URL:

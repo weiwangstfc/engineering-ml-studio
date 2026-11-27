@@ -234,4 +234,23 @@ test.describe('Engineering ML Studio — baseline browser application', () => {
     expect(await page.evaluate(() => document.documentElement.style.display)).toBe('');
     expect(pageErrors, `Unexpected page errors:\n${pageErrors.join('\n')}`).toEqual([]);
   });
+
+  test('every first-party script is requested with the asset version, so caches cannot serve stale code', async ({ page }) => {
+    const scripts = [];
+    page.on('request', request => {
+      const url = new URL(request.url());
+      if (request.resourceType() === 'script' && url.pathname.includes('/js/')) scripts.push(url);
+    });
+    await page.goto('/?localOnly=1');
+    await page.waitForFunction(() => !!(window.EMSProjectShell && window.EMSProjectGuidance));
+    const version = await page.evaluate(() => new URL(document.querySelector('script[src*="bootstrap.js"]').src).searchParams.get('v'));
+    expect(version, 'bootstrap.js carries a version').toBeTruthy();
+    const paths = scripts.map(u => u.pathname);
+    for (const name of ['bootstrap.js', 'app.js', 'project-shell.js', 'project-guidance.js', 'explore.js']) {
+      expect(paths.some(p => p.endsWith('/js/' + name)), name + ' was loaded').toBe(true);
+    }
+    const unversioned = scripts.filter(u => u.searchParams.get('v') !== version).map(u => u.pathname);
+    expect(unversioned, 'scripts without the current asset version').toEqual([]);
+  });
 });
+

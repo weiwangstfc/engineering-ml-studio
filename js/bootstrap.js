@@ -6,7 +6,18 @@
   const timeoutMs = 5500;
   window.__dependencyStatus = { modeRequested: localOnly ? 'local-only' : 'hybrid', libraries: {} };
 
+  // Cache-busting: pass this file's own ?v= (set in index.html) on to every first-party
+  // script, so a version bump makes browsers fetch fresh copies instead of reusing stale
+  // ones from cache. Without it, a cached old bootstrap.js can skip newly added modules.
+  const ASSET_VERSION = (() => {
+    try { return new URL(document.currentScript.src).searchParams.get('v') || ''; } catch (_) { return ''; }
+  })();
+  function versioned(url) {
+    return ASSET_VERSION && url.startsWith('./js/') ? `${url}?v=${encodeURIComponent(ASSET_VERSION)}` : url;
+  }
+
   function loadScript(url, expectedGlobal, timeout) {
+    url = versioned(url);
     return new Promise((resolve, reject) => {
       const script = document.createElement('script');
       let settled = false;

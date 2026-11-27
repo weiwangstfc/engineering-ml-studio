@@ -44,7 +44,7 @@ panel may still be hidden, `showStage` calls `Plotly.Plots.resize` on the
 revealed panel's `.plot` elements.
 
 **Cache-busting.** Both stylesheet links carry a version query
-(`./css/app.css?v=…`, `./css/explore.css?v=…`; bump both on every stylesheet change) so stylesheet edits are
+(`./css/app.css?v=…`, `./css/explore.css?v=…`; see "Asset versions" in `DEVELOPMENT.md` — scripts are versioned the same way) so stylesheet edits are
 never masked by a stale browser cache.
 
 ## Six user-facing stages → eight internal panels
