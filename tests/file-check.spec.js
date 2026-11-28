@@ -81,8 +81,16 @@ test.describe('File check after upload (WORKPLAN C1)', () => {
   test('large files are warned about model limits at upload, not at training', async ({ page }) => {
     await openProject(page);
     const lines = ['a,b,y'];
+    // The limits apply to training rows (60% by default): 2,500 rows is about 1,500 training rows,
+    // within exact GP's 2,000, so no finding; 4,000 rows is about 2,400, so the subset option is named.
     for (let i = 0; i < 2500; i++) lines.push(`${i % 13},${(i * 7) % 11},${i % 17}`);
     await page.setInputFiles('#csvFile', { name: 'rows2500.csv', mimeType: 'text/csv', buffer: Buffer.from(lines.join('\n')) });
-    await expect(page.locator('#fileCheck .file-check-item', { hasText: 'Gaussian process not available' })).toBeVisible();
+    await expect(page.locator('#fileCheck .file-check-ok')).toBeVisible();
+    for (let i = 2500; i < 4000; i++) lines.push(`${i % 13},${(i * 7) % 11},${i % 17}`);
+    await page.setInputFiles('#csvFile', { name: 'rows4000.csv', mimeType: 'text/csv', buffer: Buffer.from(lines.join('\n')) });
+    const item = page.locator('#fileCheck .file-check-item', { hasText: 'subset option' });
+    await expect(item).toBeVisible();
+    await expect(item).toContainText('about 2,400 training rows');
+    await expect(item).toContainText('representative subset');
   });
 });

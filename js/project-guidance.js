@@ -260,6 +260,9 @@
       return;
     }
     var rows = state.rows.length, inputs = state.selectedFeatures.size, categorical = 0;
+    // Model limits apply to training rows; estimate them from the split if it is set, else 60%.
+    var trainPct = Number(el('randomTrainPct') ? el('randomTrainPct').value : 60);
+    var trainingRows = Math.round(rows * (isFinite(trainPct) && trainPct > 0 ? trainPct : 60) / 100);
     state.selectedFeatures.forEach(function (name) {
       var profile = state.profiles && state.profiles[name];
       if (profile && profile.type !== 'numeric') categorical += 1;
@@ -274,12 +277,13 @@
     if (!categorical && inputs <= 8 && rows * 0.6 >= 2 * (quadraticTerms + 1)) {
       addItem(list, 'Polynomial response surface', 'worth comparing for a smooth relationship you want as an explainable equation (' + quadraticTerms + ' quadratic terms for your ' + inputs + ' inputs).');
     }
-    if (rows <= GP_ROW_LIMIT && inputs <= 20 && !categorical) {
+    if (trainingRows <= GP_ROW_LIMIT && inputs <= 20 && !categorical) {
       addItem(list, 'Gaussian process', 'also worth a try: with this few rows and all-numeric inputs it can fit smooth relationships and gives built-in uncertainty.');
     }
     var notes = [];
-    if (rows > GP_ROW_LIMIT) notes.push('Gaussian process is not available for ' + rows.toLocaleString('en') + ' rows (limit ' + GP_ROW_LIMIT.toLocaleString('en') + ').');
-    if (rows > KNN_ROW_LIMIT) notes.push('k-nearest neighbours is not available above ' + KNN_ROW_LIMIT.toLocaleString('en') + ' rows.');
+    if (trainingRows > GP_ROW_LIMIT) notes.push('About ' + trainingRows.toLocaleString('en') + ' training rows: exact Gaussian process is limited to ' + GP_ROW_LIMIT.toLocaleString('en') + ', so use its representative-subset option.');
+    if (trainingRows > KNN_ROW_LIMIT) notes.push('k-nearest neighbours refuses more than ' + KNN_ROW_LIMIT.toLocaleString('en') + ' training rows by default.');
+    if (rows >= 10000) notes.push('At this size, k-nearest neighbours and the neural network can take about a minute to train in the browser.');
     limits.textContent = notes.join(' ');
     limits.classList.toggle('hidden', !notes.length);
     box.classList.remove('hidden');

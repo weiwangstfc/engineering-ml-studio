@@ -14,7 +14,7 @@
 (function (global) {
   'use strict';
 
-  var GP_ROW_LIMIT = 2000, KNN_ROW_LIMIT = 25000, SLOW_ROWS = 10000;
+  var GP_ROW_LIMIT = 2000, KNN_ROW_LIMIT = 25000, SLOW_ROWS = 10000, DEFAULT_TRAINING_SHARE = 0.6;
   var MISSING_CODES = ['-999', '-9999', '-99999', '9999', '99999', '-99'];
 
   var THOUSANDS = /^[+-]?\d{1,3}(,\d{3})+(\.\d+)?$/;
@@ -143,18 +143,23 @@
       }
     });
 
-    // Size against the models' limits (the latent bug recorded in WORKPLAN C1).
-    var n = rows.length;
-    if (n > KNN_ROW_LIMIT) {
-      findings.push({ severity: 'warning', column: null, title: 'Large dataset: some models will not be available',
-        found: n.toLocaleString('en') + ' rows.',
-        effect: 'Gaussian process (up to ' + GP_ROW_LIMIT.toLocaleString('en') + ' rows) and k-nearest neighbours (up to ' + KNN_ROW_LIMIT.toLocaleString('en') + ') will refuse to train, and the other models will be slow in the browser.',
-        fix: 'Use a representative sample of the rows, or train outside the browser (see “Beyond this tool” in Learn).' });
-    } else if (n > GP_ROW_LIMIT) {
-      findings.push({ severity: 'info', column: null, title: 'Gaussian process not available for this many rows',
-        found: n.toLocaleString('en') + ' rows.',
-        effect: 'Gaussian process is limited to ' + GP_ROW_LIMIT.toLocaleString('en') + ' rows' + (n > SLOW_ROWS ? ', and training other models may take from seconds to over a minute in the browser.' : '.'),
-        fix: 'Use the other models, or a representative sample of up to ' + GP_ROW_LIMIT.toLocaleString('en') + ' rows for a Gaussian process.' });
+    // Size against the models' limits (the latent bug recorded in WORKPLAN C1). The limits
+    // apply to TRAINING rows, estimated here from the default 60% training split: exact
+    // Gaussian process holds every training row (limit 2,000), while its representative-subset
+    // mode holds a chosen subset; k-nearest neighbours stores every training row (default
+    // limit 25,000, adjustable). Timings are measured on the 10,424-row CHF course dataset.
+    var n = rows.length, training = Math.round(n * DEFAULT_TRAINING_SHARE);
+    if (training > KNN_ROW_LIMIT) {
+      findings.push({ severity: 'warning', column: null, title: 'Large dataset: k-nearest neighbours over its limit, and slow training',
+        found: n.toLocaleString('en') + ' rows, so about ' + training.toLocaleString('en') + ' training rows with the default split.',
+        effect: 'k-nearest neighbours stores every training row and refuses more than ' + KNN_ROW_LIMIT.toLocaleString('en') + ' by default. Exact Gaussian process is limited to ' + GP_ROW_LIMIT.toLocaleString('en') + ' training rows. Other models will be slow in the browser.',
+        fix: 'Use the Gaussian process’s representative-subset option, a representative sample of the rows, or train outside the browser (see “Beyond this tool” in Learn).' });
+    } else if (training > GP_ROW_LIMIT) {
+      findings.push({ severity: 'info', column: null, title: 'Exact Gaussian process needs the subset option for this many rows',
+        found: n.toLocaleString('en') + ' rows, so about ' + training.toLocaleString('en') + ' training rows with the default split.',
+        effect: 'Exact Gaussian process holds every training row and is limited to ' + GP_ROW_LIMIT.toLocaleString('en') + '.' +
+          (n >= SLOW_ROWS ? ' At this size most models train in a few seconds, but k-nearest neighbours and the neural network can take about a minute (measured on a 10,000-row dataset).' : ''),
+        fix: 'For a Gaussian process, choose “representative subset” in its settings (stage 4, advanced model settings), which uses a chosen subset of the training rows.' });
     }
     return findings;
   }
