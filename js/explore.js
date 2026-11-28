@@ -207,6 +207,48 @@
       disclaimer: 'This is a <strong>synthetic mathematical demonstration</strong>, intended to illustrate model behaviour on a nonlinear, noisy relationship. Use it to compare modelling approaches, not to draw engineering conclusions or make real-world decisions.',
       schematic: true,
       approxRows: 360
+    },
+    {
+      key: 'chf',
+      lesson: { n: 6, title: 'Real measurements: scatter between laboratories, and the limits of what the data covers.' },
+      notebook: null,
+      file: './examples/chf_sample.csv',
+      engineering: true,
+      realData: true,
+      title: 'Predict critical heat flux in a heated tube',
+      short: 'Critical heat flux',
+      target: 'chf_kw_m2',
+      targetLabel: 'critical heat flux',
+      unit: 'kW/m²',
+      intro: 'When water boils in a heated tube — as in a reactor fuel channel or a steam generator — there is a heat flux beyond which the wall suddenly dries out ' +
+        'and its temperature jumps. This <strong>critical heat flux (CHF)</strong> is a key safety limit. Unlike the earlier lessons, these are ' +
+        '<strong>real measurements</strong>: 2,500 rows drawn from over fifty published experiments. Expect what synthetic data hides — scatter between ' +
+        'laboratories, uneven coverage of conditions, and relationships that no single simple formula captures.',
+      inputs: [
+        { name: 'mass_flux_kg_m2_s', label: 'Mass flux', unit: 'kg/(m²·s)' },
+        { name: 'pressure_kpa', label: 'Pressure', unit: 'kPa' },
+        { name: 'outlet_quality', label: 'Outlet quality', unit: '' },
+        { name: 'tube_diameter_m', label: 'Tube diameter', unit: 'm' },
+        { name: 'heated_length_m', label: 'Heated length', unit: 'm' }
+      ],
+      features: ['mass_flux_kg_m2_s', 'pressure_kpa', 'outlet_quality', 'tube_diameter_m', 'heated_length_m'],
+      keyInputs: 'mass flux, pressure, outlet quality, tube diameter, heated length',
+      trendText: 'Critical heat flux falls as outlet quality rises (less liquid is left to wet the wall), and is higher in short tubes. ' +
+        'It peaks at moderate pressure and falls towards the critical point; most rows here are at high pressure, so it generally falls with pressure. ' +
+        'Two inputs are deliberately not checked: the effect of mass flux depends on quality — more flow raises CHF at low quality but can lower it at high quality — ' +
+        'and tube diameter varies together with the other conditions in this data, so neither has one reliable direction.',
+      trends: [
+        { feature: 'outlet_quality', label: 'outlet quality', direction: 'decrease' },
+        { feature: 'heated_length_m', label: 'heated length', direction: 'decrease' },
+        { feature: 'pressure_kpa', label: 'pressure', direction: 'decrease' }
+      ],
+      rangeText: 'A reproducible 2,500-row sample (seed 42) of the 24,579-row NRC CHF database: pressure 0.1–20 MPa, mass flux up to about 8,000 kg/(m²·s), ' +
+        'outlet quality from subcooled (negative) to nearly dry, tube diameters 2–16 mm. The full dataset and three out-of-domain sources are in the examples folder for Project mode.',
+      disclaimer: 'These are <strong>real experimental data</strong> (U.S. NRC CHF database, basis of the 2006 CHF look-up table; CC0-1.0), provided for teaching ' +
+        'machine-learning practice. A model trained here is <strong>not a validated CHF correlation</strong> and must not be used for design or safety analysis, ' +
+        'which require validated methods and the applicable regulatory processes.',
+      schematic: true,
+      approxRows: 2500
     }
   ];
 
@@ -446,12 +488,35 @@
       '<text x="190" y="114" font-size="10" fill="#a52b2b">straight-line fit</text>' +
     '</svg>';
 
+  var CHF_SCHEMATIC =
+    '<svg class="explore-schematic" viewBox="0 0 340 150" role="img" ' +
+        'aria-label="Water flows upward through a vertical tube of diameter D and heated length L, at mass flux G and pressure p. ' +
+        'Heat flux q enters through the wall; at the critical heat flux the wall dries out near the outlet, where the steam quality x is highest.">' +
+      '<rect x="140" y="14" width="40" height="122" fill="#e7f4f7" stroke="#125f76" stroke-width="2"></rect>' +
+      '<rect x="140" y="14" width="40" height="34" fill="#f6dcd6" opacity=".8"></rect>' +
+      '<text x="160" y="35" text-anchor="middle" font-size="9" fill="#a52b2b">dry-out</text>' +
+      '<line x1="160" y1="132" x2="160" y2="60" stroke="#125f76" stroke-width="2" stroke-dasharray="5 4"></line>' +
+      '<polygon points="155,62 160,52 165,62" fill="#125f76"></polygon>' +
+      '<g stroke="#a52b2b" stroke-width="2">' +
+        '<line x1="104" y1="56" x2="134" y2="56"></line><line x1="104" y1="86" x2="134" y2="86"></line><line x1="104" y1="116" x2="134" y2="116"></line>' +
+        '<line x1="216" y1="56" x2="186" y2="56"></line><line x1="216" y1="86" x2="186" y2="86"></line><line x1="216" y1="116" x2="186" y2="116"></line>' +
+      '</g>' +
+      '<g fill="#a52b2b"><polygon points="132,51 140,56 132,61"></polygon><polygon points="132,81 140,86 132,91"></polygon><polygon points="132,111 140,116 132,121"></polygon>' +
+        '<polygon points="188,51 180,56 188,61"></polygon><polygon points="188,81 180,86 188,91"></polygon><polygon points="188,111 180,116 188,121"></polygon></g>' +
+      '<text x="70" y="90" text-anchor="middle" font-size="11" fill="#a52b2b">heat flux q</text>' +
+      '<text x="160" y="147" text-anchor="middle" font-size="11" fill="#16202a">water in: mass flux G, pressure p, tube diameter D</text>' +
+      '<text x="160" y="10" text-anchor="middle" font-size="11" fill="#16202a">outlet quality x</text>' +
+      '<line x1="236" y1="14" x2="236" y2="136" stroke="#16202a" stroke-width="1"></line>' +
+      '<text x="242" y="80" font-size="11" fill="#16202a">heated length L</text>' +
+    '</svg>';
+
   var SCHEMATICS = {
     pipe: PIPE_SCHEMATIC,
     cooling: COOLING_SCHEMATIC,
     steel: STEEL_SCHEMATIC,
     orifice: ORIFICE_SCHEMATIC,
-    nonlinear: NONLINEAR_SCHEMATIC
+    nonlinear: NONLINEAR_SCHEMATIC,
+    chf: CHF_SCHEMATIC
   };
 
   function renderProblem() {
@@ -512,6 +577,8 @@
       target: ex.targetLabel,
       unitPhrase: ex.unit ? 'the target’s own units (' + ex.unit + ')' : 'the target’s original scale',
       unitSuffix: ex.unit ? ', in ' + ex.unit : '',
+      dataKind: ex.realData ? 'that these are real measurements, with real scatter' : 'that this is a synthetic demonstration',
+      resultKind: ex.realData ? 'This is a teaching result on real data, not a validated' : 'This is a synthetic demonstration, not a validated',
       stage4Look: ex.engineering
         ? 'sensible physical trends, errors in ' + (ex.unit || 'the target’s units') + ', and honest limits'
         : 'how the errors compare between approaches, and honest limits'
@@ -1376,7 +1443,7 @@
     cards.push({
       title: 'What this result does — and does not — show',
       level: 'medium',
-      body: 'This is one synthetic dataset with a fixed random seed. The numbers show what happened here; they do ' +
+      body: 'This is one ' + (exampleByKey(state.exampleKey).realData ? 'dataset' : 'synthetic dataset') + ' with a fixed random seed. The numbers show what happened here; they do ' +
         'not prove one model is best in general. As with every model in this tool, predictions outside the ' +
         'demonstrated data range are extrapolation and can be unreliable, and physical validation and engineering ' +
         'judgement are still required — a neural network does not change that.'
@@ -1509,13 +1576,13 @@
       html: '<p>The test RMSE is <strong>' + fmtU(res.testMetrics.rmse) +
         '</strong>. It summarises prediction error in the target’s units. ' +
         'Whether this error is acceptable depends on the engineering application and ' +
-        'requires appropriate validation; these synthetic examples are for demonstration only.</p>'
+        'requires appropriate validation; ' + (ex.realData ? 'a model trained here is a teaching result, not a validated engineering method.' : 'these synthetic examples are for demonstration only.') + '</p>'
     });
 
     cards.push({
     title: 'Is the model used inside its demonstrated range?',
     level: 'medium',
-    html: '<p>The test predictions use held-out rows drawn from the bundled synthetic dataset. ' +
+    html: '<p>The test predictions use held-out rows drawn from the bundled ' + (ex.realData ? 'dataset' : 'synthetic dataset') + '. ' +
       'The trend checks vary one input between the 10th and 90th percentiles of the training data ' +
       'while holding the other inputs at typical values. Predictions for new inputs outside the ' +
       'training data range are extrapolation and can be unreliable. Machine learning does not ' +

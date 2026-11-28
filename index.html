@@ -11,9 +11,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
   <title>Engineering ML Studio — browser-only machine learning for engineers</title>
   <!-- Must run before anything paints, and before any other script. -->
-  <script src="./js/frame-guard.js?v=1.0.24"></script>
-  <link rel="stylesheet" href="./css/app.css?v=1.0.24">
-  <link rel="stylesheet" href="./css/explore.css?v=1.0.24">
+  <script src="./js/frame-guard.js?v=1.0.25"></script>
+  <link rel="stylesheet" href="./css/app.css?v=1.0.25">
+  <link rel="stylesheet" href="./css/explore.css?v=1.0.25">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
@@ -139,14 +139,14 @@
           <ul class="explore-guide-list">
             <li><strong>What you are doing:</strong> getting to know the engineering problem before modelling it.</li>
             <li><strong>Why it matters:</strong> knowing the inputs, the target and the expected physical trends helps you judge whether a model is sensible.</li>
-            <li><strong>What to look for:</strong> the units, the range of the data, and that this is a synthetic demonstration.</li>
+            <li><strong>What to look for:</strong> the units, the range of the data, and <span data-ex-copy="dataKind">that this is a synthetic demonstration</span>.</li>
           </ul>
         </div>
         <div id="exploreProblem" class="explore-problem"><!-- problem description injected by explore.js --></div>
         <details class="explore-other-examples">
-          <summary>Learning path · five examples</summary>
+          <summary>Learning path · six examples</summary>
           <p class="fine-print">Work through the examples in order: each one teaches a new idea, from the basic
-            workflow to a deliberately hard, noisy problem. Pipe pressure drop is the starting point.</p>
+            workflow to a deliberately hard, noisy problem, finishing with real measurements. Pipe pressure drop is the starting point.</p>
           <div id="exploreExampleSwitch" class="explore-switch"><!-- example switch injected by explore.js --></div>
         </details>
         <div class="explore-nav">
@@ -359,7 +359,7 @@
         <div class="warning-box">
           <strong>Important:</strong> good test performance does not guarantee safe extrapolation.
           Predictions outside the range of the training data — or for conditions the data never
-          covered — can be unreliable. This is a synthetic demonstration, not a validated
+          covered — can be unreliable. <span data-ex-copy="resultKind">This is a synthetic demonstration, not a validated</span>
           engineering result, and it does not replace engineering judgement.
         </div>
         <div class="explore-next-lesson" id="exploreNextLesson" hidden>
@@ -1406,10 +1406,10 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
     </dl>
     <p id="glossaryEmpty" class="fine-print" hidden>No term matches.</p>
   </dialog>
-  <script src="./js/build-config.js?v=1.0.24"></script>
-  <script src="./js/i18n.js?v=1.0.24"></script>
+  <script src="./js/build-config.js?v=1.0.25"></script>
+  <script src="./js/i18n.js?v=1.0.25"></script>
   <!-- Asset version: bump every ?v= on this page whenever any CSS or JS file changes.
        bootstrap.js passes its own ?v= on to every first-party script it loads. -->
-  <script src="./js/bootstrap.js?v=1.0.24"></script>
+  <script src="./js/bootstrap.js?v=1.0.25"></script>
 </body>
 </html>
