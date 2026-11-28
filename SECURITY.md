@@ -2,7 +2,7 @@
 
 ## Supported release
 
-The supported reference release is Local Regression Studio v1.0.11. Security corrections should be distributed as a new signed or checksum-verifiable release rather than by replacing files silently.
+The supported release is Engineering ML Studio 2026.11.0 (built on the Local Regression Studio engine v1.0.11). Security corrections should be distributed as a new signed or checksum-verifiable release rather than by replacing files silently.
 
 ## Reporting a vulnerability
 

@@ -58,11 +58,32 @@ npm run serve      # same as: python3 -m http.server 8000
 Any static file server works (e.g. `npx http-server`, `php -S`); Python is used here only because
 it is universally available and requires no installation.
 
+## Releasing
+
+Engineering ML Studio uses calendar versioning, `YYYY.MM.PATCH` (decided 2026-11-28, WORKPLAN §8). The version is
+defined **once**, as `applicationVersion` in `js/build-config.js`; the app, saved files and reports read it from there.
+
+To cut a release:
+
+1. Set `applicationVersion` (and `buildId`) in `js/build-config.js`.
+2. Set the same value in `package.json` and `package-lock.json` (`version`, and `packages[""].version`).
+3. Set every `?v=` in `index.html` to the same value (see "Asset versions" below).
+4. Update the version shown in the bundled help: the `data-doc-version` spans in `docs/html/*.html` and the
+   "Version" line at the top of `docs/html/user-guide.html`.
+5. Update `SBOM.cdx.json` (metadata component version, timestamp, BOM `version`) and check it lists what ships.
+6. Add the release to `CHANGELOG.md`.
+7. Run both test suites. `tests/release.spec.js` fails if any of the places above disagree.
+8. Merge to `main`, then tag and publish: `git tag -a vYYYY.MM.PATCH -m "Engineering ML Studio YYYY.MM.PATCH"`,
+   `git push origin vYYYY.MM.PATCH`, and create a GitHub release from the tag with the changelog entry.
+
+Saved-file schema versions (`MODEL_SCHEMA_VERSION`, `PROJECT_SCHEMA_VERSION` in `js/platform-core.js`) change only
+when the file format changes, never just because of a release.
+
 ## Asset versions (cache-busting)
 
 Browsers keep CSS and JavaScript in their cache and may reuse an old copy without asking the
 server. Every stylesheet and script in `index.html` therefore carries a version query
-(`?v=1.0.15`), and `js/bootstrap.js` passes its own `?v=` on to every first-party script it loads.
+(`?v=2026.11.0`, the release version), and `js/bootstrap.js` passes its own `?v=` on to every first-party script it loads.
 **Whenever you change any file under `css/` or `js/`, bump every `?v=` in `index.html` to the same
 new value.** Without the bump, returning users can run a mix of old and new code — for example an
 old `bootstrap.js` that never loads a newly added module. A smoke test fails if any first-party

@@ -114,7 +114,7 @@
     if (!changed) { next.history = clone(previous.history); return next; }
     if (global.LRSGovernance) return global.LRSGovernance.appendLifecycleEvent(previous, next, next.reviewerRole);
     next.history = Array.isArray(previous.history) ? clone(previous.history) : [];
-    next.history.push({ fromStatus:previous.status, status:next.status, recordedAt:nowIso(), reviewer:next.reviewer || null, reviewDate:next.reviewDate || null, note:next.notes || next.conditions || null, applicationVersion:'1.0.11' });
+    next.history.push({ fromStatus:previous.status, status:next.status, recordedAt:nowIso(), reviewer:next.reviewer || null, reviewDate:next.reviewDate || null, note:next.notes || next.conditions || null, applicationVersion:(global.LRS_BUILD_CONFIG && global.LRS_BUILD_CONFIG.applicationVersion) || 'unknown' });
     return next;
   }
 
@@ -173,7 +173,7 @@
     const packageObject = {
       artifactType: 'local-regression-approved-package',
       schemaVersion: PACKAGE_SCHEMA_VERSION,
-      applicationVersion: '1.0.11',
+      applicationVersion: (global.LRS_BUILD_CONFIG && global.LRS_BUILD_CONFIG.applicationVersion) || 'unknown',
       packageId: global.LRSPlatform.randomId('approved-package'),
       createdAt: nowIso(),
       originalCsvIncluded: false,
@@ -292,7 +292,7 @@
     return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(approval.modelName || artifact.target || 'Model')} validation report</title><style>body{font:15px/1.5 Arial,sans-serif;color:#172033;max-width:1050px;margin:36px auto;padding:0 24px}h1,h2{color:#173b57}table{border-collapse:collapse;width:100%;margin:12px 0 24px}th,td{border:1px solid #ccd5dd;padding:8px;text-align:left;vertical-align:top}th{background:#eef4f7}.badge{display:inline-block;padding:4px 10px;border-radius:99px;background:#e8eef2;font-weight:700}.meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 24px}.note{background:#f4f7f9;padding:12px;border-left:4px solid #52788f}.footer{margin-top:32px;color:#667;font-size:12px}@media print{body{margin:0}.no-print{display:none}}</style></head><body>
     <button class="no-print" onclick="window.print()">Print or save as PDF</button>
     <h1>Model validation and approval report</h1>
-    <p class="note">Generated locally by Engineering ML Studio v1.0.11 (built on the Local Regression Studio engine). This report supports human review; it does not create regulatory certification.</p>
+    <p class="note">Generated locally by Engineering ML Studio v${esc((global.LRS_BUILD_CONFIG && global.LRS_BUILD_CONFIG.applicationVersion) || 'unknown')} (built on the Local Regression Studio engine). This report supports human review; it does not create regulatory certification.</p>
     <h2>Identity and approval</h2><div class="meta"><div><strong>Model name</strong><br>${esc(approval.modelName || 'Not named')}</div><div><strong>Status</strong><br><span class="badge">${esc(approval.status)}</span></div><div><strong>Developer</strong><br>${esc(approval.developer || '—')}</div><div><strong>Owner</strong><br>${esc(approval.owner || '—')}</div><div><strong>Reviewer</strong><br>${esc(approval.reviewer || '—')}</div><div><strong>Approver</strong><br>${esc(approval.approver || '—')}</div><div><strong>Decision date</strong><br>${esc(approval.decisionDate || '—')}</div><div><strong>Review date</strong><br>${esc(approval.reviewDate || '—')}</div><div><strong>Experiment ID</strong><br>${esc(artifact.experimentId || '—')}</div><div><strong>Application version</strong><br>${esc(artifact.appVersion || '—')}</div></div>
     <h2>Intended and unsupported use</h2><p><strong>Intended use</strong><br>${esc(approval.intendedUse || 'Not documented')}</p><p><strong>Prohibited or unsupported uses</strong><br>${esc(approval.prohibitedUses || 'Not documented')}</p><p><strong>Limitations</strong><br>${esc(approval.limitations || 'Not documented')}</p><p><strong>Conditions</strong><br>${esc(approval.conditions || 'None documented')}</p>
     <h2>Dataset and model</h2><table><tbody><tr><th>Dataset</th><td>${esc(artifact.dataset && artifact.dataset.fileName || '—')}</td><th>Fingerprint</th><td>${esc(artifact.dataset && artifact.dataset.fingerprint && artifact.dataset.fingerprint.value || '—')}</td></tr><tr><th>Target</th><td>${esc(artifact.target || '—')}</td><th>Model</th><td>${esc(artifact.modelType || '—')}</td></tr><tr><th>Rows</th><td>${esc(artifact.dataset && artifact.dataset.rowCount || '—')}</td><th>Split</th><td>${esc(JSON.stringify(artifact.splitSummary || {}))}</td></tr></tbody></table>

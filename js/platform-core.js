@@ -1,7 +1,8 @@
 (function (global) {
   'use strict';
 
-  const APP_VERSION = '1.0.11';
+  // Application version: read from js/build-config.js, the single source of truth (WORKPLAN F1).
+  const APP_VERSION = (global.LRS_BUILD_CONFIG && global.LRS_BUILD_CONFIG.applicationVersion) || 'unknown';
   const MODEL_SCHEMA_VERSION = 10;
   const PROJECT_SCHEMA_VERSION = 10;
   const EXPERIMENT_SCHEMA_VERSION = 6;

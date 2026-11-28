@@ -103,6 +103,14 @@
       catch (_) { global.location.hash = nextHash.slice(1); }
     }
 
+    // The top-bar Help link opens the guide at the section for this mode.
+    var help = el('navHelpLink');
+    if (help) {
+      var anchors = { explore: '#explore', learn: '#learn', about: '#about', project: '#project' };
+      var version = (global.LRS_BUILD_CONFIG && global.LRS_BUILD_CONFIG.applicationVersion) || '';
+      help.href = './docs/html/user-guide.html' + (version ? '?v=' + encodeURIComponent(version) : '') + (anchors[mode] || '');
+    }
+
     var previous = current;
     current = mode;
 
@@ -183,7 +191,15 @@
     });
   }
 
+  // Show the release version from js/build-config.js wherever the page names it (WORKPLAN F1).
+  function showVersion() {
+    var config = global.LRS_BUILD_CONFIG || {};
+    document.querySelectorAll('[data-app-version]').forEach(function (n) { if (config.applicationVersion) n.textContent = config.applicationVersion; });
+    document.querySelectorAll('[data-engine-version]').forEach(function (n) { if (config.engineVersion) n.textContent = config.engineVersion; });
+  }
+
   function init() {
+    showVersion();
     wireGlossary();
     updateLanguageNotice();
     global.addEventListener('lrs-language-change', function () { dismissedFor = null; updateLanguageNotice(); });
