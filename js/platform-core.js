@@ -49,6 +49,10 @@
       label: 'k-nearest-neighbour regression',
       capabilities: Object.freeze({ nativeUncertainty:false, approximateUncertainty:true, trainingHistory:false, featureImportance:false, iterativeTraining:false })
     }),
+    polynomial: Object.freeze({
+      label: 'Polynomial response-surface regression',
+      capabilities: Object.freeze({ nativeUncertainty:true, approximateUncertainty:false, trainingHistory:false, featureImportance:true, iterativeTraining:false })
+    }),
     quantile: Object.freeze({
       label: 'Linear quantile regression',
       capabilities: Object.freeze({ nativeUncertainty:true, approximateUncertainty:false, trainingHistory:true, featureImportance:true, iterativeTraining:true })

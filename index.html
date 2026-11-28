@@ -11,9 +11,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
   <title>Engineering ML Studio — browser-only machine learning for engineers</title>
   <!-- Must run before anything paints, and before any other script. -->
-  <script src="./js/frame-guard.js?v=1.0.22"></script>
-  <link rel="stylesheet" href="./css/app.css?v=1.0.22">
-  <link rel="stylesheet" href="./css/explore.css?v=1.0.22">
+  <script src="./js/frame-guard.js?v=1.0.23"></script>
+  <link rel="stylesheet" href="./css/app.css?v=1.0.23">
+  <link rel="stylesheet" href="./css/explore.css?v=1.0.23">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
@@ -501,7 +501,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
       <div class="table-wrap learn-table"><table>
         <thead><tr><th>Method</th><th>When it can beat the models here</th></tr></thead>
         <tbody>
-          <tr><td>Polynomial / response-surface models and splines</td><td>Smooth relationships you want as an explainable equation — the classic engineering surrogate.</td></tr>
+          <tr><td>Splines and generalised additive models</td><td>Smooth curves of each input with fewer terms than a polynomial; a flexible yet explainable alternative. (Polynomial response surfaces are now included in Project mode.)</td></tr>
           <tr><td>Optimised boosted-tree libraries (XGBoost, LightGBM, CatBoost)</td><td>Larger tabular datasets: faster and usually stronger versions of the gradient boosting here.</td></tr>
           <tr><td>Support vector regression</td><td>Smooth problems with a few hundred to a few thousand rows; an alternative to the Gaussian process.</td></tr>
           <tr><td>Bayesian regression</td><td>When you want uncertainty built into the model and prior knowledge about coefficients.</td></tr>
@@ -836,21 +836,22 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
         <div class="model-group">
           <h3 class="model-group-title step-heading"><span class="step-badge">2</span> Choose a model: recommended starting models</h3>
           <div class="model-grid">
-            <label class="model-card"><input type="radio" name="modelType" value="linear" checked><span><strong>Linear regression</strong><small>Fits one straight-line (weighted-sum) relationship. Fast, easy to explain, and the baseline every other model should beat.</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> Fast, interpretable baseline with analytical prediction intervals.</small></span></label>
+            <label class="model-card"><input type="radio" name="modelType" value="linear" checked><span><strong>Linear regression</strong><small>Fits one straight-line (weighted-sum) relationship. Fast, easy to explain, and the baseline every other model should beat.</small><small class="model-meta"><span class="model-family-chip">Equation-based</span> Fast, interpretable baseline with analytical prediction intervals.</small></span></label>
             <label class="model-card"><input type="radio" name="modelType" value="forest"><span><strong>Random forest</strong><small>Averages many decision trees. Captures curved relationships and interactions with little tuning; a strong general-purpose choice.</small><small class="model-meta"><span class="model-family-chip">Tree-based</span> Tree ensemble with approximate between-tree intervals.</small></span></label>
             <label class="model-card"><input type="radio" name="modelType" value="gboost"><span><strong>Gradient-boosted trees</strong><small>Builds small trees one after another, each correcting the last. Often the most accurate on tabular data; needs more rows and care than a forest.</small><small class="model-meta"><span class="model-family-chip">Tree-based</span> Sequential shallow trees for strong nonlinear tabular prediction.</small></span></label>
           </div>
         </div>
         <details class="model-group other-models-group">
-          <summary><span class="model-group-title">Other modelling approaches</span><span class="model-group-hint">Eight more models, grouped by family: models in the same family work in a similar way.</span></summary>
+          <summary><span class="model-group-title">Other modelling approaches</span><span class="model-group-hint">Nine more models, grouped by family: models in the same family work in a similar way.</span></summary>
           <div class="model-family">
-            <h4 class="model-family-title">Straight-line family</h4>
-            <p class="model-family-hint">One weighted-sum relationship that is easy to explain. The variants differ in how they handle correlated inputs, outliers and bounds.</p>
+            <h4 class="model-family-title">Equation-based family</h4>
+            <p class="model-family-hint">One explicit equation that is easy to explain and check against the physics. The straight-line variants differ in how they handle correlated inputs, outliers and bounds; the polynomial response surface adds squared and interaction terms to follow smooth curves.</p>
             <div class="model-grid">
-              <label class="model-card"><input type="radio" name="modelType" value="ridge"><span><strong>Ridge regression</strong><small>Linear regression that keeps coefficients small, so it stays stable when inputs are strongly correlated with each other.</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> L2 coefficient shrinkage with bootstrap uncertainty.</small></span></label>
-              <label class="model-card"><input type="radio" name="modelType" value="elasticnet"><span><strong>Elastic net</strong><small>Linear regression that can shrink unhelpful inputs to exactly zero, leaving a simpler model.</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> Combined L1 and L2 shrinkage for sparse, correlated linear models.</small></span></label>
-              <label class="model-card"><input type="radio" name="modelType" value="robust"><span><strong>Huber robust regression</strong><small>Linear regression that is pulled less by a few badly wrong measurements (outliers).</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> Downweights large residuals to reduce outlier influence.</small></span></label>
-              <label class="model-card"><input type="radio" name="modelType" value="quantile"><span><strong>Linear quantile regression</strong><small>Predicts a chosen percentile, such as a lower and an upper bound, instead of only the average.</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> Predicts a conditional quantile and fitted lower/upper quantile bounds.</small></span></label>
+              <label class="model-card"><input type="radio" name="modelType" value="polynomial"><span><strong>Polynomial response surface</strong><small>A smooth curved surface written as an explicit equation, with squared and interaction terms. The classic engineering surrogate for simulation sweeps and designed experiments; needs few inputs relative to rows.</small><small class="model-meta"><span class="model-family-chip">Equation-based</span> Least-squares fit of polynomial terms with analytical prediction intervals.</small></span></label>
+              <label class="model-card"><input type="radio" name="modelType" value="ridge"><span><strong>Ridge regression</strong><small>Linear regression that keeps coefficients small, so it stays stable when inputs are strongly correlated with each other.</small><small class="model-meta"><span class="model-family-chip">Equation-based</span> L2 coefficient shrinkage with bootstrap uncertainty.</small></span></label>
+              <label class="model-card"><input type="radio" name="modelType" value="elasticnet"><span><strong>Elastic net</strong><small>Linear regression that can shrink unhelpful inputs to exactly zero, leaving a simpler model.</small><small class="model-meta"><span class="model-family-chip">Equation-based</span> Combined L1 and L2 shrinkage for sparse, correlated linear models.</small></span></label>
+              <label class="model-card"><input type="radio" name="modelType" value="robust"><span><strong>Huber robust regression</strong><small>Linear regression that is pulled less by a few badly wrong measurements (outliers).</small><small class="model-meta"><span class="model-family-chip">Equation-based</span> Downweights large residuals to reduce outlier influence.</small></span></label>
+              <label class="model-card"><input type="radio" name="modelType" value="quantile"><span><strong>Linear quantile regression</strong><small>Predicts a chosen percentile, such as a lower and an upper bound, instead of only the average.</small><small class="model-meta"><span class="model-family-chip">Equation-based</span> Predicts a conditional quantile and fitted lower/upper quantile bounds.</small></span></label>
             </div>
           </div>
           <div class="model-family">
@@ -883,6 +884,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
             <tbody>
               <tr><td>To explain the result to a colleague</td><td>Linear regression (Ridge if inputs are correlated)</td><td>Each input has one coefficient you can read and check against the physics.</td></tr>
               <tr><td>The best accuracy on curved, interacting relationships</td><td>Gradient-boosted trees or Random forest</td><td>Tree ensembles capture curvature and interactions with little preparation.</td></tr>
+              <tr><td>An explainable equation for a smooth, curved relationship — e.g. a simulation sweep or designed experiment</td><td>Polynomial response surface</td><td>Squared and interaction terms follow curvature, and the result is still a formula you can write down.</td></tr>
               <tr><td>Robustness to a few bad measurements</td><td>Huber robust regression</td><td>Large errors are down-weighted instead of dominating the fit.</td></tr>
               <tr><td>A lower and an upper bound, not just the average</td><td>Linear quantile regression</td><td>It fits percentiles of the target directly.</td></tr>
               <tr><td>Uncertainty on a small, smooth dataset (up to 2,000 rows), such as a simulation sweep</td><td>Gaussian process</td><td>A smooth fit with built-in predictive uncertainty.</td></tr>
@@ -957,6 +959,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
                   <thead><tr><th>Model</th><th>Baseline settings used in comparison</th><th>Speed note</th></tr></thead>
                   <tbody>
                     <tr><td>Linear</td><td>Ordinary linear regression, no model-specific hyperparameters.</td><td>Fast baseline.</td></tr>
+                    <tr><td>Polynomial surface</td><td>Degree 2 (squares) with pairwise interaction terms, ordinary least squares.</td><td>Fast; refuses when there are fewer than two training rows per term.</td></tr>
                     <tr><td>Ridge</td><td>λ = 1.</td><td>Fast; useful with correlated features.</td></tr>
                     <tr><td>Elastic net</td><td>λ = 0.1, L1 ratio = 0.5, coordinate-descent limit = 500.</td><td>Moderate; can shrink unhelpful features.</td></tr>
                     <tr><td>Robust regression</td><td>Huber threshold = 1.345, IRLS limit = 80.</td><td>Moderate; downweights large residuals.</td></tr>
@@ -973,6 +976,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
             </details>
             <div id="comparisonModelChoices" class="comparison-model-grid">
               <label><input type="checkbox" name="comparisonModel" value="linear" checked><span><strong>Linear</strong><small>Fast baseline</small></span></label>
+              <label><input type="checkbox" name="comparisonModel" value="polynomial"><span><strong>Polynomial surface</strong><small>Quadratic with interactions</small></span></label>
               <label><input type="checkbox" name="comparisonModel" value="ridge" checked><span><strong>Ridge</strong><small>L2 regularised linear</small></span></label>
               <label><input type="checkbox" name="comparisonModel" value="elasticnet"><span><strong>Elastic net</strong><small>L1 + L2 regularisation</small></span></label>
               <label><input type="checkbox" name="comparisonModel" value="robust"><span><strong>Robust regression</strong><small>Outlier-resistant linear</small></span></label>
@@ -1402,10 +1406,10 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
     </dl>
     <p id="glossaryEmpty" class="fine-print" hidden>No term matches.</p>
   </dialog>
-  <script src="./js/build-config.js?v=1.0.22"></script>
-  <script src="./js/i18n.js?v=1.0.22"></script>
+  <script src="./js/build-config.js?v=1.0.23"></script>
+  <script src="./js/i18n.js?v=1.0.23"></script>
   <!-- Asset version: bump every ?v= on this page whenever any CSS or JS file changes.
        bootstrap.js passes its own ?v= on to every first-party script it loads. -->
-  <script src="./js/bootstrap.js?v=1.0.22"></script>
+  <script src="./js/bootstrap.js?v=1.0.23"></script>
 </body>
 </html>

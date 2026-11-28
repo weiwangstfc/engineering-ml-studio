@@ -2,7 +2,7 @@
   'use strict';
 
   const VERSION = '1.0.11';
-  const MODEL_ORDER = ['linear','ridge','elasticnet','robust','tree','forest','gboost','knn','quantile','gp','ann'];
+  const MODEL_ORDER = ['linear','polynomial','ridge','elasticnet','robust','tree','forest','gboost','knn','quantile','gp','ann'];
 
   function clone(value) { return value == null ? value : JSON.parse(JSON.stringify(value)); }
 
@@ -120,6 +120,7 @@
     const rows = Math.max(0, Number(context && context.trainingRows) || 0);
     const defaults = {
       linear: {},
+      polynomial: { degree:2, interactions:true },
       ridge: { lambda:1 },
       tree: { maxDepth:8, minLeaf:5, maxThresholds:24, maxFeatures:'all' },
       forest: { nTrees:40, maxDepth:8, minLeaf:5, sampleRate:0.8, maxThresholds:20, maxFeatures:'sqrt', maxRowsPerTree:20000 },

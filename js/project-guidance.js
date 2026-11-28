@@ -270,6 +270,10 @@
     addItem(list, 'Linear regression', 'start here as the baseline: fast, easy to explain, and the yardstick every other model should beat.');
     if (rows < 300) addItem(list, 'Random forest', 'then a flexible model. With a few hundred rows, a forest is a safe choice: it copes well with small datasets and needs little tuning.');
     else addItem(list, 'Gradient-boosted trees or Random forest', 'then a flexible model. Tree ensembles are usually the strongest general-purpose choice on tabular engineering data.');
+    var quadraticTerms = 2 * inputs + inputs * (inputs - 1) / 2;
+    if (!categorical && inputs <= 8 && rows * 0.6 >= 2 * (quadraticTerms + 1)) {
+      addItem(list, 'Polynomial response surface', 'worth comparing for a smooth relationship you want as an explainable equation (' + quadraticTerms + ' quadratic terms for your ' + inputs + ' inputs).');
+    }
     if (rows <= GP_ROW_LIMIT && inputs <= 20 && !categorical) {
       addItem(list, 'Gaussian process', 'also worth a try: with this few rows and all-numeric inputs it can fit smooth relationships and gives built-in uncertainty.');
     }
