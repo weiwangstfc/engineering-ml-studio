@@ -68,6 +68,18 @@ test.describe('Release consistency', () => {
     expect(await page.evaluate(() => window.LocalRegressionApp.state.artifact.appVersion)).toBe(VERSION);
   });
 
+  test('About shows the version and keeps a short credit for the original engine', async ({ page }) => {
+    await page.goto('/?localOnly=1#about');
+    await page.waitForFunction(() => !!window.EMSModes);
+    const about = page.locator('#view-about');
+    await expect(about).toContainText(`Version ${VERSION}`);
+    // Attribution is kept brief, but must stay (MIT notice; WORKPLAN guardrail 5).
+    await expect(about.locator('h2', { hasText: 'Acknowledgements' })).toBeVisible();
+    await expect(about).toContainText('Local Regression Studio by Yu Duan');
+    await expect(about).toContainText('MIT licence');
+    expect(fs.existsSync(path.join(ROOT, 'LICENSES.txt')) && fs.existsSync(path.join(ROOT, 'NOTICE.md'))).toBe(true);
+  });
+
   test('the top-bar Help link opens the guide at the section for the current mode', async ({ page, request }) => {
     await page.goto('/?localOnly=1');
     await page.waitForFunction(() => !!window.EMSModes);
