@@ -51,7 +51,7 @@
       const key = String(header);
       if (seen.has(key)) duplicateHeaders.push(key); else seen.add(key);
     });
-    if (duplicateHeaders.length) issues.push({ severity:'error', code:'duplicate_headers', message:`Duplicate CSV headers are not supported: ${duplicateHeaders.slice(0,10).join(', ')}.` });
+    if (duplicateHeaders.length) issues.push({ severity:'error', code:'duplicate_headers', message:`Duplicate CSV headers are not supported: ${duplicateHeaders.slice(0,10).join(', ')}. Every column needs a unique name: rename one of each duplicated pair (for example temperature_inlet_c and temperature_outlet_c), then load the file again.` });
     return { valid:!issues.some(issue => issue.severity === 'error'), rowCount, columnCount, issues };
   }
 
