@@ -11,9 +11,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
   <title>Engineering ML Studio — browser-only machine learning for engineers</title>
   <!-- Must run before anything paints, and before any other script. -->
-  <script src="./js/frame-guard.js?v=1.0.19"></script>
-  <link rel="stylesheet" href="./css/app.css?v=1.0.19">
-  <link rel="stylesheet" href="./css/explore.css?v=1.0.19">
+  <script src="./js/frame-guard.js?v=1.0.20"></script>
+  <link rel="stylesheet" href="./css/app.css?v=1.0.20">
+  <link rel="stylesheet" href="./css/explore.css?v=1.0.20">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
@@ -71,8 +71,8 @@
       <div class="route-secondary">
         <div class="route-secondary-item">
           <h3>Learn with Python <span class="badge">New</span></h3>
-          <p>Reproduce the pressure-drop Explore activity in a guided Python notebook — see the code
-            behind the browser.</p>
+          <p>Reproduce two Explore examples in guided Python notebooks, see the code behind the browser,
+            and find out what to use beyond this tool.</p>
           <button class="button secondary" data-mode="learn" type="button">Learn with Python</button>
         </div>
         <details class="route-secondary-item">
@@ -82,6 +82,30 @@
           <button class="button secondary" data-mode="project" type="button">Go to Project mode</button>
         </details>
       </div>
+      <section class="fit-check" aria-labelledby="fitCheckHeading">
+        <h2 id="fitCheckHeading">Is this tool right for my problem?</h2>
+        <div class="fit-check-grid">
+          <div class="fit-check-col fit-check-good">
+            <h3>A good fit when…</h3>
+            <ul>
+              <li>you want to predict <strong>one number</strong> — a pressure drop, a strength, a temperature, an efficiency;</li>
+              <li>your data is a <strong>table</strong>: one row per test, specimen or simulation run, one column per variable;</li>
+              <li>you have roughly <strong>30 to 50,000 rows</strong> (it is most responsive below about 10,000);</li>
+              <li>the inputs you would use are <strong>known when you make a prediction</strong>.</li>
+            </ul>
+            <a href="#learn" data-mode="learn" data-scroll-to="learnPrepare">How to prepare your data →</a>
+          </div>
+          <div class="fit-check-col fit-check-elsewhere">
+            <h3>Look elsewhere when you need to…</h3>
+            <ul>
+              <li>predict a <strong>category</strong>, such as pass/fail or failure mode;</li>
+              <li>forecast <strong>over time</strong>, or learn from <strong>images, signals or spectra</strong>;</li>
+              <li>predict <strong>whole fields</strong> (a CFD or FEA solution) or several linked outputs at once.</li>
+            </ul>
+            <a href="#learn" data-mode="learn" data-scroll-to="learnBeyond">What to use instead →</a>
+          </div>
+        </div>
+      </section>
     </div>
   </section>
 
@@ -119,10 +143,9 @@
         </div>
         <div id="exploreProblem" class="explore-problem"><!-- problem description injected by explore.js --></div>
         <details class="explore-other-examples">
-          <summary>Use a different example</summary>
-          <p class="fine-print">Pipe pressure drop is the default example. The others cover heat transfer,
-            mechanics and a second fluids problem, plus a generic nonlinear dataset included as a
-            mathematical contrast case.</p>
+          <summary>Learning path · five examples</summary>
+          <p class="fine-print">Work through the examples in order: each one teaches a new idea, from the basic
+            workflow to a deliberately hard, noisy problem. Pipe pressure drop is the starting point.</p>
           <div id="exploreExampleSwitch" class="explore-switch"><!-- example switch injected by explore.js --></div>
         </details>
         <div class="explore-nav">
@@ -241,10 +264,22 @@
             <li><strong>What to look for:</strong> a lower prediction error (RMSE<span data-ex-copy="unitSuffix">, in kPa</span>) and points near the diagonal.</li>
           </ul>
         </div>
+        <fieldset class="explore-predict-first is-hidden" id="explorePredictFirst">
+          <legend>Before you train: which approach do you expect to do best on the test data?</legend>
+          <div class="explore-predict-options">
+            <label><input type="radio" name="explorePredictChoice" value="linear"> Simple trend</label>
+            <label><input type="radio" name="explorePredictChoice" value="tree"> Decision tree</label>
+            <label><input type="radio" name="explorePredictChoice" value="forest"> Random forest</label>
+            <label><input type="radio" name="explorePredictChoice" value="ann"> Neural network</label>
+            <label><input type="radio" name="explorePredictChoice" value="unsure"> Not sure</label>
+          </div>
+          <p class="fine-print">Optional. Committing to a guess before seeing the answer makes the result much easier to learn from. Nothing is stored.</p>
+        </fieldset>
         <div class="action-row wrap">
           <button class="button primary" id="exploreTrainBtn" type="button">Train and show predictions</button>
           <span id="exploreTrainStatus" class="status-pill status-loading is-hidden" aria-live="polite"></span>
         </div>
+        <p class="explore-predict-reflection is-hidden" id="explorePredictReflection" aria-live="polite"></p>
         <div class="table-wrap explore-results-table is-hidden" id="exploreComparisonWrap">
           <table id="exploreComparison"></table>
         </div>
@@ -322,14 +357,18 @@
         <div id="exploreEngineering" class="explore-interpretation explore-engineering" aria-live="polite"></div>
         <div class="warning-box">
           <strong>Important:</strong> good test performance does not guarantee safe extrapolation.
-          Predictions outside the range of the training data — or for different fluids, geometries or
-          flow conditions — can be unreliable. This is a synthetic demonstration, not a validated
+          Predictions outside the range of the training data — or for conditions the data never
+          covered — can be unreliable. This is a synthetic demonstration, not a validated
           engineering result, and it does not replace engineering judgement.
         </div>
+        <div class="explore-next-lesson" id="exploreNextLesson" hidden>
+          <strong>Next in the learning path:</strong> <span id="exploreNextLessonText"></span>
+          <button class="button primary" id="exploreNextLessonBtn" type="button">Go to the next lesson</button>
+        </div>
         <div class="explore-cta">
-          <strong>Ready to see the code?</strong> Reproduce this same pressure-drop workflow in a
-          guided Python notebook — same dataset, same models, same fixed seed.
-          <button class="button primary" data-mode="learn" type="button">Continue in Python</button>
+          <strong>Ready to see the code?</strong> <span id="exploreCodeCtaText">Reproduce this same workflow in a
+          guided Python notebook — same dataset, same models, same fixed seed.</span>
+          <button class="button secondary" id="exploreCodeCtaBtn" data-mode="learn" data-scroll-to="learnNotebook1" type="button">Continue in Python</button>
         </div>
         <div class="explore-nav">
           <button class="button secondary" id="exploreBackTo3" type="button">Back</button>
@@ -345,8 +384,16 @@
   <!-- ===================== LEARN THE CODE ===================== -->
   <section id="view-learn" class="view is-hidden" aria-labelledby="learnHeading" tabindex="-1">
     <div class="learn-shell about-shell">
-      <p class="eyebrow">Learn the Code &middot; the Python behind Explore</p>
-      <h1 id="learnHeading">Reproduce the pressure-drop workflow in Python</h1>
+      <p class="eyebrow">Learn &middot; the Python behind Explore, and where to go next</p>
+      <h1 id="learnHeading">From the browser to Python, and beyond</h1>
+      <nav class="learn-contents" aria-label="On this page">
+        <a href="#learn" data-mode="learn" data-scroll-to="learnNotebook1">Notebook 1: pipe pressure drop</a>
+        <a href="#learn" data-mode="learn" data-scroll-to="learnNotebook2">Notebook 2: steel yield strength</a>
+        <a href="#learn" data-mode="learn" data-scroll-to="learnPrepare">Preparing your own data</a>
+        <a href="#learn" data-mode="learn" data-scroll-to="learnBeyond">Beyond this tool</a>
+      </nav>
+
+      <h2 id="learnNotebook1" class="learn-section-title">Notebook 1 · Pipe pressure drop: the core workflow in Python</h2>
       <p>You have used the browser <strong>Explore</strong> mode to predict the pressure drop of a
         fluid flowing through a pipe. This guided Jupyter notebook reproduces the <em>same</em>
         activity in Python, so you can read, run and change the code behind it — the same dataset, the
@@ -382,7 +429,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
         </article>
       </div>
 
-      <h2>What the notebook covers</h2>
+      <h3>What the notebook covers</h3>
       <ul>
         <li>The pressure-drop problem in plain engineering language, with the expected physical trends.</li>
         <li>Loading and inspecting the dataset; a reproducible train/test split with a fixed seed.</li>
@@ -399,10 +446,74 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
         the linear model under-fits, a single deep tree overfits, and the random forest is strongest.
       </div>
 
+
+      <h2 id="learnNotebook2" class="learn-section-title">Notebook 2 · Steel yield strength: curved relationships, overfitting and the noise floor</h2>
+      <p>The second notebook follows the steel example from Explore's learning path. Yield strength depends on grain size through
+        the Hall–Petch relationship, which is strongly curved, so a straight line does acceptably but tree-based models do clearly
+        better. It also shows a single tree overfitting, and why no model can beat the specimen-to-specimen scatter. An optional
+        section adds a neural network. Same structure and level as notebook 1; about 45 minutes.</p>
+      <div class="action-row wrap">
+        <a class="button primary"
+           href="https://colab.research.google.com/github/weiwangstfc/engineering-ml-studio/blob/main/notebooks/steel_tensile_strength.ipynb"
+           target="_blank" rel="noopener noreferrer">Open the steel notebook in Google Colab</a>
+        <a class="button secondary"
+           href="https://github.com/weiwangstfc/engineering-ml-studio/blob/main/notebooks/steel_tensile_strength.ipynb"
+           target="_blank" rel="noopener noreferrer">View it on GitHub</a>
+      </div>
+      <p class="fine-print">Locally: <code>jupyter lab notebooks/steel_tensile_strength.ipynb</code> after installing the same requirements.</p>
+
+      <h2 id="learnPrepare" class="learn-section-title">Preparing your own data for Project mode</h2>
+      <p>The Explore datasets are clean. Real measurement and simulation data rarely is, and most problems at upload come
+        from the layout of the file rather than from the data. Before you load a CSV in Project mode, check that:</p>
+      <ul class="learn-checklist">
+        <li><strong>One row is one measurement</strong> — one test, specimen, operating point or simulation run.</li>
+        <li><strong>One column is one variable</strong>, with a single header row. No merged cells, notes, totals or blank rows inside the table.</li>
+        <li><strong>Units are in the column names</strong>, not in the cells: <code>pressure_drop_kpa</code> with values like <code>12.4</code>, not <code>12.4 kPa</code>.</li>
+        <li><strong>Numbers use a decimal point</strong> (<code>12.4</code>, not <code>12,4</code>) and no thousands separators.</li>
+        <li><strong>Missing values are left blank</strong> — not written as 0, −999 or “n/a”, which the model would take as real values.</li>
+        <li><strong>Every input is known when you predict.</strong> Leave out anything measured after the event you want to predict, or the model will appear far better than it is.</li>
+        <li><strong>Keep identifiers</strong> (sample or run IDs) for traceability. Project mode recognises them and leaves them out of the inputs.</li>
+        <li><strong>Grouped or ordered data is noted.</strong> If rows come from a few rigs, batches or a time series, you will want a grouped or time-based split in stage 4.</li>
+      </ul>
+      <p><a class="button secondary" href="./examples/data_template.csv" download>Download a CSV template</a>
+        <span class="fine-print">A six-row example of the layout, with placeholder values — replace them with your own data.</span></p>
+
+      <h2 id="learnBeyond" class="learn-section-title">Beyond this tool: what it doesn't cover, and what to use instead</h2>
+      <p>This tool predicts <strong>one numeric quantity</strong> from a <strong>table of measurements</strong>, with a set of
+        well-understood regression models. That covers many engineering questions, but not all of them. If your problem is one of
+        the types below, no model choice here will help: you need a different kind of method. The Python notebooks above are the
+        natural next step, using the same libraries named here.</p>
+      <h3>Types of problem it does not handle</h3>
+      <div class="table-wrap learn-table"><table>
+        <thead><tr><th>If your problem is…</th><th>You need…</th><th>For example, in Python</th></tr></thead>
+        <tbody>
+          <tr><td>Predicting a category — pass/fail, failure mode, material class</td><td>Classification</td><td>scikit-learn classifiers</td></tr>
+          <tr><td>Forecasting over time, or a dynamic system’s response</td><td>Time-series or dynamic models</td><td>statsmodels, sktime</td></tr>
+          <tr><td>Images, signals or spectra as inputs</td><td>Feature extraction, or deep learning</td><td>scikit-image, SciPy, PyTorch</td></tr>
+          <tr><td>Whole fields — a CFD or FEA solution, not single values</td><td>Reduced-order or surrogate field models (e.g. POD)</td><td>specialist ROM tools, PyTorch</td></tr>
+          <tr><td>Several linked outputs predicted together</td><td>Multi-output models</td><td>scikit-learn multi-output</td></tr>
+          <tr><td>Repeated tests on the same specimens, rigs or sites</td><td>Mixed-effects models</td><td>statsmodels</td></tr>
+          <tr><td>Hundreds of thousands of rows or more</td><td>Scalable training outside the browser</td><td>scikit-learn, XGBoost, LightGBM</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Regression methods not included here</h3>
+      <div class="table-wrap learn-table"><table>
+        <thead><tr><th>Method</th><th>When it can beat the models here</th></tr></thead>
+        <tbody>
+          <tr><td>Polynomial / response-surface models and splines</td><td>Smooth relationships you want as an explainable equation — the classic engineering surrogate.</td></tr>
+          <tr><td>Optimised boosted-tree libraries (XGBoost, LightGBM, CatBoost)</td><td>Larger tabular datasets: faster and usually stronger versions of the gradient boosting here.</td></tr>
+          <tr><td>Support vector regression</td><td>Smooth problems with a few hundred to a few thousand rows; an alternative to the Gaussian process.</td></tr>
+          <tr><td>Bayesian regression</td><td>When you want uncertainty built into the model and prior knowledge about coefficients.</td></tr>
+          <tr><td>Symbolic regression (e.g. PySR)</td><td>When you want the data to suggest a compact equation, not just a prediction.</td></tr>
+          <tr><td>Physics-informed neural networks</td><td>When the governing equations are known and data is scarce or noisy.</td></tr>
+        </tbody>
+      </table></div>
+      <p class="fine-print">Library names are examples of widely used open-source options, not endorsements; the methods matter more than the packages.</p>
+
       <div class="warning-box">
-        <strong>Important:</strong> the dataset is a <strong>synthetic</strong> teaching demonstration
-        generated from the Darcy–Weisbach equation. It is not experimental, validated or safety-grade
-        data, and neither the notebook nor this tool should be used for real engineering design.
+        <strong>Important:</strong> the notebook datasets are <strong>synthetic</strong> teaching demonstrations
+        generated from documented equations (Darcy–Weisbach; Hall–Petch). They are not experimental, validated or safety-grade
+        data, and neither the notebooks nor this tool should be used for real engineering design.
       </div>
 
       <div class="explore-nav">
@@ -533,6 +644,8 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <span>Recommended: up to 50,000 rows and 50 original columns</span>
           <button id="chooseCsvBtn" class="button primary" type="button">Choose CSV</button>
         </div>
+        <p class="fine-print upload-help training-only">First time with your own data?
+          <a href="#learn" data-mode="learn" data-scroll-to="learnPrepare">How to prepare your CSV</a>, with a downloadable template.</p>
         <!-- Other ways to start. Each option says what it is for and which file it takes,
              grouped by who needs it, so a new user is not faced with four unexplained buttons. -->
         <div class="start-options">
@@ -774,6 +887,8 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
               <tr><td>To model very complex relationships, with plenty of data</td><td>Neural network (advanced)</td><td>The most flexible model, but it needs data and care; compare it with a forest first.</td></tr>
             </tbody>
           </table></div>
+          <p class="fine-print">Need a method this tool does not have, or a different kind of problem (categories, time series, images)?
+            <a href="#learn" data-mode="learn" data-scroll-to="learnBeyond">Beyond this tool</a> summarises what to use instead.</p>
         </details>
         <details class="subpanel advanced-settings">
           <summary><span class="advanced-settings-title step-heading"><span class="step-badge">3</span> Advanced model settings <span class="step-optional">optional</span></span><span class="advanced-settings-hint">Tuning method and model-specific settings (including neural-network architecture and training settings)</span></summary>
@@ -1228,10 +1343,10 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
     <p><strong>Severity:</strong> critical findings can invalidate fitting or interpretation; warnings need review; information items explain workflow state. These checks do not verify units, scientific plausibility, sampling representativeness, causal validity, or every form of target leakage.</p>
     <form method="dialog"><button class="button primary">Close</button></form>
   </dialog>
-  <script src="./js/build-config.js?v=1.0.19"></script>
-  <script src="./js/i18n.js?v=1.0.19"></script>
+  <script src="./js/build-config.js?v=1.0.20"></script>
+  <script src="./js/i18n.js?v=1.0.20"></script>
   <!-- Asset version: bump every ?v= on this page whenever any CSS or JS file changes.
        bootstrap.js passes its own ?v= on to every first-party script it loads. -->
-  <script src="./js/bootstrap.js?v=1.0.19"></script>
+  <script src="./js/bootstrap.js?v=1.0.20"></script>
 </body>
 </html>

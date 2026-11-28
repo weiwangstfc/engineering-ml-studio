@@ -32,6 +32,8 @@
   var EXAMPLES = [
     {
       key: 'pipe',
+      lesson: { n: 1, title: 'The basic workflow: from an engineering problem to a trained, checked model.' },
+      notebook: 'learnNotebook1',
       file: './examples/pipe_pressure_drop_sample.csv',
       engineering: true,
       title: 'Predict pressure drop in a pipe',
@@ -70,6 +72,8 @@
     },
     {
       key: 'cooling',
+      lesson: { n: 3, title: 'When inputs multiply rather than add, and why a straight line struggles.' },
+      notebook: null,
       file: './examples/convective_cooling_sample.csv',
       engineering: true,
       title: 'Predict convective heat loss from a hot surface',
@@ -101,6 +105,8 @@
     },
     {
       key: 'steel',
+      lesson: { n: 2, title: 'Curved relationships, overfitting and the noise floor that no model can beat.' },
+      notebook: 'learnNotebook2',
       file: './examples/steel_tensile_strength_sample.csv',
       engineering: true,
       title: 'Predict steel yield strength',
@@ -139,6 +145,8 @@
     },
     {
       key: 'orifice',
+      lesson: { n: 4, title: 'An input whose effect is smaller than the measurement noise.' },
+      notebook: null,
       file: './examples/orifice_flow_sample.csv',
       engineering: true,
       title: 'Predict flow rate through an orifice',
@@ -174,6 +182,8 @@
     },
     {
       key: 'nonlinear',
+      lesson: { n: 5, title: 'What a hard, noisy problem looks like, with no physics to lean on.' },
+      notebook: null,
       file: './examples/nonlinear_regression_sample.csv',
       engineering: false,
       title: 'Explore a generic nonlinear relationship',
@@ -464,6 +474,7 @@
     syncExampleCopy(ex);
 
     host.innerHTML =
+      '<p class="explore-lesson">Lesson ' + ex.lesson.n + ' of ' + EXAMPLES.length + ' · ' + escapeHtml(ex.lesson.title) + '</p>' +
       '<p class="explore-problem-intro">' + ex.intro + '</p>' +
       schematic +
       '<div class="explore-problem-grid">' +
@@ -482,6 +493,7 @@
 
     renderExampleSwitch();
     renderRail();
+    renderLessonLinks();
   }
 
   // The Explore shell (page heading, stage headings, approach and stage guidance)
@@ -510,17 +522,53 @@
     });
   }
 
+  // The examples form a learning path: each teaches one new idea, in this order.
+  function learningPath() {
+    return EXAMPLES.slice().sort(function (a, b) { return a.lesson.n - b.lesson.n; });
+  }
+
+  function nextLesson(key) {
+    var path = learningPath();
+    var index = path.findIndex(function (ex) { return ex.key === key; });
+    return index >= 0 && index < path.length - 1 ? path[index + 1] : null;
+  }
+
+  // Stage 4: offer the next lesson, and point "Continue in Python" at the matching notebook.
+  function renderLessonLinks() {
+    var ex = exampleByKey(state.exampleKey);
+    var next = nextLesson(ex.key);
+    var box = el('exploreNextLesson'), text = el('exploreNextLessonText'), button = el('exploreNextLessonBtn');
+    if (box && text && button) {
+      box.hidden = !next;
+      if (next) {
+        text.textContent = 'Lesson ' + next.lesson.n + ' · ' + next.short + ': ' + next.lesson.title.charAt(0).toLowerCase() + next.lesson.title.slice(1);
+        button.textContent = 'Go to lesson ' + next.lesson.n;
+      }
+    }
+    var cta = el('exploreCodeCtaText'), ctaButton = el('exploreCodeCtaBtn');
+    if (cta && ctaButton) {
+      if (ex.notebook) {
+        cta.textContent = 'Reproduce this same ' + ex.short.toLowerCase() + ' workflow in a guided Python notebook — same dataset, same models, same fixed seed.';
+        ctaButton.setAttribute('data-scroll-to', ex.notebook);
+      } else {
+        cta.textContent = 'There is no notebook for this example yet. The pipe pressure-drop notebook shows the same workflow in Python.';
+        ctaButton.setAttribute('data-scroll-to', 'learnNotebook1');
+      }
+    }
+  }
+
   // A clearly-secondary switch so the pipe problem stays the default focus.
   function renderExampleSwitch() {
     var host = el('exploreExampleSwitch');
     if (!host) return;
-    host.innerHTML = EXAMPLES.map(function (ex) {
+    host.innerHTML = learningPath().map(function (ex) {
       var checked = ex.key === state.exampleKey ? ' checked' : '';
       var tag = ex.engineering ? 'Engineering example' : 'Maths demonstration';
       return '<label class="explore-switch-option">' +
         '<input type="radio" name="exploreExample" value="' + ex.key + '"' + checked + '>' +
-        '<span><strong>' + escapeHtml(ex.short) + '</strong>' +
-        '<small>' + tag + '</small></span></label>';
+        '<span><strong>Lesson ' + ex.lesson.n + ' · ' + escapeHtml(ex.short) + '</strong>' +
+        '<small>' + escapeHtml(ex.lesson.title) + '</small>' +
+        '<small class="explore-switch-tag">' + tag + '</small></span></label>';
     }).join('');
     host.querySelectorAll('input[name="exploreExample"]').forEach(function (input) {
       // Manual selections create history entries so Back and Forward can restore them.
@@ -622,6 +670,8 @@
 
   function updateApproachControls() {
     state.approach = selectedApproach();
+    var predictFirst = el('explorePredictFirst');
+    if (predictFirst) predictFirst.classList.toggle('is-hidden', state.approach !== 'compare');
     var overfitPanel = el('exploreOverfitDemo');
     if (overfitPanel && state.approach !== 'compare') {
       overfitPanel.classList.add('is-hidden');
@@ -802,6 +852,7 @@
       setBusy(false, '');
       state.focusModel = bestModel(types);
       renderComparison();
+      renderPredictionReflection();
       renderOverfitDemo();
       renderFocusSelector();
       renderPlot(state.focusModel);
@@ -856,6 +907,30 @@
     ];
     list.innerHTML = rows.map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>'; }).join('') +
       '<dt>Next</dt><dd>Stage 4 explains what your own numbers mean in engineering terms.</dd>';
+    box.classList.remove('is-hidden');
+  }
+
+  // "Predict before you train": reflect the learner's guess back against the result.
+  function renderPredictionReflection() {
+    var box = el('explorePredictReflection');
+    if (!box) return;
+    var chosen = document.querySelector('input[name="explorePredictChoice"]:checked');
+    if (state.approach !== 'compare' || !chosen || !state.focusModel || !state.results[state.focusModel]) {
+      box.classList.add('is-hidden');
+      return;
+    }
+    var best = state.focusModel, bestR2 = state.results[best].testMetrics.r2;
+    var text;
+    if (chosen.value === 'unsure') {
+      text = 'The best on the test data was ' + MODEL_LABELS[best] + ' (test R² ' + fmtR2(bestR2) + ').';
+    } else if (chosen.value === best) {
+      text = 'You expected ' + MODEL_LABELS[best] + ', and it did best on the test data (test R² ' + fmtR2(bestR2) + ').';
+    } else {
+      var guess = state.results[chosen.value];
+      text = 'You expected ' + MODEL_LABELS[chosen.value] + '; the best on the test data was ' + MODEL_LABELS[best] +
+        ' (test R² ' + fmtR2(bestR2) + (guess ? ' against ' + fmtR2(guess.testMetrics.r2) : '') + ').';
+    }
+    box.textContent = text + ' Stage 4 explains why.';
     box.classList.remove('is-hidden');
   }
 
@@ -1541,6 +1616,7 @@
     var overfitPanel = el('exploreOverfitDemo');
     if (overfitPanel) overfitPanel.classList.add('is-hidden');
     var wrap = el('exploreComparisonWrap'); if (wrap) wrap.classList.add('is-hidden');
+    var reflection = el('explorePredictReflection'); if (reflection) reflection.classList.add('is-hidden');
     var metricsExplainer = el('exploreMetricsExplainer'); if (metricsExplainer) { metricsExplainer.classList.add('is-hidden'); metricsExplainer.open = false; }
     var focus = el('exploreFocusWrap'); if (focus) focus.classList.add('is-hidden');
     var card = el('explorePlotCard'); if (card) card.classList.add('is-hidden');
@@ -1682,6 +1758,13 @@
     renderProblem();
     wireRail();
     renderRail();
+    var nextLessonBtn = el('exploreNextLessonBtn');
+    if (nextLessonBtn) nextLessonBtn.addEventListener('click', function () {
+      var next = nextLesson(state.exampleKey);
+      if (!next) return;
+      selectExample(next.key, { updateHistory: true });
+      goToStage(1);
+    });
 
     var toStage2 = el('exploreToStage2'); if (toStage2) toStage2.addEventListener('click', function () { goToStage(2); });
     var toStage3 = el('exploreToStage3'); if (toStage3) toStage3.addEventListener('click', function () { updateApproachControls(); goToStage(3); });

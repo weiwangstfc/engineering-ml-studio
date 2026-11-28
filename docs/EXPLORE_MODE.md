@@ -228,6 +228,16 @@ Selecting a different example updates the URL and creates a browser history entr
 
 These links make it possible to share a specific Explore activity with another user without requiring them to navigate through the example selector.
 
+## Learning path
+
+The five examples form a learning path, each teaching one new idea: 1 pipe pressure drop (the basic workflow),
+2 steel yield strength (curved relationships, overfitting and the noise floor), 3 convective cooling (inputs that
+multiply), 4 orifice flow (an input whose effect is smaller than the noise), 5 the generic nonlinear signal (a hard,
+noisy problem). The picker lists them in this order with a one-line lesson each; stage 1 shows "Lesson n of 5"; stage 4
+offers the next lesson, and "Continue in Python" opens the matching notebook in Learn (pipe and steel) or says that
+an example has none yet. With "Compare approaches", stage 3 asks — optionally, storing nothing — which approach the
+learner expects to win, and reflects the guess back against the result after training.
+
 ## Accessibility and responsiveness
 
 **Progress rail.** The four stages are listed as buttons in a rail beside the content on screens at
