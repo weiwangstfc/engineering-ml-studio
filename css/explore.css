@@ -322,3 +322,5 @@
 .explore-predict-options label { display: flex; align-items: center; gap: .35rem; font-weight: 600; }
 .explore-predict-options input { width: auto; min-height: auto; }
 .explore-predict-reflection { margin: .8rem 0 0; padding: .6rem .9rem; border-left: 3px solid var(--primary); background: var(--surface-soft); font-weight: 600; }
+.top-nav .nav-glossary { border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 8px; padding: .4rem .75rem; font-weight: 650; }
+.top-nav .nav-glossary:hover { color: var(--text); background: var(--surface-soft); }

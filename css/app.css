@@ -653,3 +653,25 @@ h3.step-heading { margin: 1.1rem 0 .6rem; font-size: 1rem; }
 .field-help { margin: .6rem 0 .2rem; padding: .65rem .85rem; border-left: 3px solid var(--primary); border-radius: 6px; background: var(--surface-soft); font-size: .86rem; line-height: 1.5; max-width: 80ch; }
 .field-help p { margin: 0 0 .35rem; }
 .field-help p:last-child { margin-bottom: 0; }
+
+/* Research support (stage B). */
+.small-data-advice { margin: .8rem 0; padding: .7rem .9rem; border: 1px solid var(--warning-line); border-radius: 10px; background: var(--warning-bg); font-size: .86rem; line-height: 1.5; }
+.small-data-advice p { margin: 0 0 .5rem; }
+.small-data-advice .button[hidden] { display: none; }
+.methods-summary { margin-top: 1rem; }
+.methods-summary h4 { margin: 0 0 .2rem; }
+.methods-summary textarea { width: 100%; min-height: 10rem; padding: .6rem .7rem; border: 1px solid var(--line); border-radius: 8px; font-family: inherit; font-size: .88rem; line-height: 1.55; resize: vertical; background: var(--surface); color: var(--text); }
+.operational-gate { padding: .8rem 1rem; background: var(--surface-soft); }
+.operational-gate p { margin: 0 0 .6rem; font-size: .88rem; line-height: 1.5; max-width: 80ch; }
+.operational-gate[hidden], .ops-hidden { display: none !important; }
+button.topbar-action { font: inherit; cursor: pointer; }
+
+/* Glossary dialog, reachable from every mode. */
+.glossary-dialog { max-width: 720px; width: calc(100vw - 2rem); max-height: 85vh; }
+.glossary-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.glossary-head h2 { margin: 0; }
+.glossary-search { margin: .6rem 0 .8rem; }
+.glossary-list { margin: 0; display: grid; gap: .55rem; }
+.glossary-entry dt { font-weight: 700; }
+.glossary-entry dd { margin: .1rem 0 0; color: var(--muted); line-height: 1.5; font-size: .9rem; }
+.glossary-entry[hidden] { display: none; }

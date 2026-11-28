@@ -156,7 +156,35 @@
     notice.hidden = /^en\b/i.test(locale) || dismissedFor === locale;
   }
 
+  // Glossary: one dialog reachable from every mode (top navigation and Project's top bar).
+  function wireGlossary() {
+    var dialog = el('glossaryDialog');
+    if (!dialog) return;
+    document.addEventListener('click', function (event) {
+      var opener = event.target.closest ? event.target.closest('[data-open-glossary]') : null;
+      if (opener) {
+        event.preventDefault();
+        if (typeof dialog.showModal === 'function') dialog.showModal(); else dialog.setAttribute('open', '');
+        var search = el('glossarySearch');
+        if (search) search.focus();
+      }
+      if (event.target.closest && event.target.closest('[data-close-glossary]')) dialog.close();
+    });
+    var search = el('glossarySearch');
+    if (search) search.addEventListener('input', function () {
+      var q = search.value.trim().toLowerCase(), shown = 0;
+      dialog.querySelectorAll('.glossary-entry').forEach(function (entry) {
+        var match = !q || entry.textContent.toLowerCase().indexOf(q) !== -1;
+        entry.hidden = !match;
+        if (match) shown += 1;
+      });
+      var empty = el('glossaryEmpty');
+      if (empty) empty.hidden = shown > 0;
+    });
+  }
+
   function init() {
+    wireGlossary();
     updateLanguageNotice();
     global.addEventListener('lrs-language-change', function () { dismissedFor = null; updateLanguageNotice(); });
     var dismiss = el('languageNoticeDismiss');

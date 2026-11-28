@@ -789,6 +789,98 @@ test.describe('Project mode — step strips and validation help (step 5)', () =>
   });
 });
 
+test.describe('Project mode — research support (stage B)', () => {
+  const fs = require('fs');
+  const PIPE_CSV = path.join(__dirname, '..', 'examples', 'pipe_pressure_drop_sample.csv');
+  const smallPipe = () => ({ name: 'pipe120.csv', mimeType: 'text/csv',
+    buffer: Buffer.from(fs.readFileSync(PIPE_CSV, 'utf8').split(/\r?\n/).slice(0, 121).join('\n')) });
+
+  async function trainOn(page, file, target) {
+    await page.setInputFiles('#csvFile', file);
+    await expect(page.locator('#targetColumn option', { hasText: target })).toHaveCount(1);
+    await goToStage(page, 'step-features');
+    await page.selectOption('#targetColumn', target);
+    await page.click('#autoFeaturesBtn');
+    await goToStage(page, 'step-split');
+  }
+
+  test('B1. small datasets get advice to use cross-validation, and a note in the results', async ({ page }) => {
+    await ready(page);
+    await enterProjectMode(page);
+    await trainOn(page, smallPipe(), 'pressure_drop_kpa');
+    const advice = page.locator('#smallDataAdvice');
+    await expect(advice).toBeVisible();
+    await expect(advice).toContainText('about 24 rows');
+    await page.click('#smallDataEnableCvBtn');
+    await expect(page.locator('#enableCV')).toBeChecked();
+    await expect(page.locator('#smallDataEnableCvBtn')).toBeHidden();
+    await page.click('#trainBtn');
+    await expect(page.locator('#metricsTable tbody tr').first()).toBeVisible({ timeout: 60000 });
+    await goToStage(page, 'step-diagnostics');
+    await expect(page.locator('#evalSmallTestNote')).toContainText('Only 24 rows');
+    // A 400-row dataset with the default split does not trigger the advice.
+    await page.setInputFiles('#csvFile', HOUSE_CSV);
+    await expect(page.locator('#targetColumn option', { hasText: 'price' })).toHaveCount(1);
+    await goToStage(page, 'step-split');
+    await expect(advice).toBeHidden();
+  });
+
+  test('B2. the methods summary records what was done, and only steps that applied', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await ready(page);
+    await enterProjectMode(page);
+    await trainOn(page, smallPipe(), 'pressure_drop_kpa');
+    await page.click('#trainBtn');
+    await expect(page.locator('#metricsTable tbody tr').first()).toBeVisible({ timeout: 60000 });
+    await goToStage(page, 'step-diagnostics');
+    const summary = page.locator('#methodsSummaryText');
+    await expect(summary).toHaveValue(/random seed 42/);
+    const text = await summary.inputValue();
+    expect(text).toContain('72 training, 24 validation and 24 test rows');
+    expect(text).toContain('predict pressure_drop_kpa from 5 input variables');
+    expect(text).toContain('numeric inputs were standardised');
+    // No categorical inputs and no missing values in this data: nothing claimed about either.
+    expect(text).not.toContain('one-hot');
+    expect(text).not.toContain('missing');
+    const rmse = await page.evaluate(() => window.LocalRegressionApp.state.artifact.evaluation.test.pointMetrics.rmse);
+    expect(text).toContain('RMSE = ' + Number(rmse.toPrecision(4)).toLocaleString('en'));
+    await page.click('#copyMethodsSummaryBtn');
+    await expect(page.locator('#copyMethodsStatus')).toHaveText('Copied.');
+    // With categorical inputs, the encoding is reported.
+    await fullWorkflow(page);
+    await goToStage(page, 'step-diagnostics');
+    await expect(summary).toHaveValue(/categorical inputs were one-hot encoded/);
+  });
+
+  test('B3. approval and governance tools appear only when operational use is chosen', async ({ page }) => {
+    await fullWorkflow(page);
+    await goToStage(page, 'step-diagnostics');
+    await expect(page.locator('#evalGovernance')).toBeHidden();
+    await expect(page.locator('#operationalUseGate')).toBeVisible();
+    await page.click('#enableOperationalUseBtn');
+    await expect(page.locator('#evalGovernance')).toBeVisible();
+    await expect(page.locator('#evalGovernance')).toHaveJSProperty('open', true);
+    await expect(page.locator('#operationalUseGate')).toBeHidden();
+  });
+
+  test('B4. the glossary opens from every mode and filters terms', async ({ page }) => {
+    await ready(page);
+    await page.locator('.top-nav [data-open-glossary]').click();
+    const dialog = page.locator('#glossaryDialog');
+    await expect(dialog).toBeVisible();
+    expect(await dialog.locator('.glossary-entry').count()).toBeGreaterThanOrEqual(25);
+    await page.fill('#glossarySearch', 'feature');
+    await expect(dialog.locator('.glossary-entry:visible dt')).toContainText(['Feature importance', 'Input variable']);
+    await page.fill('#glossarySearch', 'zzzz');
+    await expect(page.locator('#glossaryEmpty')).toBeVisible();
+    await dialog.locator('[data-close-glossary]').click();
+    await expect(dialog).toBeHidden();
+    await enterProjectMode(page);
+    await page.locator('#view-project [data-open-glossary]').click();
+    await expect(dialog).toBeVisible();
+  });
+});
+
 test.describe('Project mode — responsive layout and accessibility', () => {
   async function layout(page) {
     return page.evaluate(() => {
