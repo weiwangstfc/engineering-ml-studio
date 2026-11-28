@@ -1,5 +1,7 @@
 (function (global) {
   'use strict';
+  // Application version from js/build-config.js, the single source of truth (WORKPLAN F1).
+  const APP_VERSION = (global.LRS_BUILD_CONFIG && global.LRS_BUILD_CONFIG.applicationVersion) || 'unknown';
 
   const $ = id => document.getElementById(id);
   const state = {
@@ -33,7 +35,7 @@
       if (state.artifact) renderResults();
       if (state.predictionOutput.length) renderUnknownPredictionPlot();
     });
-    global.LocalRegressionApp = { version: '1.0.11', state, activateExperiment, renderComparisonWorkspace, renderDataQuality, evaluateCurrentValidation, analyseMonitoringData, evaluateRevalidationRules, saveRecoverySnapshot };
+    global.LocalRegressionApp = { version: APP_VERSION, state, activateExperiment, renderComparisonWorkspace, renderDataQuality, evaluateCurrentValidation, analyseMonitoringData, evaluateRevalidationRules, saveRecoverySnapshot };
   }
 
   function setupSystemDrawers() {
@@ -555,7 +557,7 @@
   function downloadValidationSummary() {
     if(!state.artifact)return alertUser('Train or load a fitted model first.','warning');
     const acceptance=evaluateCurrentValidation(false);
-    downloadJson({applicationVersion:'1.0.11',experimentId:state.artifact.experimentId,dataset:state.artifact.dataset,target:state.artifact.target,modelType:state.artifact.modelType,validation:state.artifact.validation,approval:state.artifact.approval,generatedAt:new Date().toISOString()},`${baseName()}-validation-summary.json`);
+    downloadJson({applicationVersion:APP_VERSION,experimentId:state.artifact.experimentId,dataset:state.artifact.dataset,target:state.artifact.target,modelType:state.artifact.modelType,validation:state.artifact.validation,approval:state.artifact.approval,generatedAt:new Date().toISOString()},`${baseName()}-validation-summary.json`);
     if(acceptance)alertUser('Validation summary downloaded.','success');
   }
 
@@ -572,12 +574,12 @@
     const report=global.LRSSecurity.runtimeIntegrity(global.__dependencyStatus,global.LRS_BUILD_CONFIG);
     state.runtimeManifest={
       artifactType:'local-regression-runtime-manifest',schemaVersion:1,generatedAt:new Date().toISOString(),
-      applicationVersion:'1.0.11',buildConfig:global.LRSPlatform.cloneJson(global.LRS_BUILD_CONFIG||{}),runtime:report,
+      applicationVersion:APP_VERSION,buildConfig:global.LRSPlatform.cloneJson(global.LRS_BUILD_CONFIG||{}),runtime:report,
       schemas:global.LRSPlatform.schemas,userAgent:navigator.userAgent,secureContext:Boolean(global.isSecureContext)
     };
     const statusClass=report.offlineClean?'good':report.networkPolicy==='strict-offline'?'bad':'warning';
     const libraryText=report.libraries.length?report.libraries.map(item=>`${item.name}: ${item.source}${item.version?` (${item.version})`:''}`).join(' · '):'No library status was reported.';
-    els.integritySummary.innerHTML=`<span class="integrity-status ${statusClass}">${report.offlineClean?'No remote library loaded':'Hybrid startup used'}</span><div class="integrity-line"><span>Edition</span><strong>${escapeHtml(report.edition)}</strong></div><div class="integrity-line"><span>Network policy</span><strong>${escapeHtml(report.networkPolicy)}</strong></div><div class="integrity-line"><span>Application</span><strong>v1.0.11 · ${escapeHtml((global.LRS_BUILD_CONFIG&&global.LRS_BUILD_CONFIG.buildId)||'governance-release')}</strong></div><div class="integrity-line"><span>Dependencies</span><strong>${escapeHtml(libraryText)}</strong></div>`;
+    els.integritySummary.innerHTML=`<span class="integrity-status ${statusClass}">${report.offlineClean?'No remote library loaded':'Hybrid startup used'}</span><div class="integrity-line"><span>Edition</span><strong>${escapeHtml(report.edition)}</strong></div><div class="integrity-line"><span>Network policy</span><strong>${escapeHtml(report.networkPolicy)}</strong></div><div class="integrity-line"><span>Application</span><strong>v${escapeHtml(APP_VERSION)} · ${escapeHtml((global.LRS_BUILD_CONFIG&&global.LRS_BUILD_CONFIG.buildId)||'governance-release')}</strong></div><div class="integrity-line"><span>Dependencies</span><strong>${escapeHtml(libraryText)}</strong></div>`;
   }
 
   function downloadRuntimeManifest(){
@@ -588,7 +590,7 @@
   function recoveryProjectSnapshot(){
     if(!state.artifact)return null;
     const artifacts=experimentArtifacts();
-    return {artifactType:'local-regression-project',schemaVersion:global.LRSPlatform.schemas.project,appVersion:'1.0.11',savedAt:new Date().toISOString(),notice:'Browser-local recovery snapshot. The original CSV is not included.',originalCsvIncluded:false,activeExperimentId:state.artifact.experimentId,preferredExperimentId:state.preferredExperimentId,approvalCandidateExperimentId:state.approvalCandidateExperimentId,experiments:state.experiments.length?state.experiments:[state.artifact.experimentRecord],artifacts:artifacts.length?artifacts:[state.artifact],artifact:state.artifact,monitoringRecords:artifacts.flatMap(item=>item.monitoring&&Array.isArray(item.monitoring.records)?item.monitoring.records:[])};
+    return {artifactType:'local-regression-project',schemaVersion:global.LRSPlatform.schemas.project,appVersion:APP_VERSION,savedAt:new Date().toISOString(),notice:'Browser-local recovery snapshot. The original CSV is not included.',originalCsvIncluded:false,activeExperimentId:state.artifact.experimentId,preferredExperimentId:state.preferredExperimentId,approvalCandidateExperimentId:state.approvalCandidateExperimentId,experiments:state.experiments.length?state.experiments:[state.artifact.experimentRecord],artifacts:artifacts.length?artifacts:[state.artifact],artifact:state.artifact,monitoringRecords:artifacts.flatMap(item=>item.monitoring&&Array.isArray(item.monitoring.records)?item.monitoring.records:[])};
   }
 
   function saveRecoverySnapshot(){
@@ -710,7 +712,7 @@
     if (!candidate) throw new Error('Train or load a model first.');
     const approval = global.LRSApproval.normalizeApproval(collectApprovalForm());
     return {
-      artifactType:'local-regression-approval-record', schemaVersion:1, applicationVersion:'1.0.11', generatedAt:new Date().toISOString(),
+      artifactType:'local-regression-approval-record', schemaVersion:1, applicationVersion:APP_VERSION, generatedAt:new Date().toISOString(),
       experimentId:candidate.experimentId, modelType:candidate.modelType, dataset:candidate.dataset,
       validation:candidate.validation && candidate.validation.acceptance ? candidate.validation.acceptance : null,
       approval, governance:candidate.governance || null
@@ -729,14 +731,14 @@
     const rows = (approval.history || []).map(item => ({
       recorded_at:item.recordedAt || '', from_status:item.fromStatus || '', to_status:item.status || '', role:item.role || item.reviewerRole || '', reviewer:item.reviewer || '', approver:item.approver || '', review_date:item.reviewDate || '', reason:item.reason || item.note || '', application_version:item.applicationVersion || ''
     }));
-    if (!rows.length) rows.push({ recorded_at:'', from_status:'', to_status:approval.status || 'draft', role:approval.reviewerRole || '', reviewer:approval.reviewer || '', approver:approval.approver || '', review_date:approval.reviewDate || '', reason:'No recorded approval-history entries yet.', application_version:'1.0.11' });
+    if (!rows.length) rows.push({ recorded_at:'', from_status:'', to_status:approval.status || 'draft', role:approval.reviewerRole || '', reviewer:approval.reviewer || '', approver:approval.approver || '', review_date:approval.reviewDate || '', reason:'No recorded approval-history entries yet.', application_version:APP_VERSION });
     downloadBlob(global.CSVEngine.unparse(global.LRSSecurity.protectCsvRows(rows)), `${baseName()}-approval-history.csv`, 'text/csv;charset=utf-8');
   }
 
   function downloadGovernanceReportJson(){
     const candidate = getApprovalCandidateArtifact();
     if(!candidate)return alertUser('Train or load a model first.','warning');
-    const report={artifactType:'local-regression-governance-report',schemaVersion:1,applicationVersion:'1.0.11',generatedAt:new Date().toISOString(),experimentId:candidate.experimentId,dataset:candidate.dataset,modelType:candidate.modelType,validation:candidate.validation,approval:collectApprovalForm(),monitoring:candidate.monitoring||null,governance:candidate.governance||null,runtimeManifest:state.runtimeManifest||null};
+    const report={artifactType:'local-regression-governance-report',schemaVersion:1,applicationVersion:APP_VERSION,generatedAt:new Date().toISOString(),experimentId:candidate.experimentId,dataset:candidate.dataset,modelType:candidate.modelType,validation:candidate.validation,approval:collectApprovalForm(),monitoring:candidate.monitoring||null,governance:candidate.governance||null,runtimeManifest:state.runtimeManifest||null};
     downloadJson(report,`${baseName()}-${shortIdentifier(candidate.experimentId)}-governance-report.json`);
   }
 
@@ -1333,7 +1335,7 @@
       const storedModelParameters = { ...finalParams };
       delete storedModelParameters._validationX; delete storedModelParameters._validationY;
       const artifact = {
-        artifactType:'local-regression-model', schemaVersion:global.LRSPlatform.schemas.model, appVersion:'1.0.11', createdAt:new Date().toISOString(),
+        artifactType:'local-regression-model', schemaVersion:global.LRSPlatform.schemas.model, appVersion:APP_VERSION, createdAt:new Date().toISOString(),
         originalCsvIncluded:false, dataset, target:state.target, targetTransform, selectedFeatures, preprocessor,
         modelType, modelCapabilities:global.LRSPlatform.getModelDefinition(modelType).capabilities,
         modelParameters:storedModelParameters, model,
@@ -2271,7 +2273,7 @@
   async function downloadProject() {
     if(!state.artifact)return;
     const artifacts=experimentArtifacts();
-    const project={artifactType:'local-regression-project',schemaVersion:global.LRSPlatform.schemas.project,appVersion:'1.0.11',savedAt:new Date().toISOString(),notice:'The original CSV is not included. Upload it again to retrain or restore raw-data views.',originalCsvIncluded:false,activeExperimentId:state.artifact.experimentId,preferredExperimentId:state.preferredExperimentId,approvalCandidateExperimentId:state.approvalCandidateExperimentId,experiments:state.experiments.length?state.experiments:[state.artifact.experimentRecord],artifacts:artifacts.length?artifacts:[state.artifact],artifact:state.artifact,monitoringRecords:artifacts.flatMap(item=>item.monitoring&&Array.isArray(item.monitoring.records)?item.monitoring.records:[]),governance:{lifecycleEvents:artifacts.flatMap(item=>item.approval&&Array.isArray(item.approval.history)?item.approval.history:[]),changeAssessments:state.modelChangeAssessment?[state.modelChangeAssessment]:[]}};
+    const project={artifactType:'local-regression-project',schemaVersion:global.LRSPlatform.schemas.project,appVersion:APP_VERSION,savedAt:new Date().toISOString(),notice:'The original CSV is not included. Upload it again to retrain or restore raw-data views.',originalCsvIncluded:false,activeExperimentId:state.artifact.experimentId,preferredExperimentId:state.preferredExperimentId,approvalCandidateExperimentId:state.approvalCandidateExperimentId,experiments:state.experiments.length?state.experiments:[state.artifact.experimentRecord],artifacts:artifacts.length?artifacts:[state.artifact],artifact:state.artifact,monitoringRecords:artifacts.flatMap(item=>item.monitoring&&Array.isArray(item.monitoring.records)?item.monitoring.records:[]),governance:{lifecycleEvents:artifacts.flatMap(item=>item.approval&&Array.isArray(item.approval.history)?item.approval.history:[]),changeAssessments:state.modelChangeAssessment?[state.modelChangeAssessment]:[]}};
     await saveJsonWithPicker(project,baseName()+'.mlproject','Regression project');
   }
   function downloadUnknownPredictions() {

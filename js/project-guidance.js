@@ -314,16 +314,15 @@
   }
 
   // --- Help opens at the part of the user guide for the current stage ---------------
-  // The guide still uses the older step numbering, so the link's title names both.
   var HELP_TARGETS = {
-    'step-upload': ['user-guide.html#step-1-start-and-load-data', 'Step 1 — Start and load data'],
-    'step-features': ['user-guide.html#step-2-select-features-and-transform-the-target', 'Step 2 — Select features and transform the target'],
-    'step-preprocess': ['user-guide.html#step-3-configure-preprocessing', 'Step 3 — Configure preprocessing'],
-    'step-model': ['user-guide.html#step-4-select-a-model-and-tune-hyperparameters', 'Step 4 — Select a model and tune hyperparameters'],
-    'step-split': ['user-guide.html#step-5-split-and-train', 'Step 5 — Split and train'],
-    'step-diagnostics': ['user-guide.html#step-6-review-validate-and-approve', 'Step 6 — Review, validate and approve'],
-    'step-predict': ['user-guide.html#step-7-predict-unknown-data', 'Step 7 — Predict unknown data'],
-    'step-monitor': ['approval-and-operation.html#package-review-and-retirement', 'Package review and retirement']
+    'step-upload': ['user-guide.html#stage-1-load-data', 'Stage 1 · Load data'],
+    'step-features': ['user-guide.html#stage-2-inputs-and-target', 'Stage 2 · Inputs and target'],
+    'step-preprocess': ['user-guide.html#stage-3-prepare-data', 'Stage 3 · Prepare data'],
+    'step-model': ['user-guide.html#stage-4-choose-models', 'Stage 4 · Choose models'],
+    'step-split': ['user-guide.html#stage-4-validation-and-train', 'Stage 4 · Configure validation and train'],
+    'step-diagnostics': ['user-guide.html#stage-5-evaluate-results', 'Stage 5 · Evaluate results'],
+    'step-predict': ['user-guide.html#stage-6-predict', 'Stage 6 · Predict and export'],
+    'step-monitor': ['user-guide.html#stage-6-monitor', 'Stage 6 · Monitor and revalidate']
   };
 
   function updateHelpLink() {

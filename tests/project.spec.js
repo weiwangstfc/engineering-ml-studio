@@ -156,7 +156,7 @@ test.describe('Project mode — application shell (top bar, rail, workspace)', (
     await expect(page.locator('#view-project .app-footer-scope'))
       .toContainText(/not a safety-critical/i);
     await expect(page.locator('#view-project .app-footer-credit'))
-      .toContainText('Built on the Local Regression Studio engine.');
+      .toContainText('Built on the Local Regression Studio engine');
   });
 
   // ---- Compact workflow navigator (six stages) ------------------------
@@ -759,10 +759,14 @@ test.describe('Project mode — step strips and validation help (step 5)', () =>
     await fullWorkflow(page);
     const help = page.locator('#topbarHelpLink');
     const cases = [
-      ['step-preprocess', 'user-guide.html', 'step-3-configure-preprocessing'],
-      ['step-split', 'user-guide.html', 'step-5-split-and-train'],
-      ['step-diagnostics', 'user-guide.html', 'step-6-review-validate-and-approve'],
-      ['step-monitor', 'approval-and-operation.html', 'package-review-and-retirement']
+      ['step-upload', 'user-guide.html', 'stage-1-load-data'],
+      ['step-features', 'user-guide.html', 'stage-2-inputs-and-target'],
+      ['step-preprocess', 'user-guide.html', 'stage-3-prepare-data'],
+      ['step-model', 'user-guide.html', 'stage-4-choose-models'],
+      ['step-split', 'user-guide.html', 'stage-4-validation-and-train'],
+      ['step-diagnostics', 'user-guide.html', 'stage-5-evaluate-results'],
+      ['step-predict', 'user-guide.html', 'stage-6-predict'],
+      ['step-monitor', 'user-guide.html', 'stage-6-monitor']
     ];
     for (const [panel, file, anchor] of cases) {
       await goToStage(page, panel);

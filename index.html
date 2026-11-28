@@ -11,9 +11,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
   <title>Engineering ML Studio — browser-only machine learning for engineers</title>
   <!-- Must run before anything paints, and before any other script. -->
-  <script src="./js/frame-guard.js?v=1.0.25"></script>
-  <link rel="stylesheet" href="./css/app.css?v=1.0.25">
-  <link rel="stylesheet" href="./css/explore.css?v=1.0.25">
+  <script src="./js/frame-guard.js?v=2026.11.0"></script>
+  <link rel="stylesheet" href="./css/app.css?v=2026.11.0">
+  <link rel="stylesheet" href="./css/explore.css?v=2026.11.0">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
@@ -29,6 +29,7 @@
       <li><a href="#about" data-mode="about" data-nav="about">About</a></li>
     </ul>
     <button class="nav-glossary" type="button" data-open-glossary>Glossary</button>
+    <a id="navHelpLink" class="nav-glossary" href="./docs/html/user-guide.html" target="_blank" rel="noopener" title="Opens the user guide">Help</a>
     <span id="modeIndicator" class="mode-indicator" aria-live="polite"></span>
   </nav>
   <!-- Shown only when a non-English language is active: the guided Engineering ML Studio
@@ -1324,7 +1325,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
       <a class="text-button" href="https://www.optibayeslab.com/contact" target="_blank" rel="noopener">Report issue / Feedback</a>
     </div>
     <p class="app-footer-scope fine-print">Your data stays in the browser · Suitable for learning, prototyping and small engineering studies · Not a safety-critical design or certification tool.</p>
-    <p class="app-footer-credit fine-print">Engineering ML Studio · v1.0.11 · Built on the Local Regression Studio engine.</p>
+    <p class="app-footer-credit fine-print">Engineering ML Studio · v<span data-app-version>2026.11.0</span> · Built on the Local Regression Studio engine (v<span data-engine-version>1.0.11</span>).</p>
   </footer>
   </div><!-- /#view-project -->
 
@@ -1406,10 +1407,10 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
     </dl>
     <p id="glossaryEmpty" class="fine-print" hidden>No term matches.</p>
   </dialog>
-  <script src="./js/build-config.js?v=1.0.25"></script>
-  <script src="./js/i18n.js?v=1.0.25"></script>
+  <script src="./js/build-config.js?v=2026.11.0"></script>
+  <script src="./js/i18n.js?v=2026.11.0"></script>
   <!-- Asset version: bump every ?v= on this page whenever any CSS or JS file changes.
        bootstrap.js passes its own ?v= on to every first-party script it loads. -->
-  <script src="./js/bootstrap.js?v=1.0.25"></script>
+  <script src="./js/bootstrap.js?v=2026.11.0"></script>
 </body>
 </html>

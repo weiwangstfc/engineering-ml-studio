@@ -138,3 +138,15 @@
     padding: 0 !important;
   }
 }
+
+/* Engineering ML Studio 2026.11.0: back-to-home button, version line and notes. */
+.doc-nav a.doc-back { font-weight: 700; background: #125f76; color: #fff; border-radius: 8px; padding: .35rem .7rem; text-decoration: none; }
+.doc-nav a.doc-back:hover, .doc-nav a.doc-back:focus { background: #0b4052; color: #fff; }
+.doc-back-bottom { margin-top: 2rem; }
+.doc-back-bottom a.doc-back { font-weight: 700; color: #125f76; }
+.guide-version { color: #555; margin-top: -.4rem; }
+.guide-note { padding: .6rem .8rem; border-left: 3px solid #125f76; background: #f3f8fa; }
+/* overflow:hidden on the card stopped the contents sidebar from staying in view (sticky
+   positioning needs no scroll container between it and the page); clip keeps the rounded
+   corners without creating one. Browsers without clip keep the earlier behaviour. */
+.doc-card.card { overflow: clip; }
