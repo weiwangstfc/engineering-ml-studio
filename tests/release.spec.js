@@ -41,6 +41,17 @@ test.describe('Release consistency', () => {
     }
   });
 
+  test('user guide numbering: main sections run 1, 2, 3… and appendix subsections carry no numbers', () => {
+    const html = read('docs/html/user-guide.html');
+    const text = tag => [...html.matchAll(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, 'g'))]
+      .map(m => m[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim());
+    const numbered = text('h2').map(h => /^(\d+)\. /.exec(h)).filter(Boolean).map(m => Number(m[1]));
+    expect(numbered).toEqual(numbered.map((_, i) => i + 1));
+    expect(numbered.length).toBeGreaterThan(5);
+    expect(text('h3').filter(h => /^\d+\.\s/.test(h))).toEqual([]);
+    expect(text('h2').filter(h => h.startsWith('Appendix'))).toHaveLength(3);
+  });
+
   test('help pages and links carry the version, so browsers never mix old and new help', () => {
     for (const page of HELP_PAGES) {
       expect(read(`docs/html/${page}.html`), page).toContain(`href="./help.css?v=${VERSION}"`);
