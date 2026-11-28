@@ -709,10 +709,11 @@ test.describe('Project mode — model choice guidance (step 3)', () => {
     await expect(page.locator('#modelSuggestionData')).toContainText('categorical');
     await expect(page.locator('#modelSuggestionList')).not.toContainText('Gaussian process');
 
-    // Above the Gaussian-process row limit: it is not suggested, and the limit is stated.
+    // Above exact GP's 2,000 training rows (4,000 rows at the default 60% split): it is not
+    // suggested, and the subset option is named instead of calling it unavailable.
     const header = 'a,b,c,y';
     const lines = [header];
-    for (let i = 0; i < 2500; i++) lines.push([i % 7, (i * 13) % 11, (i * 7) % 5, i % 17].join(','));
+    for (let i = 0; i < 4000; i++) lines.push([i % 7, (i * 13) % 11, (i * 7) % 5, i % 17].join(','));
     await page.setInputFiles('#csvFile', { name: 'big.csv', mimeType: 'text/csv', buffer: Buffer.from(lines.join('\n')) });
     await expect(page.locator('#targetColumn option', { hasText: /^y$/ })).toHaveCount(1);
     await goToStage(page, 'step-features');
@@ -720,7 +721,8 @@ test.describe('Project mode — model choice guidance (step 3)', () => {
     await page.click('#autoFeaturesBtn');
     await goToStage(page, 'step-model');
     await expect(page.locator('#modelSuggestionList')).not.toContainText('Gaussian process');
-    await expect(page.locator('#modelSuggestionLimits')).toContainText('Gaussian process is not available for 2,500 rows');
+    await expect(page.locator('#modelSuggestionLimits')).toContainText('About 2,400 training rows');
+    await expect(page.locator('#modelSuggestionLimits')).toContainText('representative-subset option');
   });
 
   test('M3. "train several models at once" opens the existing baseline comparison tool', async ({ page }) => {
