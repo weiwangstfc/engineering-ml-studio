@@ -291,13 +291,10 @@
 </head>
 <body>
 <div class="page docs-shell"><nav class="doc-nav"><a class="doc-back" href="../../index.html#home">← Back to Engineering ML Studio (Home)</a><a href="./user-guide.html?v=2026.11.0">User guide</a><a href="./step-4-model-options.html?v=2026.11.0">Model options</a><a href="./validation-and-applicability.html?v=2026.11.0">Validation and applicability</a><a href="./approval-and-operation.html?v=2026.11.0">Approval and operation</a><a href="./security-and-privacy.html?v=2026.11.0">Security and privacy</a></nav><p class="fine">Engineering ML Studio <span data-doc-version>2026.11.0</span> · bundled guide, works offline and on static hosting.</p><div class="card doc-card">
-<header id="title-block-header"><h1 class="title">Engineering ML Studio User Guide</h1><p class="guide-banner-meta">Version <span data-doc-version>2026.11.0</span> · <a class="doc-back doc-back-banner" href="../../index.html#home">← Back to Engineering ML Studio (Home)</a></p></header><div class="doc-layout"><aside aria-label="Document contents" class="doc-sidebar"><nav id="TOC" role="doc-toc"><ul><li><a href="#about">1. What Engineering ML Studio is for</a><ul><li><a href="#right-tool">Is it right for my problem?</a></li></ul></li><li><a href="#getting-started">2. Getting started</a><ul><li><a href="#online-offline">Online and offline use</a></li><li><a href="#classroom">Classroom setting</a></li><li><a href="#language">Language</a></li></ul></li><li><a href="#explore">3. Explore: learn with guided examples</a><ul><li><a href="#explore-stages">The four stages</a></li><li><a href="#explore-lessons">The six lessons</a></li></ul></li><li><a href="#learn">4. Learn: Python notebooks, your own data, and beyond</a></li><li><a href="#project">5. Project: model your own data</a><ul><li><a href="#stage-1-load-data">Stage 1 · Load data</a></li><li><a href="#stage-2-inputs-and-target">Stage 2 · Inputs and target</a></li><li><a href="#stage-3-prepare-data">Stage 3 · Prepare data</a></li><li><a href="#stage-4-choose-models">Stage 4 · Choose models</a></li><li><a href="#stage-4-validation-and-train">Stage 4 · Configure validation and train</a></li><li><a href="#stage-5-evaluate-results">Stage 5 · Evaluate results</a></li><li><a href="#stage-6-predict">Stage 6 · Predict and export</a></li><li><a href="#stage-6-monitor">Stage 6 · Monitor and revalidate</a></li></ul></li><li><a href="#saving">6. Saving and reopening work</a></li><li><a href="#governance">7. Operational use: approval and governance</a></li><li><a href="#privacy-policy">8. Privacy policy</a><ul><li><a href="#data-processed-locally">Data processed locally</a></li><li><a href="#data-not-automatically-stored">Data not automatically stored</a></li><li><a href="#network-requests">Network requests</a></li><li><a href="#no-analytics-or-remote-logging">No analytics or remote logging</a></li><li><a href="#hosting-logs">Hosting logs</a></li><li><a href="#user-controlled-downloads">User-controlled downloads</a></li></ul></li><li><a href="#limitations">9. Limitations</a></li><li><a href="#troubleshooting">10. Troubleshooting</a><ul><li><a href="#file-check-findings">The file check reports a problem</a></li><li><a href="#training-is-slow">Training takes a long time</a></li><li><a href="#the-app-does-not-start">The app does not start</a></li><li><a href="#gp-covariance-factorisation-fails">GP covariance factorisation fails</a></li><li><a href="#gp-training-is-too-slow">GP training is too slow</a></li><li><a href="#ann-loss-does-not-improve">ANN loss does not improve</a></li><li><a href="#ann-loss-becomes-non-finite">ANN loss becomes non-finite</a></li><li><a href="#ann-overfits">ANN overfits</a></li><li><a href="#prediction-csv-is-rejected">Prediction CSV is rejected</a></li><li><a href="#save-as-is-unavailable">Save As is unavailable</a></li></ul></li><li><a href="#appendix-model-settings">Appendix A · Model settings in detail</a><ul><li><a href="#polynomial-response-surface">Polynomial response surface</a></li><li><a href="#core-model-settings">8. Core model settings</a></li><li><a href="#gaussian-process-regression">9. Gaussian-process regression</a></li><li><a href="#artificial-neural-network-regression">10. Artificial neural-network regression</a></li></ul></li><li><a href="#appendix-history">Appendix B · Release history</a><ul><li><a href="#release-2026-11-0">Engineering ML Studio 2026.11.0</a></li><li><a href="#engine-history">Inherited Local Regression Studio engine (up to v1.0.11)</a></li></ul></li></ul></nav></aside><main class="doc-main" id="main-content"><h1 id="engineering-ml-studio-user-guide">Engineering ML Studio User Guide</h1>
+<header id="title-block-header"><h1 class="title">Engineering ML Studio User Guide</h1><p class="guide-banner-meta">Version <span data-doc-version>2026.11.0</span> · <a class="doc-back doc-back-banner" href="../../index.html#home">← Back to Engineering ML Studio (Home)</a></p></header><div class="doc-layout"><aside aria-label="Document contents" class="doc-sidebar"><nav id="TOC" role="doc-toc"><ul><li><a href="#about">1. What Engineering ML Studio is for</a><ul><li><a href="#right-tool">Is it right for my problem?</a></li></ul></li><li><a href="#getting-started">2. Getting started</a><ul><li><a href="#online-offline">Online and offline use</a></li><li><a href="#classroom">Classroom setting</a></li><li><a href="#language">Language</a></li></ul></li><li><a href="#explore">3. Explore: learn with guided examples</a><ul><li><a href="#explore-stages">The four stages</a></li><li><a href="#explore-lessons">The six lessons</a></li></ul></li><li><a href="#learn">4. Learn: Python notebooks, your own data, and beyond</a></li><li><a href="#project">5. Project: model your own data</a><ul><li><a href="#stage-1-load-data">Stage 1 · Load data</a></li><li><a href="#stage-2-inputs-and-target">Stage 2 · Inputs and target</a></li><li><a href="#stage-3-prepare-data">Stage 3 · Prepare data</a></li><li><a href="#stage-4-choose-models">Stage 4 · Choose models</a></li><li><a href="#stage-4-validation-and-train">Stage 4 · Configure validation and train</a></li><li><a href="#stage-5-evaluate-results">Stage 5 · Evaluate results</a></li><li><a href="#stage-6-predict">Stage 6 · Predict and export</a></li><li><a href="#stage-6-monitor">Stage 6 · Monitor and revalidate</a></li></ul></li><li><a href="#saving">6. Saving and reopening work</a></li><li><a href="#governance">7. Operational use: approval and governance</a></li><li><a href="#privacy-policy">8. Privacy policy</a><ul><li><a href="#data-processed-locally">Data processed locally</a></li><li><a href="#data-not-automatically-stored">Data not automatically stored</a></li><li><a href="#network-requests">Network requests</a></li><li><a href="#no-analytics-or-remote-logging">No analytics or remote logging</a></li><li><a href="#hosting-logs">Hosting logs</a></li><li><a href="#user-controlled-downloads">User-controlled downloads</a></li></ul></li><li><a href="#limitations">9. Limitations</a></li><li><a href="#troubleshooting">10. Troubleshooting</a><ul><li><a href="#file-check-findings">The file check reports a problem</a></li><li><a href="#training-is-slow">Training takes a long time</a></li><li><a href="#the-app-does-not-start">The app does not start</a></li><li><a href="#gp-covariance-factorisation-fails">GP covariance factorisation fails</a></li><li><a href="#gp-training-is-too-slow">GP training is too slow</a></li><li><a href="#ann-loss-does-not-improve">ANN loss does not improve</a></li><li><a href="#ann-loss-becomes-non-finite">ANN loss becomes non-finite</a></li><li><a href="#ann-overfits">ANN overfits</a></li><li><a href="#prediction-csv-is-rejected">Prediction CSV is rejected</a></li><li><a href="#save-as-is-unavailable">Save As is unavailable</a></li></ul></li><li><a href="#appendix-model-settings">Appendix A · Model settings in detail</a><ul><li><a href="#polynomial-response-surface">Polynomial response surface</a></li><li><a href="#core-model-settings">8. Core model settings</a></li><li><a href="#gaussian-process-regression">9. Gaussian-process regression</a></li><li><a href="#artificial-neural-network-regression">10. Artificial neural-network regression</a></li></ul></li><li><a href="#appendix-technical">Appendix B · Technical reference</a></li><li><a href="#appendix-versions">Appendix C · Versions</a></li></ul></nav></aside><main class="doc-main" id="main-content"><h1 id="engineering-ml-studio-user-guide">Engineering ML Studio User Guide</h1>
 <p class="guide-version"><strong>Version 2026.11.0</strong> · built on the Local Regression Studio engine (release 1.0.11) by Yu Duan, MIT licence</p>
 <p>Engineering ML Studio is a browser-based tool for learning and applying machine-learning <strong>regression</strong> — predicting one numeric
 quantity, such as a pressure drop or a strength, from measured conditions — to engineering data. All calculations run in your browser.</p>
-<p class="guide-note"><strong>Coming from older instructions?</strong> Guides written for the inherited Local Regression Studio use seven “steps”.
-Steps 1–3 are Project stages 1–3; Step 4 is stage 4 <em>Choose models</em>; Step 5 is stage 4 <em>Configure validation and train</em>; Step 6 is
-stage 5 <em>Evaluate results</em>; Step 7 is stage 6 <em>Predict and monitor</em>.</p>
 
 <h2 id="about">1. What Engineering ML Studio is for</h2>
 <p>It serves two purposes:</p>
@@ -615,7 +612,7 @@ validation result.</p><p>Example: with a 1% tolerance, a 250-row subset may be s
 <li>Rational-quadratic alpha</li>
 <li>Kernel optimisation iterations</li>
 </ul><p>The implementation uses a shared length scale across processed
-features in v1.0.11. Therefore, the GP feature-relevance chart is only a
+features. Therefore, the GP feature-relevance chart is only a
 shared-scale proxy rather than an ARD ranking.</p><h4 id="gp-uncertainty">GP uncertainty</h4><p>The GP produces a predictive mean and variance. Prediction intervals
 include the configured observation-noise term. Stage 5 (Evaluate results) reports empirical
 interval coverage, width, coverage error and interval score on each
@@ -663,43 +660,13 @@ variation.</p><p>This interval is approximate and does not guarantee nominal
 coverage.</p><h4 id="small-deep-ensemble-uncertainty">Small deep ensemble
 uncertainty</h4><p>Two to seven independently initialised networks are trained. Their
 prediction distribution is combined with residual variation.</p><p>Ensembles multiply training time, memory use and exported model
-size.</p><hr/><h2 id="appendix-history">Appendix B · Release history</h2><h3 id="release-2026-11-0">Engineering ML Studio 2026.11.0</h3><p>The first release under the project’s own version scheme (calendar versioning, <em>year.month.fix</em>). It adds Explore, Learn, the six-stage Project workspace with in-context guidance, real critical heat flux data, the polynomial response surface, the upload file check and the methods summary. Full notes: <code>CHANGELOG.md</code> in the repository.</p><h3 id="engine-history">Inherited Local Regression Studio engine (up to v1.0.11)</h3><p>The notes below record the engine’s own releases. They use the engine’s original “Step” numbering.</p><h4 id="a.-models-added-in-v1.0.11">7A. Models added in v1.0.11</h4><p>The expanded modelling release adds elastic net, Huber robust
-regression, gradient-boosted trees, k-nearest neighbours, and linear
-quantile regression. All participate in tuning, cross-validation,
-comparison, validation, approval, and prediction-only workflows.</p><p>Key cautions:</p><ul>
-<li>Standardise inputs for elastic net, robust regression, kNN, and
-quantile regression.</li>
-<li>kNN does not extrapolate and may create large model packages because
-it stores processed training rows.</li>
-<li>Gradient boosting can overfit as stages/depth increase; inspect
-validation history.</li>
-<li>Quantile bounds are fitted conditional quantiles, not guaranteed
-calibrated coverage.</li>
-<li>New-model uncertainty methods must be checked on the independent
-test set.</li>
-</ul><p>See <code>docs/EXPANDED_MODELLING_GUIDE.md</code> for parameter-level
-guidance.</p><h4 id="step-4-interface-behaviour">Step 4 interface behaviour</h4><p>The package includes a detailed model-options reference at:</p><pre class="text"><code>docs/STEP_4_MODEL_OPTIONS_GUIDE.md</code></pre><p>Step 4 now hides settings that do not affect the selected
-Gaussian-process configuration:</p><ul>
-<li>Rational-quadratic alpha appears only for the rational-quadratic
-kernel.</li>
-<li>Length scale is hidden for the linear kernel.</li>
-<li>Exact GP hides every subset control.</li>
-<li>Representative-subset GP shows fixed subset size and subset
-selection.</li>
-<li>Automatic subset optimisation shows the automatic size-range
-controls and subset selection.</li>
-</ul><p>ANN grid, ordinary-random and Latin-hypercube tuning include all
-three hidden-layer sizes. A third hidden layer is allowed only when the
-second hidden layer is present. Search summaries distinguish requested
-samples from unique valid configurations and show when a grid is
-capped.</p><hr/><h4 id="experiment-provenance-and-schema-migration-in-v1.0.11">Experiment
-provenance and schema migration in v1.0.11</h4><h5 id="dataset-fingerprint">Dataset fingerprint</h5><p>After a training CSV is loaded, the app calculates a SHA-256
+size.</p><hr/><h2 id="appendix-technical">Appendix B · Technical reference</h2><p>How experiments are recorded, compared and validated. For approval and operation, see also the <a href="./approval-and-operation.html?v=2026.11.0">approval and operation guide</a>.</p><h5 id="experiment-provenance-and-schema-migration-in-v1.0.11">Experiment records, provenance and saved-file migration</h5><h4 id="dataset-fingerprint">Dataset fingerprint</h4><p>After a training CSV is loaded, the app calculates a SHA-256
 fingerprint locally. Before hashing, a UTF-8 byte-order mark is removed
 and Windows or classic-Mac line endings are normalised to line-feed
 characters. This makes fingerprints stable when the CSV content is the
 same but line-ending conventions differ.</p><p>The fingerprint is an identifier, not encryption and not a
 replacement for keeping the original data. The original CSV is not
-placed in model, project or experiment files.</p><h5 id="experiment-record">Experiment record</h5><p>Every successful training run creates an experiment record
+placed in model, project or experiment files.</p><h4 id="experiment-record">Experiment record</h4><p>Every successful training run creates an experiment record
 containing:</p><ul>
 <li>Experiment ID and application version</li>
 <li>Dataset filename metadata, row and column counts, and
@@ -712,36 +679,36 @@ fingerprint</li>
 <li>Training, validation and test metrics</li>
 <li>Training-job start, finish, progress status and result summary</li>
 <li>Warnings and migration notes</li>
-</ul><p>Use <strong>Download experiment record</strong> in Step 6 to save
-this information as a <code>.mlexperiment.json</code> file.</p><h5 id="project-and-model-schema-version-10">Project and model schema
-version 10</h5><p>v1.0.11 writes model and project schema version 10, experiment schema
+</ul><p>Use <strong>Download experiment record</strong> in Stage 5 (Evaluate results) to save
+this information as a <code>.mlexperiment.json</code> file.</p><h4 id="project-and-model-schema-version-10">Project and model schema
+version 10</h4><p>writes model and project schema version 10, experiment schema
 version 6, and approved prediction-package schema version 2. Files from
 earlier releases are migrated in memory when loaded. The migration does
 not modify the original file on disk. Saving the migrated artifact
-creates a new v1.0.11 file.</p><p>A migrated artifact from an earlier release may not contain a dataset
+creates a new file in the current format.</p><p>A migrated artifact from an earlier release may not contain a dataset
 fingerprint or exact split membership because those values were not
 recorded by the earlier release. The app marks the generated experiment
-record as migrated and includes a warning.</p><h5 id="experiment-collections">Experiment collections</h5><p>A v1.0.11 project contains multiple fitted experiments, an active
+record as migrated and includes a warning.</p><h4 id="experiment-collections">Experiment collections</h4><p>A project contains multiple fitted experiments, an active
 experiment ID, an optional preferred experiment ID, validation records
-and approval records. Step 6 provides the multi-model comparison
-workspace while diagnostics operate on the active experiment.</p><h5 id="managed-jobs-and-cancellation">Managed jobs and
-cancellation</h5><p>Training now has an internal job record. The record tracks progress,
+and approval records. Stage 5 (Evaluate results) provides the multi-model comparison
+workspace while diagnostics operate on the active experiment.</p><h4 id="managed-jobs-and-cancellation">Managed jobs and
+cancellation</h4><p>Training now has an internal job record. The record tracks progress,
 status, start and finish times, cancellation requests and errors. The
 existing Cancel button requests cancellation through this job system
-while retaining the existing model-level cancellation checks.</p><h5 id="web-worker-foundation">Web Worker foundation</h5><p>The package includes a local Web Worker protocol. v1.0.11 uses it for
+while retaining the existing model-level cancellation checks.</p><h4 id="web-worker-foundation">Web Worker foundation</h4><p>The package includes a local Web Worker protocol. uses it for
 dataset fingerprinting when the browser permits workers. If the
 application is opened in a browser context that blocks workers,
-fingerprinting safely falls back to the main browser thread.</p><p>Model training remains on the main application thread in v1.0.11.
+fingerprinting safely falls back to the main browser thread.</p><p>Model training remains on the main application thread.
 Moving complete training and tuning workflows into workers is planned
 for a later release and requires careful transfer, progress and
-cancellation handling.</p><h4 id="model-comparison-workspace">Model comparison workspace</h4><h5 id="training-a-comparison-set">Training a comparison set</h5><p>In Step 5, select the model families to include and choose
+cancellation handling.</p><h5 id="model-comparison-workspace">Model comparison workspace</h5><h4 id="training-a-comparison-set">Training a comparison set</h4><p>In Stage 4 (Configure validation and train), select the model families to include and choose
 <strong>Train selected baseline models</strong>. The app fits them
 sequentially using the same split, preprocessing, target transformation
 and uncertainty level. Linear, ridge, tree and forest are selected
 initially. GP and ANN are optional because they can be slower.</p><p>The comparison batch uses documented baseline hyperparameters. For a
-tuned candidate, configure the model in Step 4 and use <strong>Train and
+tuned candidate, configure the model in Stage 4 (Choose models) and use <strong>Train and
 evaluate</strong>; the resulting experiment is added to the same
-workspace.</p><h5 id="reading-the-leaderboard">Reading the leaderboard</h5><p>The Step 6 comparison workspace shows validation RMSE, independent
+workspace.</p><h4 id="reading-the-leaderboard">Reading the leaderboard</h4><p>The Stage 5 (Evaluate results) comparison workspace shows validation RMSE, independent
 test metrics, uncertainty metrics and training time. Use validation
 performance to compare or select candidates. Use test metrics for the
 final independent assessment rather than repeatedly tuning against the
@@ -750,36 +717,35 @@ differs from the active model in one or more of: dataset fingerprint,
 target, features, preprocessing, target transformation, exact split
 membership or requested interval level. Such experiments remain
 available but are hidden when <strong>Comparable only</strong> is
-selected.</p><h5 id="active-and-preferred-models">Active and preferred models</h5><ul>
+selected.</p><h4 id="active-and-preferred-models">Active and preferred models</h4><ul>
 <li><strong>Open</strong> makes an experiment active and refreshes
-diagnostics and Step 7 prediction.</li>
+diagnostics and Stage 6 (Predict and monitor) prediction.</li>
 <li><strong>Prefer</strong> records the user’s preferred candidate and
 moves it to the top of the leaderboard. It is not a formal approval
 mechanism.</li>
 <li><strong>Remove</strong> deletes an experiment from the current
 in-memory project.</li>
-</ul><h5 id="saving-comparison-projects">Saving comparison projects</h5><p>A v1.0.11 project stores every fitted artifact, the active experiment,
+</ul><h4 id="saving-comparison-projects">Saving comparison projects</h4><p>A project stores every fitted artifact, the active experiment,
 the preferred experiment, experiment records and diagnostic outputs. The
 original CSV remains excluded. Multi-model projects can be larger than
-earlier project files.</p><h4 id="validation-workflow">Validation workflow</h4><h5 id="data-quality-assistant">Data-quality assistant</h5><p>The assistant updates when the target or feature selection changes.
+earlier project files.</p><h5 id="validation-workflow">Validation workflow</h5><h4 id="data-quality-assistant">Data-quality assistant</h4><p>The assistant updates when the target or feature selection changes.
 It checks common risks including exact duplicate rows, missing target or
 feature values, constant and near-constant columns, selected
 identifier-like columns, high-cardinality categories and very strong
 numeric relationships that may indicate target leakage.</p><p>Findings are classified as critical, warning or information. These
 automated checks do not determine whether data are scientifically
-representative or whether a relationship is causal.</p><h5 id="acceptance-criteria">Acceptance criteria</h5><p>Step 6 allows optional limits for test RMSE, test R², interval
+representative or whether a relationship is causal.</p><h4 id="acceptance-criteria">Acceptance criteria</h4><p>Stage 5 (Evaluate results) allows optional limits for test RMSE, test R², interval
 coverage and worst-group test RMSE. It can also require no critical
 data-quality finding. Blank numeric limits are not evaluated.</p><p>The result is Passed, Failed or Not evaluated. A passed result means
 only that the configured measurable criteria passed. It is not
-regulatory approval or certification.</p><h5 id="group-validation">Group validation</h5><p>Choose a source, regime or other available column to calculate count,
+regulatory approval or certification.</p><h4 id="group-validation">Group validation</h4><p>Choose a source, regime or other available column to calculate count,
 RMSE, MAE, R², bias and interval coverage for each test-set group. Very
-small groups can produce unstable metrics.</p><h5 id="prediction-applicability">Prediction applicability</h5><p>For uploaded prediction data, the app checks numeric values against
+small groups can produce unstable metrics.</p><h4 id="prediction-applicability">Prediction applicability</h4><p>For uploaded prediction data, the app checks numeric values against
 fitted training ranges, identifies values near range boundaries, reports
 missing values handled by preprocessing and detects categorical levels
 not present during training. Row-level status and explanations are
 included in the prediction CSV.</p><p>These checks do not detect every type of distribution shift and do
-not guarantee that a prediction is reliable.</p><h4 id="v0.4.0-approval-and-operational-workflow">v0.4.0 approval and
-operational workflow</h4><h5 id="approval-workspace">Approval workspace</h5><p>After validation, Step 6 provides an approval workspace for the
+not guarantee that a prediction is reliable.</p><h5 id="v0.4.0-approval-and-operational-workflow">Approval and operational workflow</h5><h4 id="approval-workspace">Approval workspace</h4><p>After validation, Stage 5 (Evaluate results) provides an approval workspace for the
 active experiment. Record the model name, owner, reviewer, intended use,
 prohibited uses, known limitations, conditions, decision date and next
 review date. Approval history is stored with the fitted artifact,
@@ -787,20 +753,20 @@ experiment record and project.</p><p>Statuses are Draft, Approved, Approved with
 Retired. Full approval requires the configured acceptance criteria to
 pass. Conditional approval requires written conditions. Approval is a
 human decision recorded by the app; it is not automatic
-certification.</p><h5 id="operational-input-schema">Operational input schema</h5><p>The app builds an input schema from the fitted training preprocessor.
+certification.</p><h4 id="operational-input-schema">Operational input schema</h4><p>The app builds an input schema from the fitted training preprocessor.
 Numeric training ranges and categorical levels are retained. Optional
 units and descriptions can be added for operators. These values are
 documentation and applicability evidence; they do not prove that
-uploaded values use the stated unit or are fully in-distribution.</p><h5 id="validation-and-approval-report">Validation and approval
-report</h5><p>Choose <strong>Download validation report (HTML)</strong> to create a
+uploaded values use the stated unit or are fully in-distribution.</p><h4 id="validation-and-approval-report">Validation and approval
+report</h4><p>Choose <strong>Download validation report (HTML)</strong> to create a
 local report containing model identity, dataset fingerprint,
 intended/prohibited uses, test metrics, acceptance outcomes, input
 schema, limitations and decision history. Open the report in a browser
-and print or save it as PDF when required.</p><h5 id="approved-prediction-package">Approved prediction package</h5><p>An approved <code>.mlpredict.json</code> package contains the fitted
+and print or save it as PDF when required.</p><h4 id="approved-prediction-package">Approved prediction package</h4><p>An approved <code>.mlpredict.json</code> package contains the fitted
 model and preprocessing, approval record, evaluation summary, input
 schema, embedded test vectors and SHA-256 integrity metadata. The
 original CSV is excluded. The package is available only when the
-approval record is operational and the review date has not passed.</p><h5 id="prediction-only-mode">Prediction-only mode</h5><p>Prediction-only mode hides model-development controls. It requires an
+approval record is operational and the review date has not passed.</p><h4 id="prediction-only-mode">Prediction-only mode</h4><p>Prediction-only mode hides model-development controls. It requires an
 approved package and verifies:</p><ul>
 <li>Package type and schema</li>
 <li>SHA-256 integrity</li>
@@ -808,33 +774,20 @@ approved package and verifies:</p><ul>
 <li>Review-date validity</li>
 <li>Embedded self-test predictions</li>
 <li>Required input columns and numeric types</li>
-</ul><p>After verification, upload a compatible CSV in Step 7. Prediction
+</ul><p>After verification, upload a compatible CSV in Stage 6 (Predict and monitor). Prediction
 downloads include package ID, approval status, review date, integrity
-status and applicability findings.</p><h5 id="security-and-governance-limitations">Security and governance
-limitations</h5><p>SHA-256 detects changes but is not a digital signature. It does not
+status and applicability findings.</p><h4 id="security-and-governance-limitations">Security and governance
+limitations</h4><p>SHA-256 detects changes but is not a digital signature. It does not
 authenticate the reviewer or enforce organizational access control.
 Store approved packages and reports in controlled systems when
-auditability or regulated authorization is required.</p><hr/><h5 id="v1.0-deployment-and-governance">v1.0 deployment and
-governance</h5><p>v1.0 preserves the documented modelling behaviour and adds separate
+auditability or regulated authorization is required.</p><hr/><h4 id="v1.0-deployment-and-governance">v1.0 deployment and
+governance</h4><p>v1.0 preserves the documented modelling behaviour and adds separate
 deployment editions, versioned governance lifecycle records, monitoring
 and revalidation, model-change assessments, local recovery, stricter
 import/export validation, and optional verification of organizational
 signatures against deployment-pinned public keys. See the package-root
 <code>DEPLOYMENT_GUIDE.md</code>, <code>GOVERNANCE_GUIDE.md</code>,
 <code>MONITORING_GUIDE.md</code>, <code>SECURITY.md</code>, and
-<code>MIGRATION_GUIDE.md</code>.</p><h4 id="v1.0.11-comparison-and-approval-usability-notes">v1.0.11
-comparison and approval usability notes</h4><p>The Train a comparison set panel now states explicitly that a quick
-baseline comparison uses one frozen target, feature selection,
-preprocessing setup, target transformation, exact train/validation/test
-membership, random seed and interval level. A preset table and
-<code>?</code> help buttons explain the baseline settings used for each
-model.</p><p>The Model comparison workspace now includes a chart-scope selector.
-Comparable-only charts remain the recommended final-selection view.
-All-experiment charts are available for overview and mark
-different-setup models with a warning symbol. Use the Why different?
-button to display the descriptor fields that differ from the active
-experiment.</p><p>The Approval and operational release section now provides separate
-approval record JSON and approval history CSV downloads. The full
-approval bundle remains planned for a later release.</p><p class="doc-back-bottom"><a class="doc-back" href="../../index.html#home">← Back to Engineering ML Studio (Home)</a></p></main></div></div></div>
+<code>MIGRATION_GUIDE.md</code>.</p><h2 id="appendix-versions">Appendix C · Versions</h2><p>Engineering ML Studio uses calendar versioning, <em>year.month.fix</em>. This guide is for version <span data-doc-version>2026.11.0</span>, the first release. Release notes: <code>CHANGELOG.md</code> in the repository.</p><p class="doc-back-bottom"><a class="doc-back" href="../../index.html#home">← Back to Engineering ML Studio (Home)</a></p></main></div></div></div>
 </body>
 </html>

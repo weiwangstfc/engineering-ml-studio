@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="pandoc" name="generator"/>
 <meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
-<title>Step 4 Model Options Guide</title>
+<title>Model Options Guide</title>
 <style>
     html {
       color: #1a1a1a;
@@ -228,15 +228,15 @@
 <body>
 <div class="page docs-shell"><nav class="doc-nav"><a class="doc-back" href="../../index.html#home">← Back to Engineering ML Studio (Home)</a><a href="./user-guide.html?v=2026.11.0">User guide</a><a href="./step-4-model-options.html?v=2026.11.0">Model options</a><a href="./validation-and-applicability.html?v=2026.11.0">Validation and applicability</a><a href="./approval-and-operation.html?v=2026.11.0">Approval and operation</a><a href="./security-and-privacy.html?v=2026.11.0">Security and privacy</a></nav><p class="fine">Engineering ML Studio <span data-doc-version>2026.11.0</span> · bundled guide, works offline and on static hosting. Built on the Local Regression Studio engine v1.0.11 by Yu Duan (MIT licence).</p><div class="card doc-card">
 <header id="title-block-header">
-<h1 class="title">Step 4 Model Options Guide</h1>
+<h1 class="title">Model Options Guide</h1>
 </header>
 <div class="doc-layout"><aside aria-label="Document contents" class="doc-sidebar"><nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#step-4-model-options-guide" id="toc-step-4-model-options-guide">Step 4 Model Options Guide</a>
+<li><a href="#step-4-model-options-guide" id="toc-step-4-model-options-guide">Model Options Guide</a>
 <ul>
 <li><a href="#contents" id="toc-contents">Contents</a></li>
 </ul></li>
-<li><a href="#how-step-4-fits-into-the-workflow" id="toc-how-step-4-fits-into-the-workflow">1. How Step 4 fits into the
+<li><a href="#how-step-4-fits-into-the-workflow" id="toc-how-step-4-fits-into-the-workflow">1. How Stage 4 (Choose models) fits into the
 workflow</a></li>
 <li><a href="#choosing-a-model" id="toc-choosing-a-model">2. Choosing a
 model</a>
@@ -261,7 +261,7 @@ spacing</a></li>
 regression</a>
 <ul>
 <li><a href="#what-it-does" id="toc-what-it-does">What it does</a></li>
-<li><a href="#step-4-options" id="toc-step-4-options">Step 4
+<li><a href="#step-4-options" id="toc-step-4-options">Stage 4 (Choose models)
 options</a></li>
 <li><a href="#when-to-use-it" id="toc-when-to-use-it">When to use
 it</a></li>
@@ -535,12 +535,12 @@ warning</a></li>
 governance</a></li>
 </ul></li>
 </ul>
-</nav></aside><main class="doc-main" id="main-content"><p class="guide-note"><strong>Note:</strong> this reference uses the engine’s original numbering: “Step 4” is Project stage 4 <em>Choose models</em>, and “Step 5” is stage 4 <em>Configure validation and train</em>. See the <a href="./user-guide.html?v=2026.11.0#stage-4-choose-models">user guide</a> for the current layout.</p><h1 id="step-4-model-options-guide">Step 4 Model Options Guide</h1><p><strong>Application:</strong> Engineering ML Studio<br/>
+</nav></aside><main class="doc-main" id="main-content"><h1 id="step-4-model-options-guide">Model Options Guide</h1><p><strong>Application:</strong> Engineering ML Studio<br/>
 <strong>Version:</strong> 1.0.11<br/>
 <strong>Purpose:</strong> Explain the model choices and hyperparameters
-shown in <strong>Step 4: Select a model and tune
+shown in <strong>Stage 4 (Choose models): Select a model and tune
 hyperparameters</strong>.</p><hr/><h2 id="contents">Contents</h2><ol type="1">
-<li><a href="#1-how-step-4-fits-into-the-workflow">How Step 4 fits into
+<li><a href="#1-how-step-4-fits-into-the-workflow">How Stage 4 (Choose models) fits into
 the workflow</a></li>
 <li><a href="#2-choosing-a-model">Choosing a model</a></li>
 <li><a href="#3-tuning-methods">Tuning methods</a></li>
@@ -558,9 +558,9 @@ neural-network regression</a></li>
 <li><a href="#11-performance-and-safety-limits">Performance and safety
 limits</a></li>
 <li><a href="#12-glossary">Glossary</a></li>
-</ol><hr/><h1 id="how-step-4-fits-into-the-workflow">1. How Step 4 fits into the
-workflow</h1><p>Step 4 selects the model and its hyperparameters. The model is
-trained later in Step 5.</p><p>The app uses the three datasets as follows:</p><table>
+</ol><hr/><h1 id="how-step-4-fits-into-the-workflow">1. How Stage 4 (Choose models) fits into the
+workflow</h1><p>Stage 4 (Choose models) selects the model and its hyperparameters. The model is
+trained later in Stage 4 (Configure validation and train).</p><p>The app uses the three datasets as follows:</p><table>
 <thead>
 <tr class="header">
 <th>Dataset</th>
@@ -584,7 +584,7 @@ trained later in Step 5.</p><p>The app uses the three datasets as follows:</p><t
 </table><p>The <strong>test dataset is not used to select
 hyperparameters</strong>.</p><p>Preprocessing is fitted using the training data only. The same fitted
 preprocessing is then applied to validation, test, and prediction
-data.</p><p>Target transformation is selected in Step 2. Model settings in Step 4
+data.</p><p>Target transformation is selected in Stage 2 (Inputs and target). Model settings in Stage 4 (Choose models)
 operate on the target scale used during model fitting. Results and
 prediction intervals are converted back to the original target scale
 where supported.</p><hr/><h1 id="choosing-a-model">2. Choosing a model</h1><h2 id="quick-comparison">Quick comparison</h2><table>
@@ -758,7 +758,7 @@ processed input features:</p><pre class="text"><code>prediction =
 intercept
 + coefficient 1 × feature 1
 + coefficient 2 × feature 2
-+ ...</code></pre><p>One-hot encoded categorical columns can also be included.</p><h2 id="step-4-options">Step 4 options</h2><p>Linear regression has no model-specific hyperparameters in this
++ ...</code></pre><p>One-hot encoded categorical columns can also be included.</p><h2 id="step-4-options">Options in Stage 4</h2><p>Linear regression has no model-specific hyperparameters in this
 version.</p><h2 id="when-to-use-it">When to use it</h2><p>Use linear regression when:</p><ul>
 <li>A roughly linear relationship is plausible.</li>
 <li>Interpretability matters.</li>
@@ -1516,7 +1516,7 @@ you intentionally want full-batch behaviour.</li>
 <li>Smaller devices may require smaller batches.</li>
 <li>Large batches do not necessarily improve validation
 performance.</li>
-</ul><hr/><h2 id="maximum-epochs">Maximum epochs</h2><p><strong>Interface label:</strong> <code>Maximum epochs</code></p><p>An epoch is one full pass through the training dataset.</p><p>Default:</p><pre class="text"><code>150</code></pre><p>This is an upper limit. Early stopping can end training sooner.</p><p>The Step 6 training-history plot shows:</p><ul>
+</ul><hr/><h2 id="maximum-epochs">Maximum epochs</h2><p><strong>Interface label:</strong> <code>Maximum epochs</code></p><p>An epoch is one full pass through the training dataset.</p><p>Default:</p><pre class="text"><code>150</code></pre><p>This is an upper limit. Early stopping can end training sooner.</p><p>The Stage 5 (Evaluate results) training-history plot shows:</p><ul>
 <li>Training loss versus epoch</li>
 <li>Validation loss versus epoch</li>
 <li>Best validation epoch</li>
@@ -1897,10 +1897,10 @@ depend on:</p><ul>
 <li>Sources and regimes represented in each split</li>
 </ul><p>Use the defaults as starting points, not guaranteed recommendations.
 Final choices should be supported by validation performance and
-confirmed using the untouched test dataset.</p><h1 id="v0.3.0-comparison-set-note">v0.3.0 comparison-set note</h1><p>The Step 5 comparison batch uses fixed manual baseline values for
-each selected model. It does not copy the currently visible Step 4
+confirmed using the untouched test dataset.</p><h1 id="v0.3.0-comparison-set-note">v0.3.0 comparison-set note</h1><p>The Stage 4 (Configure validation and train) comparison batch uses fixed manual baseline values for
+each selected model. It does not copy the currently visible Stage 4 (Choose models)
 hyperparameters to every model family. To include a custom or tuned
-candidate, configure that model in Step 4 and select <strong>Train and
+candidate, configure that model in Stage 4 (Choose models) and select <strong>Train and
 evaluate</strong>. The result is saved in the same comparison workspace
 and is marked comparable when its data and evaluation setup matches.</p><hr/><h2 id="v1.0-deployment-and-governance">v1.0 deployment and
 governance</h2><p>v1.0 preserves the documented modelling behaviour and adds separate
