@@ -295,3 +295,27 @@ variable, units in the column names, a sample identifier, a categorical column (
 blank to show how missing data should look. The values are **placeholders**, not measurements; replace them with your
 own data. See "Preparing your own data" in the app's Learn page.
 
+## Critical heat flux (CHF) — real measured data (new — Explore lesson 6 and Project mode)
+
+- **Files:** `chf_sample.csv` (2,500 rows, Explore lesson 6), `chf_full.csv` (24,579 rows, all variables),
+  and three out-of-domain sources: `chf_ood_kim2000.csv` (482 rows), `chf_ood_lee1966.csv` (257 rows),
+  `chf_ood_peterlongo1966.csv` (342 rows).
+- **Status:** **real experimental data** — the first non-synthetic dataset in this project. Water flowing upwards
+  through uniformly heated round tubes, compiled from 60 published experimental sources.
+- **Source:** U.S. Nuclear Regulatory Commission (NRC) CHF database, the experimental basis of the 2006 CHF look-up
+  table (Groeneveld et al., 2006), as distributed with the AI4NTH Summer School.
+- **Licence:** CC0-1.0 (public-domain dedication), per the summer-school metadata. Public release here confirmed by
+  Wei Wang on 2026-11-28.
+- **Columns:** `tube_diameter_m`, `heated_length_m`, `pressure_kpa`, `mass_flux_kg_m2_s`, `outlet_quality`,
+  `inlet_subcooling_kj_kg` and `inlet_temperature_c` (full and out-of-domain files only), `chf_kw_m2` (target),
+  `source` (the publication each row comes from). Values are unchanged from the source; only names were converted
+  to the project convention.
+- **Use one of** outlet quality, inlet subcooling or inlet temperature as an input, not several: they are
+  thermodynamically linked. The sample keeps outlet quality only.
+- **Teaching uses:** scatter between laboratories (try a source-grouped split in Project stage 4), interaction effects
+  (the effect of mass flux depends on quality), and extrapolation — load an out-of-domain file in Project stage 6 and
+  read the applicability check.
+- **Not for design or safety analysis.** A model trained here is not a validated CHF correlation.
+- **Reproducible:** `python3 scripts/prepare_chf_datasets.py --source <summer-school datasets folder>` writes all five
+  files; the sample is a seed-42 random draw from the full file. Tests: [`../tests/test_chf_dataset.py`](../tests/test_chf_dataset.py).
+

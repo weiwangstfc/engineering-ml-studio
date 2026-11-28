@@ -58,14 +58,19 @@ test.describe('File check after upload (WORKPLAN C1)', () => {
     expect(await page.evaluate(() => window.MLCore.toNumber('4,9'))).toBe(49);
   });
 
-  test('clean files, including every bundled dataset, raise no problems', async ({ page }) => {
+  test('clean files, including every bundled dataset, raise no layout problems', async ({ page }) => {
     await openProject(page);
     const files = fs.readdirSync(path.join(ROOT, 'examples')).filter(f => f.endsWith('.csv'))
       .map(f => path.join(ROOT, 'examples', f)).concat([path.join(FIXTURES, 'blank_rows.csv')]);
     for (const file of files) {
       await page.setInputFiles('#csvFile', file);
-      await expect(page.locator('#fileCheck .file-check-ok'), path.basename(file)).toBeVisible();
-      await expect(page.locator('#fileCheck .file-check-item'), path.basename(file)).toHaveCount(0);
+      await expect(page.locator('#fileCheck'), path.basename(file)).toBeVisible();
+      // No layout problem in any bundled file. Size notes (info) are allowed: the full
+      // 24,579-row CHF dataset rightly gets the Gaussian-process subset note.
+      await expect(page.locator('#fileCheck .file-check-item:not([data-severity="info"])'), path.basename(file)).toHaveCount(0);
+      if (path.basename(file) === 'chf_full.csv') {
+        await expect(page.locator('#fileCheck .file-check-item[data-severity="info"]', { hasText: 'subset option' })).toBeVisible();
+      }
     }
   });
 

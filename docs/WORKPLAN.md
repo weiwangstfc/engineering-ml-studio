@@ -313,19 +313,13 @@ A single engineer, roughly one quarter. Adjust once A1 reveals the real pace.
 
 ### Still open
 
-1. **A1/A3** — synthetic only, or is there real, clearance-checked experimental data available? Real
-   data would be a significant differentiator and a significant IP conversation.
-2. **D3a input — confirm the target dataset size.** A proposal is now on the table (**10,000 rows ×
-   30 columns**, ceiling 50,000 × 100) with the reasoning under Workstream D. It is inferred from
-   the code's own limits and the bundled datasets, not from knowing who attends the courses — so it
-   needs a yes, or a replacement, **before week 5**. If real course data will be much larger than
-   this, say so early: it changes D3 from a responsiveness task into a scale task, which is a
-   different and considerably larger piece of work.
 3. **Sequencing** — accept ~14 weeks, or defer B3 and D4 to land at 13? See the note under §7.
-4. **F1** — version scheme, and whether to cut a `v1.0.0` of Engineering ML Studio proper.
 
 ### Decided
 
+- **2026-11-28 — Real data: CHF.** The AI4NTH Summer School critical heat flux data (NRC CHF database; CC0-1.0) are cleared for public release in this repository: `examples/chf_*.csv`, prepared by `scripts/prepare_chf_datasets.py`, and Explore lesson 6.
+- **2026-11-28 — F1 version scheme: calendar versioning `YYYY.MM.PATCH`.** The first Engineering ML Studio release is named for the month it ships (e.g. `2026.12.0`); fixes in the same month increment the last number. Saved-file schema versions stay independent.
+- **2026-11-28 — Target dataset size.** Comfortable target 10,000 rows × up to 30 columns; supported maximum 25,000 rows (the full CHF dataset). Measured on the 10,424-row CHF data: most models 2–5 s per Train click; neural network 43 s; k-nearest neighbours 78 s with a 76 s freeze — the case for D3b.
 - **2026-11-28 — Parser: decimal commas.** Keep `MLCore.toNumber` unchanged (saved models and approved packages read inputs through it) and rely on the upload file check, which flags affected columns as “Fix before modelling” and shows what each value was read as. Revisit only with a versioned migration (F1).
 - **2026-11-28 — Sequencing.** The accessibility audit (D1, with D2) is done last, after the remaining feature work and the guide rewrite.
 - **2026-11-27 — Polynomial response surface added** (exception to guardrail 1, like D3). The twelfth model, `polynomial` (`js/response-surface-core.js`): degree 2 or 3, optional interactions, least-squares fit with exact analytical prediction intervals; no power terms for 0/1 columns, constant terms dropped, and a refusal below two training rows per term. The original eleven model IDs, the pipeline order and the schemas are unchanged; saved projects and packages keep working, and a polynomial model saves and reloads like any other.

@@ -335,9 +335,9 @@ test.describe('Engineering ML Studio — Phase 1 landing + problem-led Explore',
     // Open the clearly-secondary "use a different example" control and switch.
     await page.locator('.explore-other-examples summary').click();
     const examples = page.locator('#exploreExampleSwitch input[name="exploreExample"]');
-    await expect(examples).toHaveCount(5);
+    await expect(examples).toHaveCount(6);
     await expect(examples.first()).toBeChecked();     // pipe is the default
-    await examples.nth(4).check();                     // generic nonlinear
+    await page.locator('#exploreExampleSwitch input[value="nonlinear"]').check();   // generic nonlinear
     await expect(page.locator('#exploreProblem')).toContainText('mathematical');
     await expect(page.locator('#exploreProblem')).toContainText('harder, noisier prediction problem');
     await expect(page.locator('#exploreProblem')).toContainText('cleaner, physics-based engineering examples');
@@ -499,7 +499,7 @@ test.describe('Engineering ML Studio — Phase 1 landing + problem-led Explore',
     await expect(guide.nth(2)).toContainText('What to look for:');
 
     const labels = new Set();
-    for (const key of ['pipe', 'cooling', 'steel', 'orifice', 'nonlinear']) {
+    for (const key of ['pipe', 'cooling', 'steel', 'orifice', 'nonlinear', 'chf']) {
       await page.evaluate(k => window.EMSExplore.selectExample(k), key);
       const svg = page.locator('#exploreProblem svg.explore-schematic');
       await expect(svg, key).toBeVisible();
@@ -508,7 +508,7 @@ test.describe('Engineering ML Studio — Phase 1 landing + problem-led Explore',
       labels.add(label);
     }
     // Each example shows a different figure, not the pipe reused.
-    expect(labels.size).toBe(5);
+    expect(labels.size).toBe(6);
   });
 
   test('R1. the progress rail stays in view, its steps navigate, and stage 4 waits for training', async ({ page }) => {
@@ -612,10 +612,10 @@ test.describe('Engineering ML Studio — Phase 1 landing + problem-led Explore',
   test('L3. the examples form a learning path with a next lesson and the matching notebook', async ({ page }) => {
     await page.goto('/?localOnly=1#explore/steel');
     await appReady(page);
-    await expect(page.locator('#exploreProblem .explore-lesson')).toContainText('Lesson 2 of 5');
+    await expect(page.locator('#exploreProblem .explore-lesson')).toContainText('Lesson 2 of 6');
     await page.locator('.explore-other-examples summary').click();
     const order = await page.locator('#exploreExampleSwitch input[name="exploreExample"]').evaluateAll(els => els.map(e => e.value));
-    expect(order).toEqual(['pipe', 'steel', 'cooling', 'orifice', 'nonlinear']);
+    expect(order).toEqual(['pipe', 'steel', 'cooling', 'orifice', 'nonlinear', 'chf']);
     await expect(page.locator('#exploreExampleSwitch label').first()).toContainText('Lesson 1');
     // Stage 4: next lesson, and "Continue in Python" points at the steel notebook.
     await page.locator('#exploreSteps .explore-step[data-stage="3"]').click();
@@ -630,7 +630,7 @@ test.describe('Engineering ML Studio — Phase 1 landing + problem-led Explore',
     // Examples without a notebook say so instead of promising one.
     await page.evaluate(() => window.EMSExplore.selectExample('orifice'));
     await expect(page.locator('#exploreCodeCtaText')).toContainText('no notebook for this example yet');
-    await page.evaluate(() => window.EMSExplore.selectExample('nonlinear'));
+    await page.evaluate(() => window.EMSExplore.selectExample('chf'));
     await expect(page.locator('#exploreNextLesson')).toBeHidden();
   });
 
@@ -648,6 +648,26 @@ test.describe('Engineering ML Studio — Phase 1 landing + problem-led Explore',
     await expect(reflection).toBeVisible({ timeout: 60000 });
     await expect(reflection).toContainText('You expected Linear Regression');
     await expect(reflection).toContainText('the best on the test data was');
+  });
+
+  test('L5. the real-data lesson (CHF) trains, passes its trend checks and never calls itself synthetic', async ({ page }) => {
+    await page.goto('/?localOnly=1#explore/chf');
+    await appReady(page);
+    await expect(page.locator('#exploreHeading')).toHaveText('Predict critical heat flux in a heated tube');
+    await expect(page.locator('#exploreProblem .explore-lesson')).toContainText('Lesson 6 of 6');
+    await expect(page.locator('#exploreProblem')).toContainText('real experimental data');
+    await expect(page.locator('#explore-stage-1 [data-ex-copy="dataKind"]')).toContainText('real measurements');
+    await page.locator('#exploreSteps .explore-step[data-stage="2"]').click();
+    await page.locator('input[name="exploreApproach"][value="compare"]').check();
+    await page.locator('#exploreSteps .explore-step[data-stage="3"]').click();
+    await page.click('#exploreTrainBtn');
+    await expect(page.locator('#exploreComparison tbody tr')).toHaveCount(4, { timeout: 60000 });
+    const r2 = await page.evaluate(() => { const R = window.EMSExplore.state.results; return { linear: R.linear.testMetrics.r2, forest: R.forest.testMetrics.r2 }; });
+    expect(r2.forest).toBeGreaterThan(r2.linear + 0.1);
+    await page.click('#exploreToStage4');
+    await expect(page.locator('#exploreEngineering .explore-trend-list li')).toHaveCount(3);
+    await expect(page.locator('#exploreEngineering .explore-trend-list li.trend-warn')).toHaveCount(0);
+    await expect(page.locator('#explore-stage-4')).not.toContainText('synthetic');
   });
 
   test('E1. returning to Explore through the navigation keeps the selected example in the URL', async ({ page }) => {
