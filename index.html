@@ -11,9 +11,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
   <title>Engineering ML Studio — browser-only machine learning for engineers</title>
   <!-- Must run before anything paints, and before any other script. -->
-  <script src="./js/frame-guard.js?v=1.0.18"></script>
-  <link rel="stylesheet" href="./css/app.css?v=1.0.18">
-  <link rel="stylesheet" href="./css/explore.css?v=1.0.18">
+  <script src="./js/frame-guard.js?v=1.0.19"></script>
+  <link rel="stylesheet" href="./css/app.css?v=1.0.19">
+  <link rel="stylesheet" href="./css/explore.css?v=1.0.19">
 </head>
 <body>
   <noscript><div class="noscript">JavaScript is required to run this application.</div></noscript>
@@ -458,7 +458,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
       <button id="topbarSaveBtn" class="topbar-action" type="button">Save project</button>
       <button id="topbarOpenBtn" class="topbar-action" type="button">Open project</button>
       <button id="privacyInfoBtn" class="topbar-action" type="button">Privacy</button>
-      <a class="topbar-action" href="./docs/html/user-guide.html" target="_blank" rel="noopener">Help</a>
+      <a id="topbarHelpLink" class="topbar-action" href="./docs/html/user-guide.html" target="_blank" rel="noopener" title="Opens the user guide">Help</a>
       <details class="local-processing">
         <summary><span class="local-dot" aria-hidden="true"></span>Local processing</summary>
         <div class="local-processing-body">
@@ -621,7 +621,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
         </section>
         <section class="subpanel data-quality-workspace" aria-live="polite">
           <div class="panel-heading compact-heading">
-            <div><h3>Data-quality assistant <button id="dataQualityHelpBtn" class="help-button" type="button" aria-label="What does the data-quality assistant check?">?</button></h3><p class="fine-print">Automated checks update with the selected target and features. They identify common risks but do not replace scientific or domain review.</p></div>
+            <div><h3 class="step-heading"><span class="step-badge">3</span> Data-quality assistant <button id="dataQualityHelpBtn" class="help-button" type="button" aria-label="What does the data-quality assistant check?">?</button></h3><p class="fine-print">Automated checks update with the selected target and features. They identify common risks but do not replace scientific or domain review.</p></div>
           </div>
           <div id="dataQualitySummary" class="quality-summary">Load a CSV to run data-quality checks.</div>
           <div class="table-wrap quality-table-wrap"><table id="dataQualityTable"></table></div>
@@ -710,7 +710,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <p><strong>Look for:</strong> begin simple, then compare against a flexible model to see whether the extra complexity is justified.</p>
         </details>
         <aside id="modelSuggestion" class="model-suggestion hidden" aria-live="polite">
-          <h3>A starting point for your data</h3>
+          <h3 class="step-heading"><span class="step-badge">1</span> A starting point for your data</h3>
           <p id="modelSuggestionData" class="model-suggestion-data"></p>
           <ol id="modelSuggestionList" class="model-suggestion-list"></ol>
           <p id="modelSuggestionLimits" class="fine-print"></p>
@@ -718,7 +718,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
             <button id="openBaselineComparisonBtn" class="text-button" type="button">Train several models at once and compare them →</button></p>
         </aside>
         <div class="model-group">
-          <h3 class="model-group-title">Recommended starting models</h3>
+          <h3 class="model-group-title step-heading"><span class="step-badge">2</span> Choose a model: recommended starting models</h3>
           <div class="model-grid">
             <label class="model-card"><input type="radio" name="modelType" value="linear" checked><span><strong>Linear regression</strong><small>Fits one straight-line (weighted-sum) relationship. Fast, easy to explain, and the baseline every other model should beat.</small><small class="model-meta"><span class="model-family-chip">Straight-line</span> Fast, interpretable baseline with analytical prediction intervals.</small></span></label>
             <label class="model-card"><input type="radio" name="modelType" value="forest"><span><strong>Random forest</strong><small>Averages many decision trees. Captures curved relationships and interactions with little tuning; a strong general-purpose choice.</small><small class="model-meta"><span class="model-family-chip">Tree-based</span> Tree ensemble with approximate between-tree intervals.</small></span></label>
@@ -776,7 +776,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           </table></div>
         </details>
         <details class="subpanel advanced-settings">
-          <summary><span class="advanced-settings-title">Advanced model settings</span><span class="advanced-settings-hint">Tuning method and model-specific settings (including neural-network architecture and training settings)</span></summary>
+          <summary><span class="advanced-settings-title step-heading"><span class="step-badge">3</span> Advanced model settings <span class="step-optional">optional</span></span><span class="advanced-settings-hint">Tuning method and model-specific settings (including neural-network architecture and training settings)</span></summary>
           <div class="form-grid three">
             <label>Tuning method <span class="term-note">(model-setting search)</span>
               <select id="tuningMode"><option value="manual">Manual configuration</option><option value="grid">Grid search</option><option value="random">Ordinary random search</option><option value="lhs">Latin hypercube sampling</option></select>
@@ -799,6 +799,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <p><strong>Why it matters:</strong> the split decides what "accuracy" means. A split that leaks information between train and test overstates how well the model will really perform.</p>
           <p><strong>Look for:</strong> a split strategy that matches how your data is grouped or ordered, then press <em>Train and evaluate</em>.</p>
         </details>
+        <h3 class="step-heading"><span class="step-badge">1</span> Choose how to split the data</h3>
         <div class="form-grid three">
           <label>Split strategy
             <select id="splitStrategy"><option value="random">Naive random split</option><option value="source">Metadata/source-grouped split</option><option value="regime">Regime-aware split</option><option value="time">Time-based split for transient data</option></select>
@@ -809,7 +810,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
         </div>
         <div id="splitControls" class="subpanel"></div>
         <div class="subpanel">
-          <h3>Prediction uncertainty</h3>
+          <h3 class="step-heading"><span class="step-badge">2</span> Prediction uncertainty</h3>
           <div class="form-grid three">
             <label class="toggle-card"><input id="enableUncertainty" type="checkbox" checked><span><strong>Estimate prediction intervals</strong><small>The method depends on the selected model and is labelled in results.</small></span></label>
             <label>Requested interval coverage
@@ -868,7 +869,8 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
             <div id="comparisonQueue" class="comparison-queue hidden" aria-live="polite"></div>
           </div>
         </div>
-                <div class="warning-box">Training data fits preprocessing and the model. Validation data selects hyperparameters. Test data is used only for the final independent evaluation.</div>
+                <h3 class="step-heading"><span class="step-badge">3</span> Train and evaluate <span class="step-optional">preview the split first if you want to check it</span></h3>
+        <div class="warning-box">Training data fits preprocessing and the model. Validation data selects hyperparameters. Test data is used only for the final independent evaluation.</div>
         <div class="action-row">
           <button id="previewSplitBtn" class="button secondary" type="button">Preview split</button>
           <button id="trainBtn" class="button primary large" type="button">Train and evaluate</button>
@@ -1090,12 +1092,11 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <p><strong>Look for:</strong> the applicability summary — check how many prediction rows fall inside the valid input range before relying on the numbers.</p>
         </details>
         <div id="approvedPackageSummary" class="approved-package-summary">No approved prediction package is loaded. Full-workspace users may still predict with the active fitted model.</div>
+        <h3 class="step-heading"><span class="step-badge">1</span> Upload a CSV of new input conditions</h3>
         <div class="action-row wrap">
           <label class="file-button button primary">Upload prediction CSV<input id="predictionFile" type="file" accept=".csv,text/csv" hidden></label>
           <label>Plot predictions against input feature<select id="predictionFeature"></select></label>
           <label>Optional source/group column<select id="predictionSource"><option value="">No grouping</option></select></label>
-          <button id="downloadUnknownPredictionsBtn" class="button secondary" type="button" disabled>Download predicted values</button>
-          <label class="toggle-inline"><input id="includeFeaturesInPredictionExport" type="checkbox" checked> Include original input features in export</label>
         </div>
         <div class="subpanel">
           <h3>Optional measured-target comparison</h3>
@@ -1104,9 +1105,15 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
             <label>Measured target column<select id="predictionMeasuredTarget" disabled><option value="">Choose measured target…</option></select></label>
           </div>
         </div>
+        <h3 class="step-heading"><span class="step-badge">2</span> Check the predictions and how many rows are inside the training range</h3>
         <div id="predictionSummary" class="info-box">Train or load a fitted model, then upload a compatible CSV. A measured target column is optional.</div>
         <div id="predictionApplicabilitySummary" class="applicability-summary hidden" aria-live="polite"></div>
         <article class="chart-card prediction-chart-card"><div class="chart-title"><h3>Predictions against selected input feature</h3><button data-plot="unknownPrediction" class="text-button export-plot" type="button">PNG</button></div><div id="plotUnknownPrediction" class="plot"></div></article>
+        <h3 class="step-heading"><span class="step-badge">3</span> Download the predicted values</h3>
+        <div class="action-row wrap">
+          <button id="downloadUnknownPredictionsBtn" class="button secondary" type="button" disabled>Download predicted values</button>
+          <label class="toggle-inline"><input id="includeFeaturesInPredictionExport" type="checkbox" checked> Include original input features in export</label>
+        </div>
         <div class="stage-nav governance-only"><button class="button secondary stage-continue" type="button" data-target="step-monitor">Continue to monitoring and revalidation</button></div>
       </section>
 
@@ -1118,10 +1125,12 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <p><strong>Why it matters:</strong> real-world data drifts over time. A model that was accurate at approval can degrade, which is a condition requiring review.</p>
           <p><strong>Look for:</strong> a rising error trend, poor interval coverage, or specific groups drifting — any of these is a signal to revalidate the model.</p>
         </details>
+        <h3 class="step-heading"><span class="step-badge">1</span> Upload results measured in service, with their predictions</h3>
         <div class="action-row wrap">
           <label class="file-button button primary">Upload monitoring CSV<input id="monitoringFile" type="file" accept=".csv,text/csv" hidden></label>
           <button id="downloadMonitoringBtn" class="button secondary" type="button" disabled>Download monitoring record</button>
         </div>
+        <h3 class="step-heading"><span class="step-badge">2</span> Match the columns, then analyse</h3>
         <div id="monitoringMapping" class="form-grid three hidden">
           <label>Measured target column<select id="monitorMeasuredColumn"></select></label>
           <label>Predicted target column<select id="monitorPredictedColumn"></select></label>
@@ -1136,7 +1145,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
         <div id="monitoringSummary" class="monitoring-summary">Upload an operational-results CSV to calculate performance after deployment.</div>
         <div class="table-wrap"><table id="monitoringGroupTable"></table></div>
         <section class="subpanel">
-          <h3>Revalidation triggers</h3>
+          <h3 class="step-heading"><span class="step-badge">3</span> Revalidation triggers</h3>
           <div class="form-grid three">
             <label>Maximum monitoring RMSE<input id="monitorMaxRmse" type="number" step="any" placeholder="Not configured"></label>
             <label>Maximum absolute bias<input id="monitorMaxBias" type="number" step="any" placeholder="Not configured"></label>
@@ -1149,7 +1158,7 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
           <div class="table-wrap"><table id="revalidationTable"></table></div>
         </section>
         <section class="subpanel">
-          <h3>Model-change assessment</h3>
+          <h3>Model-change assessment <span class="step-optional">optional</span></h3>
           <p class="fine-print">Compare the active experiment with another saved experiment before replacement or reapproval.</p>
           <div class="action-row wrap"><label>Reference experiment<select id="changeReferenceExperiment"><option value="">Choose saved experiment…</option></select></label><button id="compareModelChangeBtn" class="button secondary" type="button" disabled>Compare models</button><button id="downloadModelChangeBtn" class="button secondary" type="button" disabled>Download assessment</button></div>
           <div id="modelChangeSummary" class="info-box">Save at least two experiments in the project to compare a proposed replacement.</div>
@@ -1219,10 +1228,10 @@ jupyter lab notebooks/pipe_pressure_drop.ipynb</code></pre>
     <p><strong>Severity:</strong> critical findings can invalidate fitting or interpretation; warnings need review; information items explain workflow state. These checks do not verify units, scientific plausibility, sampling representativeness, causal validity, or every form of target leakage.</p>
     <form method="dialog"><button class="button primary">Close</button></form>
   </dialog>
-  <script src="./js/build-config.js?v=1.0.18"></script>
-  <script src="./js/i18n.js?v=1.0.18"></script>
+  <script src="./js/build-config.js?v=1.0.19"></script>
+  <script src="./js/i18n.js?v=1.0.19"></script>
   <!-- Asset version: bump every ?v= on this page whenever any CSS or JS file changes.
        bootstrap.js passes its own ?v= on to every first-party script it loads. -->
-  <script src="./js/bootstrap.js?v=1.0.18"></script>
+  <script src="./js/bootstrap.js?v=1.0.19"></script>
 </body>
 </html>
