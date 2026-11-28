@@ -330,7 +330,10 @@
     if (!link) return;
     var active = document.querySelector('#view-project .panel.is-active-panel');
     var target = active && HELP_TARGETS[active.id];
-    link.href = './docs/html/' + (target ? target[0] : 'user-guide.html');
+    // The version query makes the browser fetch the guide for this release, never a cached older one.
+    var version = (global.LRS_BUILD_CONFIG && global.LRS_BUILD_CONFIG.applicationVersion) || '';
+    var parts = (target ? target[0] : 'user-guide.html').split('#');
+    link.href = './docs/html/' + parts[0] + (version ? '?v=' + encodeURIComponent(version) : '') + (parts[1] ? '#' + parts[1] : '');
     link.title = target ? 'Opens the user guide at “' + target[1] + '”' : 'Opens the user guide';
   }
 

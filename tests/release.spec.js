@@ -33,13 +33,22 @@ test.describe('Release consistency', () => {
     for (const page of HELP_PAGES) {
       expect(read(`docs/html/${page}.html`), page).toContain(`<span data-doc-version>${VERSION}</span>`);
     }
-    expect(read('docs/html/user-guide.html')).toContain(`<strong>Version ${VERSION}</strong>`);
   });
 
   test('every help page links back to the application Home', () => {
     for (const page of HELP_PAGES) {
       expect(read(`docs/html/${page}.html`), page).toContain('href="../../index.html#home"');
     }
+  });
+
+  test('help pages and links carry the version, so browsers never mix old and new help', () => {
+    for (const page of HELP_PAGES) {
+      expect(read(`docs/html/${page}.html`), page).toContain(`href="./help.css?v=${VERSION}"`);
+    }
+    const links = [...read('index.html').matchAll(/href="\.\/docs\/html\/[^"]+"/g)].map(m => m[0]);
+    expect(links.length).toBeGreaterThan(3);
+    for (const link of links) expect(link, link).toContain(`?v=${VERSION}`);
+    expect(read('docs/html/user-guide.html')).toContain(`Version <span data-doc-version>${VERSION}</span>`);
   });
 
   test('the app shows the version, and new saved files record it', async ({ page }) => {
@@ -65,7 +74,7 @@ test.describe('Release consistency', () => {
     const guide = await (await request.get('/docs/html/user-guide.html')).text();
     for (const [mode, anchor] of [['explore', 'explore'], ['learn', 'learn'], ['about', 'about']]) {
       await page.locator(`.top-nav [data-nav="${mode}"]`).click();
-      await expect(page.locator('#navHelpLink')).toHaveAttribute('href', `./docs/html/user-guide.html#${anchor}`);
+      await expect(page.locator('#navHelpLink')).toHaveAttribute('href', `./docs/html/user-guide.html?v=${VERSION}#${anchor}`);
       expect(guide, anchor).toContain(`id="${anchor}"`);
     }
   });

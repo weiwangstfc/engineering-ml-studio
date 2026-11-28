@@ -770,7 +770,7 @@ test.describe('Project mode — step strips and validation help (step 5)', () =>
     ];
     for (const [panel, file, anchor] of cases) {
       await goToStage(page, panel);
-      await expect(help).toHaveAttribute('href', `./docs/html/${file}#${anchor}`);
+      await expect(help).toHaveAttribute('href', new RegExp(`^\\./docs/html/${file.replace('.', '\\.')}\\?v=[^#]+#${anchor}$`));
       const doc = await (await request.get(`/docs/html/${file}`)).text();
       expect(doc, `${file} has #${anchor}`).toContain(`id="${anchor}"`);
     }

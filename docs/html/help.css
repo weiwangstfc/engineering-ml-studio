@@ -150,3 +150,5 @@
    positioning needs no scroll container between it and the page); clip keeps the rounded
    corners without creating one. Browsers without clip keep the earlier behaviour. */
 .doc-card.card { overflow: clip; }
+.guide-banner-meta { margin: .6rem 0 0 !important; color: #fff; font-size: 1.05rem; opacity: 1 !important; }
+.guide-banner-meta a.doc-back-banner { margin-left: .6rem; padding: .3rem .7rem; border-radius: 8px; background: #fff; color: #0b4052; font-weight: 700; text-decoration: none; }

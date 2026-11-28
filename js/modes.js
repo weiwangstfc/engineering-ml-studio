@@ -107,7 +107,8 @@
     var help = el('navHelpLink');
     if (help) {
       var anchors = { explore: '#explore', learn: '#learn', about: '#about', project: '#project' };
-      help.href = './docs/html/user-guide.html' + (anchors[mode] || '');
+      var version = (global.LRS_BUILD_CONFIG && global.LRS_BUILD_CONFIG.applicationVersion) || '';
+      help.href = './docs/html/user-guide.html' + (version ? '?v=' + encodeURIComponent(version) : '') + (anchors[mode] || '');
     }
 
     var previous = current;
